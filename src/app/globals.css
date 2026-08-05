@@ -1,20 +1,41 @@
 @import "tailwindcss";
 
+@theme inline {
+  --color-brand-50: #effaf5;
+  --color-brand-100: #d9f3e7;
+  --color-brand-200: #b6e6d2;
+  --color-brand-300: #85d3b6;
+  --color-brand-400: #4eb994;
+  --color-brand-500: #299d78;
+  --color-brand-600: #197e61;
+  --color-brand-700: #14664f;
+  --color-brand-800: #125141;
+  --color-brand-900: #0d4034;
+  --color-brand-950: #06251f;
+
+  --color-canvas: #f4f7f5;
+  --color-surface: #ffffff;
+  --color-ink: #17201c;
+  --color-muted: #66736c;
+  --color-line: #dfe7e2;
+
+  --shadow-soft:
+    0 1px 2px rgb(15 23 42 / 0.04),
+    0 12px 30px rgb(15 23 42 / 0.06);
+
+  --shadow-panel:
+    0 1px 3px rgb(15 23 42 / 0.05),
+    0 20px 45px rgb(15 23 42 / 0.07);
+}
+
 :root {
-  --background: #f5f7f6;
-  --foreground: #18211d;
+  color-scheme: light;
 
+  --background: #f4f7f5;
   --surface: #ffffff;
-  --surface-secondary: #eef3f0;
-
-  --border: #d7e0db;
-
-  --primary: #166a4b;
-  --primary-hover: #11593e;
-  --primary-foreground: #ffffff;
-
-  --muted-foreground: #617068;
-  --danger: #b42318;
+  --text-primary: #17201c;
+  --text-secondary: #66736c;
+  --border: #dfe7e2;
 }
 
 * {
@@ -22,16 +43,22 @@
 }
 
 html {
+  min-width: 320px;
   min-height: 100%;
   background: var(--background);
 }
 
 body {
-  min-height: 100%;
+  min-height: 100vh;
   margin: 0;
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-primary);
+  font-family:
+    var(--font-geist-sans),
+    Arial,
+    Helvetica,
+    sans-serif;
+  text-rendering: optimizeLegibility;
 }
 
 button,
@@ -41,19 +68,36 @@ select {
   font: inherit;
 }
 
-button {
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled),
+a {
   cursor: pointer;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+::selection {
+  background: #b6e6d2;
+  color: #06251f;
 }
 
-::selection {
-  background: color-mix(
-    in srgb,
-    var(--primary) 24%,
-    transparent
-  );
+.app-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #b8c8bf transparent;
+}
+
+.app-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.app-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #b8c8bf;
 }

@@ -1,0 +1,99 @@
+"use client";
+
+import { useActionState } from "react";
+
+import { loginAction } from "@/features/auth/actions/login";
+import { initialLoginActionState } from "@/features/auth/types/login-action-state";
+
+export function LoginForm() {
+  const [state, formAction, isPending] = useActionState(
+    loginAction,
+    initialLoginActionState,
+  );
+
+  return (
+    <form action={formAction} className="space-y-5">
+      <div>
+        <label
+          htmlFor="email"
+          className="mb-2 block text-sm font-semibold text-slate-700"
+        >
+          Email
+        </label>
+
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+          disabled={isPending}
+          placeholder="nama@pesantren.id"
+          aria-describedby="email-error"
+          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+        />
+
+        {state.fieldErrors.email?.map((errorMessage) => (
+          <p
+            key={errorMessage}
+            id="email-error"
+            className="mt-2 text-sm text-red-600"
+          >
+            {errorMessage}
+          </p>
+        ))}
+      </div>
+
+      <div>
+        <label
+          htmlFor="password"
+          className="mb-2 block text-sm font-semibold text-slate-700"
+        >
+          Password
+        </label>
+
+        <input
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          required
+          disabled={isPending}
+          placeholder="Masukkan password"
+          aria-describedby="password-error"
+          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+        />
+
+        {state.fieldErrors.password?.map((errorMessage) => (
+          <p
+            key={errorMessage}
+            id="password-error"
+            className="mt-2 text-sm text-red-600"
+          >
+            {errorMessage}
+          </p>
+        ))}
+      </div>
+
+      {state.status === "error" && (
+        <div
+          role="alert"
+          aria-live="polite"
+          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700"
+        >
+          {state.message}
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={isPending}
+        className="flex w-full items-center justify-center rounded-xl bg-emerald-700 px-5 py-3 font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-emerald-400"
+      >
+        {isPending
+          ? "Memverifikasi akun..."
+          : "Masuk ke E-Ma'had"}
+      </button>
+    </form>
+  );
+}
