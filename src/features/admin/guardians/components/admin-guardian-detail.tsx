@@ -1,48 +1,38 @@
 import Link from "next/link";
 
 import { deleteAdminGuardianStudentRelation } from "../actions/delete-admin-guardian-student-relation";
+import { setAdminGuardianAccountStatus } from "../actions/set-admin-guardian-account-status";
 import type { AdminGuardianDetailData } from "../schemas/admin-guardian-detail-schema";
 
+import { GuardianAccountStatusButton } from "./guardian-account-status-button";
 import { GuardianStudentRelationDeleteButton } from "./guardian-student-relation-delete-button";
 
 type AdminGuardianDetailProps = {
   data: AdminGuardianDetailData;
 };
 
-const relationshipLabels: Record<
-  string,
-  string
-> = {
+const relationshipLabels: Record<string, string> = {
   father: "Ayah",
   mother: "Ibu",
   guardian: "Wali",
   other: "Lainnya",
 };
 
-function formatDateTime(
-  value: string,
-): string {
-  return new Intl.DateTimeFormat(
-    "id-ID",
-    {
-      dateStyle: "long",
-      timeStyle: "short",
-      timeZone: "Asia/Jakarta",
-    },
-  ).format(new Date(value));
+function formatDateTime(value: string): string {
+  return new Intl.DateTimeFormat("id-ID", {
+    dateStyle: "long",
+    timeStyle: "short",
+    timeZone: "Asia/Jakarta",
+  }).format(new Date(value));
 }
 
-function getInitials(
-  fullName: string,
-): string {
+function getInitials(fullName: string): string {
   return fullName
     .trim()
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
-    .map((word) =>
-      word.charAt(0).toUpperCase(),
-    )
+    .map((word) => word.charAt(0).toUpperCase())
     .join("");
 }
 
@@ -52,6 +42,18 @@ export function AdminGuardianDetail({
   const guardian = data.guardian;
   const account = data.account;
   const summary = data.summary;
+
+  const canCreateAccount =
+    guardian.is_active &&
+    summary.children_count > 0;
+
+  const accountStatusAction = account.linked
+    ? setAdminGuardianAccountStatus.bind(
+        null,
+        guardian.id,
+        !account.active,
+      )
+    : null;
 
   return (
     <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
@@ -110,9 +112,7 @@ export function AdminGuardianDetail({
         <article className="rounded-3xl border border-line bg-white p-6 shadow-soft">
           <div className="flex items-start gap-4">
             <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-brand-100 text-base font-bold text-brand-700">
-              {getInitials(
-                guardian.full_name,
-              )}
+              {getInitials(guardian.full_name)}
             </div>
 
             <div className="min-w-0">
@@ -137,8 +137,7 @@ export function AdminGuardianDetail({
               <p className="mt-2 text-sm text-slate-500">
                 ID Wali{" "}
                 <strong className="text-slate-700">
-                  {guardian.legacy_guardian_id ??
-                    "-"}
+                  {guardian.legacy_guardian_id ?? "-"}
                 </strong>
               </p>
             </div>
@@ -151,19 +150,17 @@ export function AdminGuardianDetail({
               </dt>
 
               <dd className="mt-2 break-words text-sm font-semibold text-slate-700">
-                {guardian.phone ??
-                  "Belum tersedia"}
+                {guardian.phone ?? "Belum tersedia"}
               </dd>
             </div>
 
             <div className="rounded-2xl bg-slate-50 p-4">
               <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                Email data
+                Email kontak
               </dt>
 
               <dd className="mt-2 break-all text-sm font-semibold text-slate-700">
-                {guardian.email ??
-                  "Belum tersedia"}
+                {guardian.email ?? "Belum tersedia"}
               </dd>
             </div>
 
@@ -173,9 +170,7 @@ export function AdminGuardianDetail({
               </dt>
 
               <dd className="mt-2 text-sm font-semibold text-slate-700">
-                {formatDateTime(
-                  guardian.created_at,
-                )}
+                {formatDateTime(guardian.created_at)}
               </dd>
             </div>
 
@@ -185,9 +180,7 @@ export function AdminGuardianDetail({
               </dt>
 
               <dd className="mt-2 text-sm font-semibold text-slate-700">
-                {formatDateTime(
-                  guardian.updated_at,
-                )}
+                {formatDateTime(guardian.updated_at)}
               </dd>
             </div>
           </dl>
@@ -198,37 +191,97 @@ export function AdminGuardianDetail({
             Akun keluarga
           </p>
 
-          <div className="mt-4 flex flex-col gap-4 rounded-2xl bg-slate-50 p-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-lg font-bold text-ink">
-                {account.linked
-                  ? "Akun sudah terhubung"
-                  : "Belum memiliki akun login"}
-              </h2>
+          <div className="mt-4 rounded-2xl bg-slate-50 p-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <h2 className="text-lg font-bold text-ink">
+                  {account.linked
+                    ? "Akun sudah terhubung"
+                    : "Belum memiliki akun login"}
+                </h2>
 
-              <p className="mt-2 text-sm leading-6 text-muted">
+                {account.linked ? (
+                  <div className="mt-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                      ID Pengguna
+                    </p>
+
+                    <p className="mt-1 break-all text-base font-bold tracking-wide text-slate-700">
+                      {account.login_id ??
+                        "ID Pengguna belum tersedia"}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="mt-2 text-sm leading-6 text-muted">
+                    ID Pengguna akan dibuat
+                    otomatis berdasarkan ID
+                    santri.
+                  </p>
+                )}
+              </div>
+
+              <span
+                className={
+                  account.linked
+                    ? account.active
+                      ? "shrink-0 rounded-full bg-brand-100 px-3 py-1.5 text-xs font-semibold text-brand-700"
+                      : "shrink-0 rounded-full bg-red-100 px-3 py-1.5 text-xs font-semibold text-red-700"
+                    : "shrink-0 rounded-full bg-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600"
+                }
+              >
                 {account.linked
-                  ? account.login_email ??
-                    "Email login belum tersedia."
-                  : "Pembuatan akun login wali akan dilakukan pada tahap akun orang tua."}
-              </p>
+                  ? account.active
+                    ? "Akun aktif"
+                    : "Akun nonaktif"
+                  : "Belum terhubung"}
+              </span>
             </div>
 
-            <span
-              className={
-                account.linked
-                  ? account.active
-                    ? "shrink-0 rounded-full bg-brand-100 px-3 py-1.5 text-xs font-semibold text-brand-700"
-                    : "shrink-0 rounded-full bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-700"
-                  : "shrink-0 rounded-full bg-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600"
-              }
-            >
-              {account.linked
-                ? account.active
-                  ? "Akun aktif"
-                  : "Akun nonaktif"
-                : "Belum terhubung"}
-            </span>
+            {account.linked ? (
+              <div className="mt-5 flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:flex-wrap">
+                <Link
+                  href={`/admin/wali/${guardian.id}/akun/reset-password`}
+                  className="inline-flex min-h-10 items-center justify-center rounded-xl border border-line bg-white px-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+                >
+                  Reset password
+                </Link>
+
+                {!account.active &&
+                !guardian.is_active ? (
+                  <Link
+                    href={`/admin/wali/${guardian.id}/edit`}
+                    className="inline-flex min-h-10 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 px-4 text-sm font-semibold text-amber-700 transition hover:bg-amber-100"
+                  >
+                    Aktifkan data wali dahulu
+                  </Link>
+                ) : (
+                  accountStatusAction && (
+                    <GuardianAccountStatusButton
+                      action={accountStatusAction}
+                      targetIsActive={
+                        !account.active
+                      }
+                      guardianName={
+                        guardian.full_name
+                      }
+                    />
+                  )
+                )}
+              </div>
+            ) : canCreateAccount ? (
+              <Link
+                href={`/admin/wali/${guardian.id}/akun/buat`}
+                className="mt-5 inline-flex min-h-10 items-center justify-center rounded-xl bg-brand-700 px-4 text-sm font-semibold text-white transition hover:bg-brand-800"
+              >
+                Buat akun login
+              </Link>
+            ) : (
+              <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-700">
+                {!guardian.is_active
+                  ? "Aktifkan data wali terlebih dahulu."
+                  : "Hubungkan wali dengan minimal satu santri terlebih dahulu."}
+              </div>
+            )}
           </div>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
@@ -248,9 +301,7 @@ export function AdminGuardianDetail({
               </p>
 
               <p className="mt-2 text-2xl font-bold text-ink">
-                {
-                  summary.active_children_count
-                }
+                {summary.active_children_count}
               </p>
             </div>
 
@@ -260,9 +311,7 @@ export function AdminGuardianDetail({
               </p>
 
               <p className="mt-2 text-2xl font-bold text-ink">
-                {
-                  summary.primary_contact_count
-                }
+                {summary.primary_contact_count}
               </p>
             </div>
           </div>
@@ -383,9 +432,7 @@ export function AdminGuardianDetail({
 
                     <GuardianStudentRelationDeleteButton
                       action={deleteAction}
-                      studentName={
-                        child.full_name
-                      }
+                      studentName={child.full_name}
                     />
                   </div>
                 </article>

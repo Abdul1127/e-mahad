@@ -6,42 +6,69 @@ import { loginAction } from "@/features/auth/actions/login";
 import { initialLoginActionState } from "@/features/auth/types/login-action-state";
 
 export function LoginForm() {
-  const [state, formAction, isPending] = useActionState(
+  const [
+    state,
+    formAction,
+    isPending,
+  ] = useActionState(
     loginAction,
     initialLoginActionState,
   );
 
   return (
-    <form action={formAction} className="space-y-5">
+    <form
+      action={formAction}
+      className="space-y-5"
+    >
       <div>
         <label
-          htmlFor="email"
+          htmlFor="login_id"
           className="mb-2 block text-sm font-semibold text-slate-700"
         >
-          Email
+          ID Pengguna
         </label>
 
         <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
+          id="login_id"
+          name="login_id"
+          type="text"
+          autoComplete="username"
+          autoCapitalize="characters"
+          spellCheck={false}
           required
+          maxLength={64}
           disabled={isPending}
-          placeholder="nama@pesantren.id"
-          aria-describedby="email-error"
-          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+          placeholder="Contoh: ADM-001"
+          aria-describedby="login-id-help login-id-error"
+          aria-invalid={Boolean(
+            state.fieldErrors.login_id,
+          )}
+          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 font-medium uppercase tracking-wide text-slate-900 outline-none transition placeholder:normal-case placeholder:tracking-normal placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100"
         />
 
-        {state.fieldErrors.email?.map((errorMessage) => (
-          <p
-            key={errorMessage}
-            id="email-error"
-            className="mt-2 text-sm text-red-600"
-          >
-            {errorMessage}
-          </p>
-        ))}
+        <p
+          id="login-id-help"
+          className="mt-2 text-xs leading-5 text-slate-500"
+        >
+          Gunakan ID akun yang diberikan
+          oleh administrator.
+        </p>
+
+        <div
+          id="login-id-error"
+          className="mt-2 space-y-1"
+        >
+          {state.fieldErrors.login_id?.map(
+            (errorMessage) => (
+              <p
+                key={errorMessage}
+                className="text-sm text-red-600"
+              >
+                {errorMessage}
+              </p>
+            ),
+          )}
+        </div>
       </div>
 
       <div>
@@ -61,18 +88,27 @@ export function LoginForm() {
           disabled={isPending}
           placeholder="Masukkan password"
           aria-describedby="password-error"
+          aria-invalid={Boolean(
+            state.fieldErrors.password,
+          )}
           className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100"
         />
 
-        {state.fieldErrors.password?.map((errorMessage) => (
-          <p
-            key={errorMessage}
-            id="password-error"
-            className="mt-2 text-sm text-red-600"
-          >
-            {errorMessage}
-          </p>
-        ))}
+        <div
+          id="password-error"
+          className="mt-2 space-y-1"
+        >
+          {state.fieldErrors.password?.map(
+            (errorMessage) => (
+              <p
+                key={errorMessage}
+                className="text-sm text-red-600"
+              >
+                {errorMessage}
+              </p>
+            ),
+          )}
+        </div>
       </div>
 
       {state.status === "error" && (

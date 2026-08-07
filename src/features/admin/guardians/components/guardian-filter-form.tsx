@@ -36,9 +36,17 @@ export function GuardianFilterForm({
             name="q"
             type="search"
             defaultValue={query.search}
-            placeholder="Nama, ID wali, email, atau telepon"
+            placeholder="Nama, ID Pengguna, ID wali, email, atau telepon"
+            autoComplete="off"
+            spellCheck={false}
             className="min-h-11 w-full rounded-xl border border-line bg-white px-3.5 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
           />
+
+          <p className="mt-2 text-xs leading-5 text-slate-400">
+            Pencarian dapat menggunakan nama,
+            ID Pengguna, ID wali lama, email
+            kontak, atau nomor telepon.
+          </p>
         </div>
 
         <div>

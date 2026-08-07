@@ -20,6 +20,32 @@ function getInitials(
     .join("");
 }
 
+function getAccountStatusLabel(
+  guardian: AdminGuardianListItem,
+): string {
+  if (!guardian.account_linked) {
+    return "Belum terhubung";
+  }
+
+  return guardian.account_active
+    ? "Akun aktif"
+    : "Akun nonaktif";
+}
+
+function getAccountStatusClassName(
+  guardian: AdminGuardianListItem,
+): string {
+  if (!guardian.account_linked) {
+    return "mt-1.5 text-sm font-semibold text-slate-500";
+  }
+
+  if (guardian.account_active) {
+    return "mt-1.5 text-sm font-semibold text-brand-700";
+  }
+
+  return "mt-1.5 text-sm font-semibold text-amber-700";
+}
+
 export function GuardianMobileList({
   guardians,
 }: GuardianMobileListProps) {
@@ -76,7 +102,7 @@ export function GuardianMobileList({
 
             <div className="rounded-2xl bg-slate-50 p-3.5">
               <dt className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-                Email
+                Email kontak
               </dt>
 
               <dd className="mt-1.5 break-all text-sm font-semibold text-slate-700">
@@ -108,20 +134,31 @@ export function GuardianMobileList({
               </dt>
 
               <dd
-                className={
-                  guardian.account_linked
-                    ? guardian.account_active
-                      ? "mt-1.5 text-sm font-semibold text-brand-700"
-                      : "mt-1.5 text-sm font-semibold text-amber-700"
-                    : "mt-1.5 text-sm font-semibold text-slate-500"
-                }
+                className={getAccountStatusClassName(
+                  guardian,
+                )}
               >
-                {guardian.account_linked
-                  ? guardian.account_active
-                    ? "Akun aktif"
-                    : "Akun nonaktif"
-                  : "Belum terhubung"}
+                {getAccountStatusLabel(
+                  guardian,
+                )}
               </dd>
+
+              {guardian.account_linked ? (
+                <div className="mt-2 border-t border-slate-200 pt-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                    ID Pengguna
+                  </p>
+
+                  <p className="mt-1 break-all text-xs font-bold tracking-wide text-slate-700">
+                    {guardian.account_login_id ??
+                      "Belum tersedia"}
+                  </p>
+                </div>
+              ) : (
+                <p className="mt-2 text-xs leading-5 text-slate-400">
+                  Belum dibuatkan akun.
+                </p>
+              )}
             </div>
           </dl>
 

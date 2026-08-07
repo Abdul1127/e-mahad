@@ -31,17 +31,17 @@ const roleNavigation = {
       icon: "students",
       available: true,
     },
-    { 
-      label: "Pengurus dan Akun",
-      href: "/admin/pengurus",
+    {
+      label: "Staf Pesantren",
+      href: "/admin/staf",
       icon: "staff",
-      available: false,
+      available: true,
     },
     {
       label: "Kelompok dan Assignment",
       href: "/admin/kelompok",
       icon: "groups",
-      available: false,
+      available: true,
     },
   ],
 
@@ -212,7 +212,10 @@ const roleNavigation = {
       available: false,
     },
   ],
-} satisfies Record<RoleCode, RoleNavigationItem[]>;
+} satisfies Record<
+  RoleCode,
+  RoleNavigationItem[]
+>;
 
 export function getRoleNavigation(
   roleCode: RoleCode,
@@ -224,17 +227,30 @@ export function getCurrentNavigationItem(
   roleCode: RoleCode,
   pathname: string,
 ): RoleNavigationItem | null {
-  const availableItems = getRoleNavigation(roleCode)
-    .filter((item) => item.available)
-    .sort((firstItem, secondItem) => {
-      return secondItem.href.length - firstItem.href.length;
-    });
+  const availableItems =
+    getRoleNavigation(roleCode)
+      .filter(
+        (item) => item.available,
+      )
+      .sort(
+        (
+          firstItem,
+          secondItem,
+        ) => {
+          return (
+            secondItem.href.length -
+            firstItem.href.length
+          );
+        },
+      );
 
   return (
     availableItems.find((item) => {
       return (
         pathname === item.href ||
-        pathname.startsWith(`${item.href}/`)
+        pathname.startsWith(
+          `${item.href}/`,
+        )
       );
     }) ?? null
   );

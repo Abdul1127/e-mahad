@@ -4,8 +4,9 @@ import { LoginForm } from "@/features/auth/components/login-form";
 
 export const metadata: Metadata = {
   title: "Login",
+
   description:
-    "Masuk ke sistem informasi E-Ma'had.",
+    "Masuk ke sistem informasi E-Ma'had menggunakan ID Pengguna.",
 };
 
 export default function LoginPage() {
@@ -22,17 +23,19 @@ export default function LoginPage() {
           </h1>
 
           <p className="mt-6 max-w-xl text-lg leading-8 text-emerald-100">
-            Sistem terpusat untuk pengelolaan dan
-            pemantauan kegiatan asrama, pengasuhan,
-            tahfiz, dan keuangan santri.
+            Sistem terpusat untuk pengelolaan
+            dan pemantauan kegiatan asrama,
+            pengasuhan, tahfiz, dan keuangan
+            santri.
           </p>
         </div>
 
         <div className="rounded-2xl border border-emerald-700 bg-emerald-800/50 p-6">
           <p className="text-sm leading-7 text-emerald-100">
-            Setiap pengguna memperoleh dashboard dan
-            cakupan data berdasarkan role serta
-            assignment yang telah ditentukan.
+            Setiap pengguna memperoleh
+            dashboard dan cakupan data
+            berdasarkan role serta assignment
+            yang telah ditentukan.
           </p>
         </div>
       </section>
@@ -50,8 +53,9 @@ export default function LoginPage() {
               </h2>
 
               <p className="mt-3 leading-7 text-slate-600">
-                Gunakan email dan password yang telah
-                diberikan oleh administrator.
+                Gunakan ID Pengguna dan
+                password yang telah diberikan
+                oleh administrator.
               </p>
             </div>
 
@@ -59,8 +63,9 @@ export default function LoginPage() {
           </div>
 
           <p className="mt-6 text-center text-sm text-slate-500">
-            Hubungi administrator apabila akun tidak
-            dapat digunakan.
+            Hubungi administrator apabila ID
+            Pengguna atau password tidak dapat
+            digunakan.
           </p>
         </div>
       </section>

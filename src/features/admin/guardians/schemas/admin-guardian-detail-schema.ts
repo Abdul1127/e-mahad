@@ -23,6 +23,7 @@ const guardianChildSchema = z.object({
 
   class_id: z.string().uuid().nullable(),
   class_name: z.string().nullable(),
+
   grade_level: z
     .number()
     .int()
@@ -39,6 +40,7 @@ export const adminGuardianDetailSchema =
 
     guardian: z.object({
       id: z.string().uuid(),
+
       profile_id: z
         .string()
         .uuid()
@@ -67,6 +69,14 @@ export const adminGuardianDetailSchema =
         .uuid()
         .nullable(),
 
+      login_id: z
+        .string()
+        .nullable(),
+
+      /*
+       * Dipertahankan sementara sampai seluruh
+       * komponen UI selesai menggunakan login_id.
+       */
       login_email: z
         .string()
         .nullable(),

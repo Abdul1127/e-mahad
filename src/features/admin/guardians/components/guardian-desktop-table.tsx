@@ -20,13 +20,39 @@ function getInitials(
     .join("");
 }
 
+function getAccountStatusLabel(
+  guardian: AdminGuardianListItem,
+): string {
+  if (!guardian.account_linked) {
+    return "Belum terhubung";
+  }
+
+  return guardian.account_active
+    ? "Akun aktif"
+    : "Akun nonaktif";
+}
+
+function getAccountStatusClassName(
+  guardian: AdminGuardianListItem,
+): string {
+  if (!guardian.account_linked) {
+    return "inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500";
+  }
+
+  if (guardian.account_active) {
+    return "inline-flex rounded-full bg-brand-100 px-2.5 py-1 text-xs font-semibold text-brand-700";
+  }
+
+  return "inline-flex rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700";
+}
+
 export function GuardianDesktopTable({
   guardians,
 }: GuardianDesktopTableProps) {
   return (
     <div className="hidden overflow-hidden rounded-3xl border border-line bg-white shadow-soft lg:block">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[1100px] border-collapse">
+        <table className="w-full min-w-[1180px] border-collapse">
           <thead>
             <tr className="border-b border-line bg-slate-50/80 text-left">
               <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -42,7 +68,7 @@ export function GuardianDesktopTable({
               </th>
 
               <th className="px-4 py-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Status
+                Status data
               </th>
 
               <th className="px-4 py-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -84,14 +110,14 @@ export function GuardianDesktopTable({
                 </td>
 
                 <td className="px-4 py-4">
-                  <p className="text-sm font-medium text-slate-700">
+                  <p className="max-w-64 truncate text-sm font-medium text-slate-700">
                     {guardian.phone ??
                       "Telepon belum tersedia"}
                   </p>
 
                   <p className="mt-1 max-w-64 truncate text-xs text-slate-400">
                     {guardian.email ??
-                      "Email belum tersedia"}
+                      "Email kontak belum tersedia"}
                   </p>
                 </td>
 
@@ -134,20 +160,31 @@ export function GuardianDesktopTable({
 
                 <td className="px-4 py-4">
                   <span
-                    className={
-                      guardian.account_linked
-                        ? guardian.account_active
-                          ? "inline-flex rounded-full bg-brand-100 px-2.5 py-1 text-xs font-semibold text-brand-700"
-                          : "inline-flex rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700"
-                        : "inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500"
-                    }
+                    className={getAccountStatusClassName(
+                      guardian,
+                    )}
                   >
-                    {guardian.account_linked
-                      ? guardian.account_active
-                        ? "Akun aktif"
-                        : "Akun nonaktif"
-                      : "Belum terhubung"}
+                    {getAccountStatusLabel(
+                      guardian,
+                    )}
                   </span>
+
+                  {guardian.account_linked ? (
+                    <div className="mt-2">
+                      <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                        ID Pengguna
+                      </p>
+
+                      <p className="mt-1 max-w-56 break-all text-xs font-bold tracking-wide text-slate-700">
+                        {guardian.account_login_id ??
+                          "Belum tersedia"}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="mt-2 max-w-56 text-xs leading-5 text-slate-400">
+                      Dibuat melalui detail wali.
+                    </p>
+                  )}
                 </td>
 
                 <td className="px-5 py-4 text-right">
