@@ -116,13 +116,13 @@ const roleNavigation = {
       label: "Santri Ampuan",
       href: "/pengasuh/santri",
       icon: "students",
-      available: false,
+      available: true,
     },
     {
       label: "Jurnal Pengasuhan",
       href: "/pengasuh/jurnal",
       icon: "journal",
-      available: false,
+      available: true,
     },
     {
       label: "Riwayat Pengasuhan",

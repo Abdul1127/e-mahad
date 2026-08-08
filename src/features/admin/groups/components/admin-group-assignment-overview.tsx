@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import type {
   AdminCareGroup,
   AdminGroupAssignmentOverviewData,
@@ -5,12 +7,10 @@ import type {
 } from "../schemas/admin-group-assignment-overview-schema";
 
 type AdminGroupAssignmentOverviewProps = {
-  data:
-    AdminGroupAssignmentOverviewData;
+  data: AdminGroupAssignmentOverviewData;
 };
 
-const numberFormatter =
-  new Intl.NumberFormat("id-ID");
+const numberFormatter = new Intl.NumberFormat("id-ID");
 
 function getGenderLabel(
   gender: "male" | "female",
@@ -23,14 +23,9 @@ function getGenderLabel(
 function formatDate(
   value: string,
 ): string {
-  const date =
-    new Date(value);
+  const date = new Date(value);
 
-  if (
-    Number.isNaN(
-      date.getTime(),
-    )
-  ) {
+  if (Number.isNaN(date.getTime())) {
     return "-";
   }
 
@@ -110,8 +105,7 @@ function CareGroupCard({
           </p>
 
           <p className="mt-2 text-sm font-bold text-brand-700">
-            {group.caregiver_count >
-            0
+            {group.caregiver_count > 0
               ? "Assignment tersedia"
               : "Belum ada Pengasuh"}
           </p>
@@ -123,8 +117,7 @@ function CareGroupCard({
           Pengasuh aktif
         </p>
 
-        {group.caregivers.length >
-        0 ? (
+        {group.caregivers.length > 0 ? (
           <div className="mt-3 grid gap-3 md:grid-cols-2">
             {group.caregivers.map(
               (caregiver) => (
@@ -175,6 +168,13 @@ function CareGroupCard({
           </div>
         )}
       </div>
+
+      <Link
+        href={`/admin/kelompok/pengasuhan/${group.id}`}
+        className="mt-5 inline-flex min-h-10 w-full items-center justify-center rounded-xl border border-brand-200 bg-brand-50 px-4 text-sm font-semibold text-brand-700 transition hover:bg-brand-100"
+      >
+        Lihat Detail Kelompok
+      </Link>
     </article>
   );
 }
@@ -282,8 +282,7 @@ function TahfizGroupCard({
           </div>
         )}
 
-        {group.supervisors.length >
-          1 && (
+        {group.supervisors.length > 1 && (
           <div className="mt-3 space-y-2">
             {group.supervisors
               .filter(
@@ -313,6 +312,13 @@ function TahfizGroupCard({
           </div>
         )}
       </div>
+
+      <Link
+        href={`/admin/kelompok/tahfiz/${group.id}`}
+        className="mt-5 inline-flex min-h-10 w-full items-center justify-center rounded-xl border border-brand-200 bg-brand-50 px-4 text-sm font-semibold text-brand-700 transition hover:bg-brand-100"
+      >
+        Lihat Detail Kelompok
+      </Link>
     </article>
   );
 }
