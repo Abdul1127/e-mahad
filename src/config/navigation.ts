@@ -83,7 +83,7 @@ const roleNavigation = {
       label: "Jurnal Pengasuhan",
       href: "/kepala-mahad/pengasuhan",
       icon: "journal",
-      available: false,
+      available: true,
     },
     {
       label: "Perkembangan Tahfiz",
@@ -128,7 +128,7 @@ const roleNavigation = {
       label: "Riwayat Pengasuhan",
       href: "/pengasuh/riwayat",
       icon: "shield",
-      available: false,
+      available: true,
     },
   ],
 
@@ -149,7 +149,7 @@ const roleNavigation = {
       label: "Laporan Mingguan",
       href: "/pembina-tahfiz/laporan",
       icon: "tahfiz",
-      available: false,
+      available: true,
     },
     {
       label: "Klinik Tahsin",

@@ -1,33 +1,70 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import type {
+  Metadata,
+} from "next";
 
-import { getRoleCodeBySlug } from "@/config/roles";
-import { PengasuhStudentList } from "@/features/pengasuh/students/components/pengasuh-student-list";
-import { getPengasuhStudentList } from "@/features/pengasuh/students/data/get-pengasuh-student-list";
+import {
+  notFound,
+} from "next/navigation";
+
+import {
+  getRoleCodeBySlug,
+} from "@/config/roles";
+
+import {
+  PengasuhStudentList,
+} from "@/features/pengasuh/students/components/pengasuh-student-list";
+
+import {
+  getPengasuhStudentList,
+} from "@/features/pengasuh/students/data/get-pengasuh-student-list";
+
 import {
   parsePengasuhStudentListQuery,
   type PengasuhStudentListSearchParams,
 } from "@/features/pengasuh/students/lib/parse-pengasuh-student-list-query";
-import { requireRole } from "@/lib/auth/guards";
+
+import {
+  PembinaTahfizStudentList,
+} from "@/features/pembina-tahfiz/students/components/pembina-tahfiz-student-list";
+
+import {
+  getPembinaTahfizStudentList,
+} from "@/features/pembina-tahfiz/students/data/get-pembina-tahfiz-student-list";
+
+import {
+  parsePembinaTahfizStudentListQuery,
+  type PembinaTahfizStudentListSearchParams,
+} from "@/features/pembina-tahfiz/students/lib/parse-pembina-tahfiz-student-list-query";
+
+import {
+  requireRole,
+} from "@/lib/auth/guards";
 
 export const metadata: Metadata = {
-  title: "Santri Ampuan",
+  title:
+    "Santri Ampuan",
+
   description:
-    "Daftar santri yang menjadi tanggung jawab Pengasuh E-Ma'had.",
+    "Daftar Santri Ampuan E-Ma'had.",
 };
 
-type PengasuhStudentsPageProps = {
+type CombinedSearchParams =
+  PengasuhStudentListSearchParams &
+  PembinaTahfizStudentListSearchParams;
+
+type Props = {
   params: Promise<{
     role: string;
   }>;
 
-  searchParams: Promise<PengasuhStudentListSearchParams>;
+  searchParams:
+    Promise<CombinedSearchParams>;
 };
 
-export default async function PengasuhStudentsPage({
+export default async function Page({
   params,
   searchParams,
-}: PengasuhStudentsPageProps) {
+}: Props) {
   const {
     role,
   } = await params;
@@ -37,38 +74,84 @@ export default async function PengasuhStudentsPage({
       role,
     );
 
-  if (
-    roleCode !==
-    "pengasuh"
-  ) {
-    notFound();
-  }
-
-  await requireRole(
-    "pengasuh",
-  );
-
   const resolvedSearchParams =
     await searchParams;
 
-  const query =
-    parsePengasuhStudentListQuery(
-      resolvedSearchParams,
+  /*
+   * =====================================================
+   * PENGASUH
+   * =====================================================
+   */
+
+  if (
+    roleCode ===
+    "pengasuh"
+  ) {
+    await requireRole(
+      "pengasuh",
     );
 
-  const data =
-    await getPengasuhStudentList(
-      query,
+    const query =
+      parsePengasuhStudentListQuery(
+        resolvedSearchParams,
+      );
+
+    const data =
+      await getPengasuhStudentList(
+        query,
+      );
+
+    return (
+      <PengasuhStudentList
+        data={
+          data
+        }
+        search={
+          query.search ??
+          ""
+        }
+      />
+    );
+  }
+
+  /*
+   * =====================================================
+   * PEMBINA TAHFIZ
+   * =====================================================
+   */
+
+  if (
+    roleCode ===
+    "pembina_tahfiz"
+  ) {
+    await requireRole(
+      "pembina_tahfiz",
     );
 
-  return (
-    <PengasuhStudentList
-      data={
-        data
-      }
-      search={
-        query.search
-      }
-    />
-  );
+    const query =
+      parsePembinaTahfizStudentListQuery(
+        resolvedSearchParams,
+      );
+
+    const data =
+      await getPembinaTahfizStudentList(
+        query,
+      );
+
+    return (
+      <PembinaTahfizStudentList
+        data={
+          data
+        }
+      />
+    );
+  }
+
+  /*
+   * =====================================================
+   * ROLE LAIN
+   * =====================================================
+   */
+
+  notFound();
 }
