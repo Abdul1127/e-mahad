@@ -170,13 +170,13 @@ const roleNavigation = {
       label: "Tagihan Santri",
       href: "/bendahara/tagihan",
       icon: "finance",
-      available: false,
+      available: true,
     },
     {
       label: "Pembayaran",
       href: "/bendahara/pembayaran",
       icon: "journal",
-      available: false,
+      available: true,
     },
     {
       label: "Laporan Keuangan",
@@ -203,13 +203,13 @@ const roleNavigation = {
       label: "Tagihan",
       href: "/wali/tagihan",
       icon: "finance",
-      available: false,
+      available: true,
     },
     {
       label: "Riwayat Pembayaran",
       href: "/wali/pembayaran",
       icon: "journal",
-      available: false,
+      available: true,
     },
   ],
 } satisfies Record<
