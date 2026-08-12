@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import type {
   PengasuhDashboardData,
   PengasuhDashboardGroup,
@@ -239,6 +241,10 @@ export function PengasuhDashboard({
 
   return (
     <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
+
       <section className="overflow-hidden rounded-3xl border border-brand-100 bg-gradient-to-br from-brand-50 via-white to-white shadow-soft">
         <div className="p-6 sm:p-8 lg:p-10">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
@@ -302,6 +308,10 @@ export function PengasuhDashboard({
           </div>
         </div>
       </section>
+
+      {/* =====================================================
+          SUMMARY
+      ===================================================== */}
 
       <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-2xl border border-line bg-white p-5 shadow-soft">
@@ -369,6 +379,10 @@ export function PengasuhDashboard({
         </article>
       </section>
 
+      {/* =====================================================
+          GROUPS
+      ===================================================== */}
+
       <section className="mt-8">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
@@ -419,22 +433,88 @@ export function PengasuhDashboard({
         )}
       </section>
 
+      {/* =====================================================
+          QUICK ACTIONS
+      ===================================================== */}
+
       <section className="mt-8 rounded-3xl border border-line bg-white p-5 shadow-soft sm:p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
-          Tahap Berikutnya
-        </p>
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+            Ruang Kerja
+          </p>
 
-        <h2 className="mt-2 text-xl font-bold text-ink">
-          Jurnal Pengasuhan
-        </h2>
+          <h2 className="mt-2 text-xl font-bold text-ink">
+            Pengasuhan Santri
+          </h2>
 
-        <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
-          Setelah dashboard ini selesai
-          diverifikasi, modul berikutnya
-          akan digunakan untuk mencatat
-          kegiatan dan perkembangan
-          pengasuhan santri.
-        </p>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
+            Gunakan menu berikut untuk
+            melihat santri ampuan,
+            mencatat jurnal, dan
+            meninjau riwayat
+            pengasuhan.
+          </p>
+        </div>
+
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          <Link
+            href="/pengasuh/santri"
+            className="rounded-2xl border border-line bg-slate-50 p-4 transition hover:border-brand-200 hover:bg-brand-50"
+          >
+            <p className="font-semibold text-ink">
+              Santri Ampuan
+            </p>
+
+            <p className="mt-1 text-xs leading-5 text-muted">
+              Lihat daftar santri yang
+              menjadi tanggung jawab
+              Anda.
+            </p>
+
+            <p className="mt-3 text-xs font-semibold text-brand-700">
+              Buka daftar →
+            </p>
+          </Link>
+
+          <Link
+            href="/pengasuh/jurnal"
+            className="rounded-2xl border border-brand-100 bg-brand-50 p-4 transition hover:border-brand-300"
+          >
+            <p className="font-semibold text-brand-900">
+              Jurnal Pengasuhan
+            </p>
+
+            <p className="mt-1 text-xs leading-5 text-brand-700">
+              Catat kondisi,
+              perkembangan, kasus,
+              serta tindak lanjut
+              santri.
+            </p>
+
+            <p className="mt-3 text-xs font-semibold text-brand-800">
+              Buka jurnal →
+            </p>
+          </Link>
+
+          <Link
+            href="/pengasuh/riwayat"
+            className="rounded-2xl border border-line bg-slate-50 p-4 transition hover:border-brand-200 hover:bg-brand-50"
+          >
+            <p className="font-semibold text-ink">
+              Riwayat Pengasuhan
+            </p>
+
+            <p className="mt-1 text-xs leading-5 text-muted">
+              Lihat jurnal yang telah
+              dibuat dan proses
+              reviewnya.
+            </p>
+
+            <p className="mt-3 text-xs font-semibold text-brand-700">
+              Lihat riwayat →
+            </p>
+          </Link>
+        </div>
       </section>
     </div>
   );

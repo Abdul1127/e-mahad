@@ -125,7 +125,11 @@ export default async function BendaharaUploadPaymentProofPage({
         </Link>
 
         <section className="mt-6 rounded-2xl border border-red-100 bg-red-50 p-6">
-          <h1 className="text-2xl font-bold text-red-900">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-red-600">
+            Pembayaran Dibatalkan
+          </p>
+
+          <h1 className="mt-2 text-2xl font-bold text-red-900">
             Bukti tidak dapat
             ditambahkan
           </h1>
@@ -133,7 +137,9 @@ export default async function BendaharaUploadPaymentProofPage({
           <p className="mt-3 text-sm leading-7 text-red-700">
             Pembayaran{" "}
             <strong>
-              {payment.payment_code}
+              {
+                payment.payment_code
+              }
             </strong>{" "}
             sudah dibatalkan.
             Pembayaran yang telah
@@ -164,7 +170,11 @@ export default async function BendaharaUploadPaymentProofPage({
         </Link>
 
         <section className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50 p-6">
-          <h1 className="text-2xl font-bold text-emerald-900">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">
+            Dokumen Tersimpan
+          </p>
+
+          <h1 className="mt-2 text-2xl font-bold text-emerald-900">
             Bukti pembayaran sudah
             tersedia
           </h1>
@@ -172,22 +182,43 @@ export default async function BendaharaUploadPaymentProofPage({
           <p className="mt-3 text-sm leading-7 text-emerald-700">
             Transaksi{" "}
             <strong>
-              {payment.payment_code}
+              {
+                payment.payment_code
+              }
             </strong>{" "}
             sudah mempunyai bukti
             pembayaran yang tersimpan
-            pada private Storage.
+            pada private Storage
+            E-Ma&apos;had.
           </p>
 
-          <p className="mt-3 text-xs text-emerald-700">
-            Tombol untuk membuka file
-            private akan kita aktifkan
-            pada tahap berikutnya.
+          <p className="mt-3 text-sm leading-6 text-emerald-700">
+            Bukti dapat dibuka melalui
+            tombol{" "}
+            <strong>
+              Lihat Bukti
+            </strong>{" "}
+            pada Detail Tagihan.
           </p>
+
+          <div className="mt-5">
+            <Link
+              href={`/bendahara/tagihan/${data.bill.id}`}
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-emerald-700 px-5 text-sm font-semibold text-white transition hover:bg-emerald-800"
+            >
+              Buka Detail Tagihan
+            </Link>
+          </div>
         </section>
       </div>
     );
   }
+
+  /*
+   * =====================================================
+   * UPLOAD FORM
+   * =====================================================
+   */
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
@@ -209,9 +240,8 @@ export default async function BendaharaUploadPaymentProofPage({
 
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
           Simpan foto atau dokumen
-          bukti pembayaran pada
-          private Storage
-          E-Ma&apos;had.
+          bukti pembayaran pada private
+          Storage E-Ma&apos;had.
         </p>
       </section>
 

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import type {
   BendaharaDashboardData,
 } from "../schemas/bendahara-dashboard-schema";
@@ -100,9 +102,14 @@ function SummaryCard({
   value,
   description,
 }: {
-  label: string;
-  value: string | number;
-  description?: string;
+  label:
+    string;
+
+  value:
+    string | number;
+
+  description?:
+    string;
 }) {
   return (
     <div className="rounded-2xl border border-line bg-white p-5 shadow-soft">
@@ -173,10 +180,73 @@ export function BendaharaDashboard({
       </section>
 
       {/* =====================================================
+          QUICK ACTIONS
+      ===================================================== */}
+
+      <section className="mt-6 grid gap-3 sm:grid-cols-3">
+        <Link
+          href="/bendahara/tagihan"
+          className="rounded-2xl border border-line bg-white p-4 shadow-soft transition hover:border-brand-200 hover:bg-brand-50/40"
+        >
+          <p className="text-sm font-semibold text-ink">
+            Tagihan Santri
+          </p>
+
+          <p className="mt-1 text-xs leading-5 text-muted">
+            Lihat seluruh tagihan,
+            status pembayaran, dan
+            sisa kewajiban.
+          </p>
+
+          <p className="mt-3 text-xs font-semibold text-brand-700">
+            Buka tagihan →
+          </p>
+        </Link>
+
+        <Link
+          href="/bendahara/tagihan/baru"
+          className="rounded-2xl border border-brand-100 bg-brand-50 p-4 shadow-soft transition hover:border-brand-300"
+        >
+          <p className="text-sm font-semibold text-brand-900">
+            Buat Tagihan
+          </p>
+
+          <p className="mt-1 text-xs leading-5 text-brand-700">
+            Tambahkan tagihan baru
+            untuk santri pada tahun
+            ajaran aktif.
+          </p>
+
+          <p className="mt-3 text-xs font-semibold text-brand-800">
+            + Tagihan baru
+          </p>
+        </Link>
+
+        <Link
+          href="/bendahara/pembayaran"
+          className="rounded-2xl border border-line bg-white p-4 shadow-soft transition hover:border-brand-200 hover:bg-brand-50/40"
+        >
+          <p className="text-sm font-semibold text-ink">
+            Riwayat Pembayaran
+          </p>
+
+          <p className="mt-1 text-xs leading-5 text-muted">
+            Pantau pembayaran tercatat,
+            dibatalkan, dan metode
+            transaksi.
+          </p>
+
+          <p className="mt-3 text-xs font-semibold text-brand-700">
+            Buka pembayaran →
+          </p>
+        </Link>
+      </section>
+
+      {/* =====================================================
           BILL COUNTS
       ===================================================== */}
 
-      <section className="mt-6">
+      <section className="mt-7">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
             Posisi Tagihan
@@ -304,10 +374,9 @@ export function BendaharaDashboard({
             </p>
 
             <p className="mt-2 text-xs leading-5 text-emerald-700">
-              Nominal pembayaran
-              aktif yang sudah
-              dialokasikan ke
-              tagihan.
+              Nominal pembayaran aktif
+              yang sudah dialokasikan
+              ke tagihan.
             </p>
           </div>
 
@@ -378,13 +447,14 @@ export function BendaharaDashboard({
         0 ? (
           <div className="mt-5 rounded-3xl border border-dashed border-line bg-white p-8 text-center">
             <h3 className="font-bold text-ink">
-              Tidak ada tagihan jatuh tempo
+              Tidak ada tagihan jatuh
+              tempo
             </h3>
 
             <p className="mt-2 text-sm text-muted">
-              Belum terdapat
-              tagihan aktif yang
-              melewati jatuh tempo.
+              Belum terdapat tagihan
+              aktif yang melewati jatuh
+              tempo.
             </p>
           </div>
         ) : (
@@ -533,8 +603,8 @@ export function BendaharaDashboard({
             <p className="mt-2 text-sm text-muted">
               Transaksi pembayaran
               santri yang dicatat
-              Bendahara akan tampil
-              di sini.
+              Bendahara akan tampil di
+              sini.
             </p>
           </div>
         ) : (
@@ -650,19 +720,18 @@ export function BendaharaDashboard({
           INFORMATION
       ===================================================== */}
 
-      <section className="mt-7 rounded-2xl border border-blue-100 bg-blue-50 p-4 sm:p-5">
-        <p className="font-semibold text-blue-800">
-          Modul Keuangan
+      <section className="mt-7 rounded-2xl border border-brand-100 bg-brand-50 p-4 sm:p-5">
+        <p className="font-semibold text-brand-900">
+          Keuangan E-Ma&apos;had
         </p>
 
-        <p className="mt-1 max-w-4xl text-sm leading-6 text-blue-700">
-          Dashboard ini menjadi pusat
-          monitoring Bendahara.
-          Selanjutnya kita akan
-          mengaktifkan pembuatan
-          tagihan dan pencatatan
-          pembayaran langsung dari
-          aplikasi.
+        <p className="mt-1 max-w-4xl text-sm leading-6 text-brand-700">
+          Tagihan dan pembayaran sudah
+          dikelola langsung melalui
+          aplikasi. Setiap transaksi
+          tetap memiliki riwayat untuk
+          mendukung penelusuran dan
+          monitoring keuangan.
         </p>
       </section>
     </div>

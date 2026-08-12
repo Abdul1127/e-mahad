@@ -1,14 +1,24 @@
-import type { AppIconName } from "@/components/app-shell/app-icon";
+import type {
+  AppIconName,
+} from "@/components/app-shell/app-icon";
+
 import {
   roleDefinitions,
   type RoleCode,
 } from "@/config/roles";
 
 export type RoleNavigationItem = {
-  label: string;
-  href: string;
-  icon: AppIconName;
-  available: boolean;
+  label:
+    string;
+
+  href:
+    string;
+
+  icon:
+    AppIconName;
+
+  available:
+    boolean;
 };
 
 const roleNavigation = {
@@ -48,34 +58,26 @@ const roleNavigation = {
   penanggung_jawab: [
     {
       label: "Dashboard",
-      href: roleDefinitions.penanggung_jawab.dashboardPath,
+      href:
+        roleDefinitions.penanggung_jawab
+          .dashboardPath,
       icon: "dashboard",
       available: true,
-    },
-    {
-      label: "Monitoring Asrama",
-      href: "/penanggung-jawab/monitoring",
-      icon: "shield",
-      available: false,
-    },
-    {
-      label: "Perkembangan Tahfiz",
-      href: "/penanggung-jawab/tahfiz",
-      icon: "tahfiz",
-      available: false,
     },
     {
       label: "Jurnal Kepala Ma'had",
       href: "/penanggung-jawab/jurnal",
       icon: "journal",
-      available: false,
+      available: true,
     },
   ],
 
   kepala_mahad: [
     {
       label: "Dashboard",
-      href: roleDefinitions.kepala_mahad.dashboardPath,
+      href:
+        roleDefinitions.kepala_mahad
+          .dashboardPath,
       icon: "dashboard",
       available: true,
     },
@@ -86,29 +88,19 @@ const roleNavigation = {
       available: true,
     },
     {
-      label: "Perkembangan Tahfiz",
-      href: "/kepala-mahad/tahfiz",
-      icon: "tahfiz",
-      available: false,
-    },
-    {
-      label: "Klinik Tahsin",
-      href: "/kepala-mahad/tahsin",
-      icon: "clinic",
-      available: false,
-    },
-    {
-      label: "Ringkasan Keuangan",
-      href: "/kepala-mahad/keuangan",
-      icon: "finance",
-      available: false,
+      label: "Jurnal Kepala Ma'had",
+      href: "/kepala-mahad/jurnal",
+      icon: "journal",
+      available: true,
     },
   ],
 
   pengasuh: [
     {
       label: "Dashboard",
-      href: roleDefinitions.pengasuh.dashboardPath,
+      href:
+        roleDefinitions.pengasuh
+          .dashboardPath,
       icon: "dashboard",
       available: true,
     },
@@ -135,15 +127,11 @@ const roleNavigation = {
   pembina_tahfiz: [
     {
       label: "Dashboard",
-      href: roleDefinitions.pembina_tahfiz.dashboardPath,
+      href:
+        roleDefinitions.pembina_tahfiz
+          .dashboardPath,
       icon: "dashboard",
       available: true,
-    },
-    {
-      label: "Kelompok Tahfiz",
-      href: "/pembina-tahfiz/kelompok",
-      icon: "groups",
-      available: false,
     },
     {
       label: "Laporan Mingguan",
@@ -152,17 +140,19 @@ const roleNavigation = {
       available: true,
     },
     {
-      label: "Klinik Tahsin",
-      href: "/pembina-tahfiz/tahsin",
-      icon: "clinic",
-      available: false,
+      label: "Riwayat Laporan",
+      href: "/pembina-tahfiz/laporan/riwayat",
+      icon: "journal",
+      available: true,
     },
   ],
 
   bendahara: [
     {
       label: "Dashboard",
-      href: roleDefinitions.bendahara.dashboardPath,
+      href:
+        roleDefinitions.bendahara
+          .dashboardPath,
       icon: "dashboard",
       available: true,
     },
@@ -178,26 +168,16 @@ const roleNavigation = {
       icon: "journal",
       available: true,
     },
-    {
-      label: "Laporan Keuangan",
-      href: "/bendahara/laporan",
-      icon: "shield",
-      available: false,
-    },
   ],
 
   guardian: [
     {
       label: "Beranda",
-      href: roleDefinitions.guardian.dashboardPath,
+      href:
+        roleDefinitions.guardian
+          .dashboardPath,
       icon: "home",
       available: true,
-    },
-    {
-      label: "Tahfiz Anak",
-      href: "/wali/tahfiz",
-      icon: "tahfiz",
-      available: false,
     },
     {
       label: "Tagihan",
@@ -218,40 +198,47 @@ const roleNavigation = {
 >;
 
 export function getRoleNavigation(
-  roleCode: RoleCode,
+  roleCode:
+    RoleCode,
 ): RoleNavigationItem[] {
-  return roleNavigation[roleCode];
+  return roleNavigation[
+    roleCode
+  ];
 }
 
 export function getCurrentNavigationItem(
-  roleCode: RoleCode,
-  pathname: string,
+  roleCode:
+    RoleCode,
+
+  pathname:
+    string,
 ): RoleNavigationItem | null {
   const availableItems =
-    getRoleNavigation(roleCode)
+    getRoleNavigation(
+      roleCode,
+    )
       .filter(
-        (item) => item.available,
+        (item) =>
+          item.available,
       )
       .sort(
         (
           firstItem,
           secondItem,
-        ) => {
-          return (
-            secondItem.href.length -
-            firstItem.href.length
-          );
-        },
+        ) =>
+          secondItem.href.length -
+          firstItem.href.length,
       );
 
   return (
-    availableItems.find((item) => {
-      return (
-        pathname === item.href ||
+    availableItems.find(
+      (item) =>
+        pathname ===
+          item.href ||
         pathname.startsWith(
           `${item.href}/`,
-        )
-      );
-    }) ?? null
+        ),
+    ) ??
+    null
   );
 }

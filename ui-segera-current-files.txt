@@ -1,0 +1,2052 @@
+
+========================================
+C:\Users\Nryuu\e-mahad\src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\bukti\unggah\page.tsx
+========================================
+
+import Link from "next/link";
+
+import {
+  notFound,
+} from "next/navigation";
+
+import {
+  z,
+} from "zod";
+
+import {
+  getRoleCodeBySlug,
+} from "@/config/roles";
+
+import {
+  getBendaharaBillDetailData,
+} from "@/features/bendahara/bills/data/get-bendahara-bill-detail-data";
+
+import {
+  BendaharaUploadPaymentProofForm,
+} from "@/features/bendahara/payments/components/bendahara-upload-payment-proof-form";
+
+import {
+  requireRole,
+} from "@/lib/auth/guards";
+
+type PageProps = {
+  params:
+    Promise<{
+      role:
+        string;
+
+      billId:
+        string;
+
+      paymentId:
+        string;
+    }>;
+};
+
+export default async function BendaharaUploadPaymentProofPage({
+  params,
+}: PageProps) {
+  const {
+    role,
+    billId,
+    paymentId,
+  } = await params;
+
+  const roleCode =
+    getRoleCodeBySlug(
+      role,
+    );
+
+  if (
+    roleCode !==
+    "bendahara"
+  ) {
+    notFound();
+  }
+
+  const billIdValidation =
+    z.string()
+      .uuid()
+      .safeParse(
+        billId,
+      );
+
+  const paymentIdValidation =
+    z.string()
+      .uuid()
+      .safeParse(
+        paymentId,
+      );
+
+  if (
+    !billIdValidation.success ||
+    !paymentIdValidation.success
+  ) {
+    notFound();
+  }
+
+  await requireRole(
+    "bendahara",
+  );
+
+  const data =
+    await getBendaharaBillDetailData(
+      billIdValidation.data,
+    );
+
+  const paymentItem =
+    data.payments.find(
+      (
+        item,
+      ) =>
+        item.payment.id ===
+        paymentIdValidation.data,
+    );
+
+  if (!paymentItem) {
+    notFound();
+  }
+
+  const payment =
+    paymentItem.payment;
+
+  /*
+   * =====================================================
+   * CANCELLED PAYMENT
+   * =====================================================
+   */
+
+  if (
+    payment.status ===
+    "cancelled"
+  ) {
+    return (
+      <div className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        <Link
+          href={`/bendahara/tagihan/${data.bill.id}`}
+          className="text-sm font-semibold text-brand-700 transition hover:text-brand-800"
+        >
+          ? Kembali ke Detail Tagihan
+        </Link>
+
+        <section className="mt-6 rounded-2xl border border-red-100 bg-red-50 p-6">
+          <h1 className="text-2xl font-bold text-red-900">
+            Bukti tidak dapat
+            ditambahkan
+          </h1>
+
+          <p className="mt-3 text-sm leading-7 text-red-700">
+            Pembayaran{" "}
+            <strong>
+              {payment.payment_code}
+            </strong>{" "}
+            sudah dibatalkan.
+            Pembayaran yang telah
+            dibatalkan tidak dapat
+            menerima bukti baru.
+          </p>
+        </section>
+      </div>
+    );
+  }
+
+  /*
+   * =====================================================
+   * EXISTING PROOF
+   * =====================================================
+   */
+
+  if (
+    payment.proof_path
+  ) {
+    return (
+      <div className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        <Link
+          href={`/bendahara/tagihan/${data.bill.id}`}
+          className="text-sm font-semibold text-brand-700 transition hover:text-brand-800"
+        >
+          ? Kembali ke Detail Tagihan
+        </Link>
+
+        <section className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50 p-6">
+          <h1 className="text-2xl font-bold text-emerald-900">
+            Bukti pembayaran sudah
+            tersedia
+          </h1>
+
+          <p className="mt-3 text-sm leading-7 text-emerald-700">
+            Transaksi{" "}
+            <strong>
+              {payment.payment_code}
+            </strong>{" "}
+            sudah mempunyai bukti
+            pembayaran yang tersimpan
+            pada private Storage.
+          </p>
+
+          <p className="mt-3 text-xs text-emerald-700">
+            Tombol untuk membuka file
+            private akan kita aktifkan
+            pada tahap berikutnya.
+          </p>
+        </section>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <section>
+        <Link
+          href={`/bendahara/tagihan/${data.bill.id}`}
+          className="text-sm font-semibold text-brand-700 transition hover:text-brand-800"
+        >
+          ? Kembali ke Detail Tagihan
+        </Link>
+
+        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+          Dokumen Pembayaran
+        </p>
+
+        <h1 className="mt-2 text-3xl font-bold text-ink">
+          Upload Bukti Pembayaran
+        </h1>
+
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
+          Simpan foto atau dokumen
+          bukti pembayaran pada
+          private Storage
+          E-Ma&apos;had.
+        </p>
+      </section>
+
+      <section className="mt-7">
+        <BendaharaUploadPaymentProofForm
+          billId={
+            data.bill.id
+          }
+          paymentId={
+            payment.id
+          }
+          paymentCode={
+            payment.payment_code
+          }
+          studentName={
+            data.bill.student
+              .full_name
+          }
+          billTitle={
+            data.bill.title
+          }
+          paymentAmount={
+            payment.amount
+          }
+          paymentDate={
+            payment.payment_date
+          }
+          paymentMethod={
+            payment.payment_method
+          }
+        />
+      </section>
+    </div>
+  );
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\components\app-shell\sidebar-navigation.tsx
+========================================
+
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+import { AppIcon } from "@/components/app-shell/app-icon";
+import type { RoleNavigationItem } from "@/config/navigation";
+
+type SidebarNavigationProps = {
+  items: RoleNavigationItem[];
+  onNavigate?: () => void;
+};
+
+export function SidebarNavigation({
+  items,
+  onNavigate,
+}: SidebarNavigationProps) {
+  const pathname = usePathname();
+
+  return (
+    <nav
+      aria-label="Navigasi utama"
+      className="space-y-1.5"
+    >
+      {items.map((item) => {
+        const isActive =
+          item.available &&
+          (pathname === item.href ||
+            pathname.startsWith(`${item.href}/`));
+
+        if (!item.available) {
+          return (
+            <div
+              key={item.href}
+              aria-disabled="true"
+              title="Fitur akan dikembangkan pada tahap berikutnya"
+              className="flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-white/45"
+            >
+              <AppIcon
+                name={item.icon}
+                className="size-5 shrink-0"
+              />
+
+              <span className="min-w-0 flex-1 truncate">
+                {item.label}
+              </span>
+
+              <span className="rounded-full bg-white/8 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white/45">
+                Segera
+              </span>
+            </div>
+          );
+        }
+
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={onNavigate}
+            aria-current={isActive ? "page" : undefined}
+            className={
+              isActive
+                ? "flex min-h-11 items-center gap-3 rounded-xl bg-white px-3.5 py-2.5 text-sm font-semibold text-brand-900 shadow-sm"
+                : "flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-white/75 transition hover:bg-white/8 hover:text-white"
+            }
+          >
+            <AppIcon
+              name={item.icon}
+              className="size-5 shrink-0"
+            />
+
+            <span className="min-w-0 flex-1 truncate">
+              {item.label}
+            </span>
+
+            {isActive && (
+              <AppIcon
+                name="chevron-right"
+                className="size-4 shrink-0 text-brand-600"
+              />
+            )}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\components\layout\role-dashboard.tsx
+========================================
+
+import { AppIcon } from "@/components/app-shell/app-icon";
+import {
+  roleDefinitions,
+  type RoleCode,
+} from "@/config/roles";
+import type { AccessContext } from "@/lib/auth/types";
+
+type WorkspaceDefinition = {
+  focusTitle: string;
+  focusDescription: string;
+  modules: string[];
+};
+
+const workspaceByRole: Record<
+  RoleCode,
+  WorkspaceDefinition
+> = {
+  admin: {
+    focusTitle: "Pastikan data dasar selalu siap",
+    focusDescription:
+      "Admin bertanggung jawab terhadap data santri, pengurus, akun, role, kelompok, dan assignment.",
+    modules: [
+      "Data Santri",
+      "Pengurus dan Akun",
+      "Role Pengguna",
+      "Kelompok dan Assignment",
+    ],
+  },
+
+  penanggung_jawab: {
+    focusTitle: "Pantau kegiatan asrama secara menyeluruh",
+    focusDescription:
+      "Penanggung Jawab memantau pengasuhan, tahfiz, Klinik Tahsin, dan kinerja Kepala Ma'had tanpa mengakses keuangan.",
+    modules: [
+      "Monitoring Asrama",
+      "Perkembangan Tahfiz",
+      "Klinik Tahsin",
+      "Jurnal Kepala Ma'had",
+    ],
+  },
+
+  kepala_mahad: {
+    focusTitle: "Kendalikan operasional harian asrama",
+    focusDescription:
+      "Kepala Ma'had meninjau jurnal pengasuhan, perkembangan tahfiz, Klinik Tahsin, dan ringkasan keuangan.",
+    modules: [
+      "Review Jurnal Pengasuhan",
+      "Perkembangan Tahfiz",
+      "Klinik Tahsin",
+      "Ringkasan Keuangan",
+    ],
+  },
+
+  pengasuh: {
+    focusTitle: "Selesaikan pemantauan santri hari ini",
+    focusDescription:
+      "Pengasuh mengisi jurnal untuk santri Putra atau Putri sesuai assignment yang diberikan.",
+    modules: [
+      "Santri Ampuan",
+      "Jurnal Hari Ini",
+      "Jurnal Perlu Revisi",
+      "Riwayat Pengasuhan",
+    ],
+  },
+
+  pembina_tahfiz: {
+    focusTitle: "Perbarui perkembangan tahfiz mingguan",
+    focusDescription:
+      "Pembina mengisi laporan individual setiap santri sesuai kelompok tahfiz yang diampu.",
+    modules: [
+      "Kelompok Tahfiz",
+      "Laporan Mingguan",
+      "Publikasi Laporan",
+      "Klinik Tahsin",
+    ],
+  },
+
+  bendahara: {
+    focusTitle: "Kelola tagihan dan pembayaran santri",
+    focusDescription:
+      "Bendahara mencatat tagihan bulanan, pembayaran, verifikasi, dan laporan keuangan.",
+    modules: [
+      "Tagihan Santri",
+      "Pembayaran",
+      "Verifikasi",
+      "Laporan Keuangan",
+    ],
+  },
+
+  guardian: {
+    focusTitle: "Pantau perkembangan anak",
+    focusDescription:
+      "Orang tua dapat melihat perkembangan tahfiz, tagihan, dan pembayaran anak yang terhubung dengan akun.",
+    modules: [
+      "Data Anak",
+      "Perkembangan Tahfiz",
+      "Tagihan",
+      "Riwayat Pembayaran",
+    ],
+  },
+};
+
+type RoleDashboardProps = {
+  roleCode: RoleCode;
+  context: AccessContext;
+};
+
+export function RoleDashboard({
+  roleCode,
+  context,
+}: RoleDashboardProps) {
+  const roleDefinition =
+    roleDefinitions[roleCode];
+
+  const workspace =
+    workspaceByRole[roleCode];
+
+  return (
+    <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <section className="overflow-hidden rounded-3xl border border-brand-100 bg-white shadow-soft">
+        <div className="grid gap-8 p-6 sm:p-8 xl:grid-cols-[minmax(0,1fr)_340px] xl:p-10">
+          <div className="min-w-0">
+            <div className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-700">
+              <span className="size-2 rounded-full bg-brand-500" />
+              Dashboard {roleDefinition.label}
+            </div>
+
+            <h2 className="mt-5 max-w-3xl text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+              Assalamu&apos;alaikum,{" "}
+              {context.fullName}
+            </h2>
+
+            <p className="mt-4 max-w-3xl text-base leading-7 text-muted">
+              {roleDefinition.description}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-brand-100 bg-brand-50/70 p-5">
+            <div className="flex items-start gap-3">
+              <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-700 text-white">
+                <AppIcon
+                  name="shield"
+                  className="size-5"
+                />
+              </div>
+
+              <div>
+                <p className="font-semibold text-brand-950">
+                  Akses role sudah aktif
+                </p>
+
+                <p className="mt-1 text-sm leading-6 text-brand-700">
+                  Session, proteksi route, dan pembatasan
+                  dashboard sudah berfungsi.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)]">
+        <section className="rounded-3xl border border-line bg-white p-6 shadow-soft sm:p-7">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+            Fokus utama
+          </p>
+
+          <h3 className="mt-3 text-2xl font-bold tracking-tight text-ink">
+            {workspace.focusTitle}
+          </h3>
+
+          <p className="mt-3 max-w-2xl leading-7 text-muted">
+            {workspace.focusDescription}
+          </p>
+
+          <div className="mt-6 rounded-2xl border border-dashed border-brand-200 bg-brand-50/50 p-5">
+            <p className="text-sm font-semibold text-brand-800">
+              Tahap berikutnya
+            </p>
+
+            <p className="mt-2 text-sm leading-6 text-brand-700">
+              Dashboard ini akan dihubungkan dengan data
+              aktual dan tindakan yang sesuai pekerjaan
+              pengguna, bukan statistik contoh.
+            </p>
+          </div>
+        </section>
+
+        <section className="rounded-3xl border border-line bg-white p-6 shadow-soft sm:p-7">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+            Ruang kerja
+          </p>
+
+          <h3 className="mt-3 text-xl font-bold text-ink">
+            Modul yang disiapkan
+          </h3>
+
+          <div className="mt-5 space-y-2.5">
+            {workspace.modules.map(
+              (moduleName) => (
+                <div
+                  key={moduleName}
+                  className="flex min-h-13 items-center gap-3 rounded-2xl border border-line bg-slate-50/70 px-4 py-3"
+                >
+                  <div className="grid size-8 shrink-0 place-items-center rounded-lg bg-white text-brand-700 shadow-sm">
+                    <AppIcon
+                      name="chevron-right"
+                      className="size-4"
+                    />
+                  </div>
+
+                  <p className="min-w-0 flex-1 text-sm font-semibold text-slate-700">
+                    {moduleName}
+                  </p>
+
+                  <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                    Segera
+                  </span>
+                </div>
+              ),
+            )}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\config\navigation.ts
+========================================
+
+import type { AppIconName } from "@/components/app-shell/app-icon";
+import {
+  roleDefinitions,
+  type RoleCode,
+} from "@/config/roles";
+
+export type RoleNavigationItem = {
+  label: string;
+  href: string;
+  icon: AppIconName;
+  available: boolean;
+};
+
+const roleNavigation = {
+  admin: [
+    {
+      label: "Dashboard",
+      href: roleDefinitions.admin.dashboardPath,
+      icon: "dashboard",
+      available: true,
+    },
+    {
+      label: "Data Santri",
+      href: "/admin/santri",
+      icon: "students",
+      available: true,
+    },
+    {
+      label: "Orang Tua/Wali",
+      href: "/admin/wali",
+      icon: "students",
+      available: true,
+    },
+    {
+      label: "Staf Pesantren",
+      href: "/admin/staf",
+      icon: "staff",
+      available: true,
+    },
+    {
+      label: "Kelompok dan Assignment",
+      href: "/admin/kelompok",
+      icon: "groups",
+      available: true,
+    },
+  ],
+
+  penanggung_jawab: [
+    {
+      label: "Dashboard",
+      href: roleDefinitions.penanggung_jawab.dashboardPath,
+      icon: "dashboard",
+      available: true,
+    },
+    {
+      label: "Monitoring Asrama",
+      href: "/penanggung-jawab/monitoring",
+      icon: "shield",
+      available: false,
+    },
+    {
+      label: "Perkembangan Tahfiz",
+      href: "/penanggung-jawab/tahfiz",
+      icon: "tahfiz",
+      available: false,
+    },
+    {
+      label: "Jurnal Kepala Ma'had",
+      href: "/penanggung-jawab/jurnal",
+      icon: "journal",
+      available: false,
+    },
+  ],
+
+  kepala_mahad: [
+    {
+      label: "Dashboard",
+      href: roleDefinitions.kepala_mahad.dashboardPath,
+      icon: "dashboard",
+      available: true,
+    },
+    {
+      label: "Jurnal Pengasuhan",
+      href: "/kepala-mahad/pengasuhan",
+      icon: "journal",
+      available: true,
+    },
+    {
+      label: "Perkembangan Tahfiz",
+      href: "/kepala-mahad/tahfiz",
+      icon: "tahfiz",
+      available: false,
+    },
+    {
+      label: "Klinik Tahsin",
+      href: "/kepala-mahad/tahsin",
+      icon: "clinic",
+      available: false,
+    },
+    {
+      label: "Ringkasan Keuangan",
+      href: "/kepala-mahad/keuangan",
+      icon: "finance",
+      available: false,
+    },
+  ],
+
+  pengasuh: [
+    {
+      label: "Dashboard",
+      href: roleDefinitions.pengasuh.dashboardPath,
+      icon: "dashboard",
+      available: true,
+    },
+    {
+      label: "Santri Ampuan",
+      href: "/pengasuh/santri",
+      icon: "students",
+      available: true,
+    },
+    {
+      label: "Jurnal Pengasuhan",
+      href: "/pengasuh/jurnal",
+      icon: "journal",
+      available: true,
+    },
+    {
+      label: "Riwayat Pengasuhan",
+      href: "/pengasuh/riwayat",
+      icon: "shield",
+      available: true,
+    },
+  ],
+
+  pembina_tahfiz: [
+    {
+      label: "Dashboard",
+      href: roleDefinitions.pembina_tahfiz.dashboardPath,
+      icon: "dashboard",
+      available: true,
+    },
+    {
+      label: "Kelompok Tahfiz",
+      href: "/pembina-tahfiz/kelompok",
+      icon: "groups",
+      available: false,
+    },
+    {
+      label: "Laporan Mingguan",
+      href: "/pembina-tahfiz/laporan",
+      icon: "tahfiz",
+      available: true,
+    },
+    {
+      label: "Klinik Tahsin",
+      href: "/pembina-tahfiz/tahsin",
+      icon: "clinic",
+      available: false,
+    },
+  ],
+
+  bendahara: [
+    {
+      label: "Dashboard",
+      href: roleDefinitions.bendahara.dashboardPath,
+      icon: "dashboard",
+      available: true,
+    },
+    {
+      label: "Tagihan Santri",
+      href: "/bendahara/tagihan",
+      icon: "finance",
+      available: true,
+    },
+    {
+      label: "Pembayaran",
+      href: "/bendahara/pembayaran",
+      icon: "journal",
+      available: true,
+    },
+    {
+      label: "Laporan Keuangan",
+      href: "/bendahara/laporan",
+      icon: "shield",
+      available: false,
+    },
+  ],
+
+  guardian: [
+    {
+      label: "Beranda",
+      href: roleDefinitions.guardian.dashboardPath,
+      icon: "home",
+      available: true,
+    },
+    {
+      label: "Tahfiz Anak",
+      href: "/wali/tahfiz",
+      icon: "tahfiz",
+      available: false,
+    },
+    {
+      label: "Tagihan",
+      href: "/wali/tagihan",
+      icon: "finance",
+      available: true,
+    },
+    {
+      label: "Riwayat Pembayaran",
+      href: "/wali/pembayaran",
+      icon: "journal",
+      available: true,
+    },
+  ],
+} satisfies Record<
+  RoleCode,
+  RoleNavigationItem[]
+>;
+
+export function getRoleNavigation(
+  roleCode: RoleCode,
+): RoleNavigationItem[] {
+  return roleNavigation[roleCode];
+}
+
+export function getCurrentNavigationItem(
+  roleCode: RoleCode,
+  pathname: string,
+): RoleNavigationItem | null {
+  const availableItems =
+    getRoleNavigation(roleCode)
+      .filter(
+        (item) => item.available,
+      )
+      .sort(
+        (
+          firstItem,
+          secondItem,
+        ) => {
+          return (
+            secondItem.href.length -
+            firstItem.href.length
+          );
+        },
+      );
+
+  return (
+    availableItems.find((item) => {
+      return (
+        pathname === item.href ||
+        pathname.startsWith(
+          `${item.href}/`,
+        )
+      );
+    }) ?? null
+  );
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\config\roles.ts
+========================================
+
+export const roleDefinitions = {
+  admin: {
+    slug: "admin",
+    label: "Admin",
+    dashboardPath: "/admin/dashboard",
+    description:
+      "Mengelola akun, data master, role, assignment, dan konfigurasi sistem.",
+  },
+
+  penanggung_jawab: {
+    slug: "penanggung-jawab",
+    label: "Penanggung Jawab",
+    dashboardPath: "/penanggung-jawab/dashboard",
+    description:
+      "Memantau seluruh kegiatan asrama selain bagian keuangan.",
+  },
+
+  kepala_mahad: {
+    slug: "kepala-mahad",
+    label: "Kepala Ma'had",
+    dashboardPath: "/kepala-mahad/dashboard",
+    description:
+      "Memantau operasional asrama, pengasuhan, tahfiz, dan keuangan.",
+  },
+
+  pengasuh: {
+    slug: "pengasuh",
+    label: "Pengasuh",
+    dashboardPath: "/pengasuh/dashboard",
+    description:
+      "Mengelola jurnal pengasuhan santri sesuai cakupan Putra atau Putri.",
+  },
+
+  pembina_tahfiz: {
+    slug: "pembina-tahfiz",
+    label: "Pembina Tahfiz",
+    dashboardPath: "/pembina-tahfiz/dashboard",
+    description:
+      "Mengelola perkembangan tahfiz dan Klinik Tahsin sesuai kelompok.",
+  },
+
+  bendahara: {
+    slug: "bendahara",
+    label: "Bendahara",
+    dashboardPath: "/bendahara/dashboard",
+    description:
+      "Mengelola tagihan, pembayaran, dan laporan keuangan.",
+  },
+
+  guardian: {
+    slug: "wali",
+    label: "Orang Tua/Wali",
+    dashboardPath: "/wali/dashboard",
+    description:
+      "Memantau tahfiz dan keuangan anak yang terhubung dengan akun.",
+  },
+} as const;
+
+export type RoleCode = keyof typeof roleDefinitions;
+
+export const roleCodes = Object.keys(
+  roleDefinitions,
+) as RoleCode[];
+
+export function isRoleCode(
+  value: unknown,
+): value is RoleCode {
+  return (
+    typeof value === "string" &&
+    Object.prototype.hasOwnProperty.call(
+      roleDefinitions,
+      value,
+    )
+  );
+}
+
+export function getRoleCodeBySlug(
+  slug: string,
+): RoleCode | null {
+  return (
+    roleCodes.find(
+      (roleCode) =>
+        roleDefinitions[roleCode].slug === slug,
+    ) ?? null
+  );
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\bendahara\dashboard\components\bendahara-dashboard.tsx
+========================================
+
+import type {
+  BendaharaDashboardData,
+} from "../schemas/bendahara-dashboard-schema";
+
+type Props = {
+  data:
+    BendaharaDashboardData;
+};
+
+/*
+ * =========================================================
+ * HELPERS
+ * =========================================================
+ */
+
+function formatCurrency(
+  value: number,
+): string {
+  return new Intl.NumberFormat(
+    "id-ID",
+    {
+      style:
+        "currency",
+
+      currency:
+        "IDR",
+
+      maximumFractionDigits:
+        0,
+    },
+  ).format(
+    value,
+  );
+}
+
+function formatDate(
+  value: string,
+): string {
+  return new Intl.DateTimeFormat(
+    "id-ID",
+    {
+      day:
+        "2-digit",
+
+      month:
+        "long",
+
+      year:
+        "numeric",
+    },
+  ).format(
+    new Date(
+      `${value}T00:00:00Z`,
+    ),
+  );
+}
+
+function genderLabel(
+  value:
+    "male" | "female",
+): string {
+  return value === "male"
+    ? "Putra"
+    : "Putri";
+}
+
+function paymentMethodLabel(
+  value: string,
+): string {
+  const normalized =
+    value
+      .trim()
+      .toLowerCase();
+
+  switch (
+    normalized
+  ) {
+    case "cash":
+      return "Tunai";
+
+    case "transfer":
+      return "Transfer";
+
+    case "bank_transfer":
+      return "Transfer Bank";
+
+    default:
+      return value;
+  }
+}
+
+/*
+ * =========================================================
+ * SUMMARY CARD
+ * =========================================================
+ */
+
+function SummaryCard({
+  label,
+  value,
+  description,
+}: {
+  label: string;
+  value: string | number;
+  description?: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-line bg-white p-5 shadow-soft">
+      <p className="text-xs font-medium text-muted">
+        {label}
+      </p>
+
+      <p className="mt-2 text-2xl font-bold text-ink sm:text-3xl">
+        {value}
+      </p>
+
+      {description && (
+        <p className="mt-2 text-xs leading-5 text-muted">
+          {description}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/*
+ * =========================================================
+ * MAIN
+ * =========================================================
+ */
+
+export function BendaharaDashboard({
+  data,
+}: Props) {
+  return (
+    <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
+
+      <section>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+          Bendahara
+        </p>
+
+        <h1 className="mt-2 text-3xl font-bold text-ink">
+          Dashboard Keuangan
+        </h1>
+
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
+          Pantau tagihan, pembayaran,
+          tunggakan, dan posisi
+          keuangan santri pada tahun
+          ajaran berjalan.
+        </p>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
+            Tahun Ajaran{" "}
+            {
+              data.academic_year
+                .name
+            }
+          </span>
+
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+            {
+              data.staff
+                .full_name
+            }
+          </span>
+        </div>
+      </section>
+
+      {/* =====================================================
+          BILL COUNTS
+      ===================================================== */}
+
+      <section className="mt-6">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+            Posisi Tagihan
+          </p>
+
+          <h2 className="mt-2 text-xl font-bold text-ink">
+            Status Tagihan Santri
+          </h2>
+        </div>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          <SummaryCard
+            label="Tagihan Aktif"
+            value={
+              data.summary
+                .active_bill_count
+            }
+          />
+
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <p className="text-xs font-medium text-slate-600">
+              Belum Dibayar
+            </p>
+
+            <p className="mt-2 text-3xl font-bold text-slate-900">
+              {
+                data.summary
+                  .unpaid_count
+              }
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-amber-100 bg-amber-50 p-5">
+            <p className="text-xs font-medium text-amber-700">
+              Dibayar Sebagian
+            </p>
+
+            <p className="mt-2 text-3xl font-bold text-amber-900">
+              {
+                data.summary
+                  .partial_count
+              }
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
+            <p className="text-xs font-medium text-emerald-700">
+              Lunas
+            </p>
+
+            <p className="mt-2 text-3xl font-bold text-emerald-900">
+              {
+                data.summary
+                  .paid_count
+              }
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-red-100 bg-red-50 p-5">
+            <p className="text-xs font-medium text-red-700">
+              Jatuh Tempo
+            </p>
+
+            <p className="mt-2 text-3xl font-bold text-red-900">
+              {
+                data.summary
+                  .overdue_count
+              }
+            </p>
+          </div>
+        </div>
+
+        {data.summary
+          .cancelled_count >
+          0 && (
+          <p className="mt-3 text-xs text-muted">
+            Terdapat{" "}
+            <span className="font-semibold text-ink">
+              {
+                data.summary
+                  .cancelled_count
+              }
+            </span>{" "}
+            tagihan yang telah
+            dibatalkan dan tidak
+            dihitung sebagai
+            kewajiban aktif.
+          </p>
+        )}
+      </section>
+
+      {/* =====================================================
+          MONEY SUMMARY
+      ===================================================== */}
+
+      <section className="mt-7">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+          Ringkasan Nominal
+        </p>
+
+        <h2 className="mt-2 text-xl font-bold text-ink">
+          Posisi Keuangan
+        </h2>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <SummaryCard
+            label="Total Tagihan"
+            value={formatCurrency(
+              data.summary
+                .billed_amount,
+            )}
+            description="Tidak termasuk tagihan yang dibatalkan."
+          />
+
+          <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
+            <p className="text-xs font-medium text-emerald-700">
+              Sudah Dibayar
+            </p>
+
+            <p className="mt-2 text-2xl font-bold text-emerald-900 sm:text-3xl">
+              {formatCurrency(
+                data.summary
+                  .paid_amount,
+              )}
+            </p>
+
+            <p className="mt-2 text-xs leading-5 text-emerald-700">
+              Nominal pembayaran
+              aktif yang sudah
+              dialokasikan ke
+              tagihan.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-amber-100 bg-amber-50 p-5">
+            <p className="text-xs font-medium text-amber-700">
+              Sisa Tagihan
+            </p>
+
+            <p className="mt-2 text-2xl font-bold text-amber-900 sm:text-3xl">
+              {formatCurrency(
+                data.summary
+                  .outstanding_amount,
+              )}
+            </p>
+
+            <p className="mt-2 text-xs leading-5 text-amber-700">
+              Kewajiban yang masih
+              belum dilunasi.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
+            <p className="text-xs font-medium text-brand-700">
+              Pembayaran Bulan Ini
+            </p>
+
+            <p className="mt-2 text-2xl font-bold text-brand-900 sm:text-3xl">
+              {formatCurrency(
+                data.summary
+                  .payment_amount_this_month,
+              )}
+            </p>
+
+            <p className="mt-2 text-xs leading-5 text-brand-700">
+              {
+                data.summary
+                  .payment_count_this_month
+              }{" "}
+              transaksi pembayaran
+              tercatat.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* =====================================================
+          OVERDUE
+      ===================================================== */}
+
+      <section className="mt-8">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-red-600">
+            Perlu Perhatian
+          </p>
+
+          <h2 className="mt-2 text-2xl font-bold text-ink">
+            Tagihan Jatuh Tempo
+          </h2>
+
+          <p className="mt-2 text-sm text-muted">
+            Tagihan aktif yang telah
+            melewati tanggal jatuh
+            tempo.
+          </p>
+        </div>
+
+        {data.overdue_bills.length ===
+        0 ? (
+          <div className="mt-5 rounded-3xl border border-dashed border-line bg-white p-8 text-center">
+            <h3 className="font-bold text-ink">
+              Tidak ada tagihan jatuh tempo
+            </h3>
+
+            <p className="mt-2 text-sm text-muted">
+              Belum terdapat
+              tagihan aktif yang
+              melewati jatuh tempo.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-5 space-y-4">
+            {data.overdue_bills.map(
+              (bill) => (
+                <article
+                  key={
+                    bill.id
+                  }
+                  className="rounded-2xl border border-red-100 bg-white p-5 shadow-soft"
+                >
+                  <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-lg font-bold text-ink">
+                          {
+                            bill.student
+                              .full_name
+                          }
+                        </h3>
+
+                        <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
+                          Jatuh Tempo
+                        </span>
+
+                        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                          {genderLabel(
+                            bill.student
+                              .gender,
+                          )}
+                        </span>
+                      </div>
+
+                      <p className="mt-2 font-semibold text-ink">
+                        {
+                          bill.title
+                        }
+                      </p>
+
+                      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
+                        <span>
+                          Kode{" "}
+                          {
+                            bill.bill_code
+                          }
+                        </span>
+
+                        {bill.student
+                          .nis && (
+                          <span>
+                            NIS{" "}
+                            {
+                              bill.student
+                                .nis
+                            }
+                          </span>
+                        )}
+
+                        {bill.period_label && (
+                          <span>
+                            {
+                              bill.period_label
+                            }
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid min-w-0 gap-3 sm:grid-cols-3 lg:min-w-[520px]">
+                      <div className="rounded-xl bg-slate-50 p-3">
+                        <p className="text-xs text-muted">
+                          Tagihan
+                        </p>
+
+                        <p className="mt-1 font-bold text-ink">
+                          {formatCurrency(
+                            bill.amount,
+                          )}
+                        </p>
+                      </div>
+
+                      <div className="rounded-xl bg-emerald-50 p-3">
+                        <p className="text-xs text-emerald-700">
+                          Dibayar
+                        </p>
+
+                        <p className="mt-1 font-bold text-emerald-900">
+                          {formatCurrency(
+                            bill.paid_amount,
+                          )}
+                        </p>
+                      </div>
+
+                      <div className="rounded-xl bg-red-50 p-3">
+                        <p className="text-xs text-red-700">
+                          Sisa
+                        </p>
+
+                        <p className="mt-1 font-bold text-red-900">
+                          {formatCurrency(
+                            bill.outstanding_amount,
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 border-t border-line pt-3">
+                    <p className="text-xs font-medium text-red-700">
+                      Jatuh tempo{" "}
+                      {formatDate(
+                        bill.due_date,
+                      )}
+                    </p>
+                  </div>
+                </article>
+              ),
+            )}
+          </div>
+        )}
+      </section>
+
+      {/* =====================================================
+          RECENT PAYMENTS
+      ===================================================== */}
+
+      <section className="mt-8">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+            Aktivitas Terbaru
+          </p>
+
+          <h2 className="mt-2 text-2xl font-bold text-ink">
+            Pembayaran Terbaru
+          </h2>
+        </div>
+
+        {data.recent_payments.length ===
+        0 ? (
+          <div className="mt-5 rounded-3xl border border-dashed border-line bg-white p-8 text-center">
+            <h3 className="font-bold text-ink">
+              Belum ada pembayaran
+            </h3>
+
+            <p className="mt-2 text-sm text-muted">
+              Transaksi pembayaran
+              santri yang dicatat
+              Bendahara akan tampil
+              di sini.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-5 overflow-hidden rounded-2xl border border-line bg-white shadow-soft">
+            <div className="divide-y divide-line">
+              {data.recent_payments.map(
+                (payment) => (
+                  <article
+                    key={
+                      payment.id
+                    }
+                    className="p-5"
+                  >
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="font-bold text-ink">
+                            {
+                              payment.student
+                                .full_name
+                            }
+                          </h3>
+
+                          {payment.status ===
+                          "recorded" ? (
+                            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                              Tercatat
+                            </span>
+                          ) : (
+                            <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
+                              Dibatalkan
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
+                          <span>
+                            {
+                              payment.payment_code
+                            }
+                          </span>
+
+                          <span>
+                            {formatDate(
+                              payment.payment_date,
+                            )}
+                          </span>
+
+                          <span>
+                            {paymentMethodLabel(
+                              payment.payment_method,
+                            )}
+                          </span>
+
+                          {payment.reference_number && (
+                            <span>
+                              Ref.{" "}
+                              {
+                                payment.reference_number
+                              }
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[530px]">
+                        <div className="rounded-xl bg-slate-50 p-3">
+                          <p className="text-xs text-muted">
+                            Pembayaran
+                          </p>
+
+                          <p className="mt-1 font-bold text-ink">
+                            {formatCurrency(
+                              payment.amount,
+                            )}
+                          </p>
+                        </div>
+
+                        <div className="rounded-xl bg-brand-50 p-3">
+                          <p className="text-xs text-brand-700">
+                            Dialokasikan
+                          </p>
+
+                          <p className="mt-1 font-bold text-brand-900">
+                            {formatCurrency(
+                              payment.allocated_amount,
+                            )}
+                          </p>
+                        </div>
+
+                        <div className="rounded-xl bg-amber-50 p-3">
+                          <p className="text-xs text-amber-700">
+                            Belum Dialokasikan
+                          </p>
+
+                          <p className="mt-1 font-bold text-amber-900">
+                            {formatCurrency(
+                              payment.unallocated_amount,
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                ),
+              )}
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* =====================================================
+          INFORMATION
+      ===================================================== */}
+
+      <section className="mt-7 rounded-2xl border border-blue-100 bg-blue-50 p-4 sm:p-5">
+        <p className="font-semibold text-blue-800">
+          Modul Keuangan
+        </p>
+
+        <p className="mt-1 max-w-4xl text-sm leading-6 text-blue-700">
+          Dashboard ini menjadi pusat
+          monitoring Bendahara.
+          Selanjutnya kita akan
+          mengaktifkan pembuatan
+          tagihan dan pencatatan
+          pembayaran langsung dari
+          aplikasi.
+        </p>
+      </section>
+    </div>
+  );
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pengasuh\dashboard\components\pengasuh-dashboard.tsx
+========================================
+
+import type {
+  PengasuhDashboardData,
+  PengasuhDashboardGroup,
+  PengasuhDashboardMemberPreview,
+} from "../schemas/pengasuh-dashboard-schema";
+
+type PengasuhDashboardProps = {
+  data:
+    PengasuhDashboardData;
+};
+
+const numberFormatter =
+  new Intl.NumberFormat(
+    "id-ID",
+  );
+
+function getGenderLabel(
+  gender:
+    "male" | "female",
+): string {
+  return gender === "male"
+    ? "Putra"
+    : "Putri";
+}
+
+function formatDate(
+  value: string,
+): string {
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime(),
+    )
+  ) {
+    return "-";
+  }
+
+  return new Intl.DateTimeFormat(
+    "id-ID",
+    {
+      dateStyle:
+        "medium",
+
+      timeZone:
+        "Asia/Jakarta",
+    },
+  ).format(date);
+}
+
+function StudentPreviewCard({
+  student,
+}: {
+  student:
+    PengasuhDashboardMemberPreview;
+}) {
+  return (
+    <article className="rounded-2xl border border-line bg-white p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-semibold text-ink">
+            {
+              student.full_name
+            }
+          </p>
+
+          <p className="mt-1 text-xs text-slate-400">
+            ID{" "}
+            {student.legacy_student_id ??
+              "-"}
+
+            {student.nis
+              ? ` • NIS ${student.nis}`
+              : ""}
+          </p>
+        </div>
+
+        <span className="shrink-0 rounded-full bg-brand-50 px-2.5 py-1 text-[10px] font-semibold text-brand-700">
+          {getGenderLabel(
+            student.gender,
+          )}
+        </span>
+      </div>
+
+      <div className="mt-3 rounded-xl bg-slate-50 px-3 py-2.5">
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+          Kelas
+        </p>
+
+        <p className="mt-1 text-sm font-semibold text-slate-700">
+          {student.class_name ??
+            "Belum tersedia"}
+        </p>
+
+        {student.grade_level !==
+          null && (
+          <p className="mt-1 text-xs text-slate-400">
+            Tingkat{" "}
+            {
+              student.grade_level
+            }
+          </p>
+        )}
+      </div>
+    </article>
+  );
+}
+
+function CareGroupCard({
+  group,
+}: {
+  group:
+    PengasuhDashboardGroup;
+}) {
+  return (
+    <article className="overflow-hidden rounded-3xl border border-line bg-white shadow-soft">
+      <div className="p-5 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <div className="flex flex-wrap gap-2">
+              <span className="rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700">
+                {getGenderLabel(
+                  group.gender,
+                )}
+              </span>
+
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
+                {group.code}
+              </span>
+            </div>
+
+            <h2 className="mt-3 text-xl font-bold text-ink">
+              {group.name}
+            </h2>
+
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+              {group.description ??
+                "Kelompok pengasuhan yang menjadi tanggung jawab Anda."}
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-brand-50 px-4 py-3 text-center">
+            <p className="text-2xl font-bold text-brand-800">
+              {numberFormatter.format(
+                group.active_member_count,
+              )}
+            </p>
+
+            <p className="mt-1 text-xs font-medium text-brand-600">
+              Santri aktif
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 border-t border-line pt-4">
+          <p className="text-xs text-slate-500">
+            Ditugaskan sejak{" "}
+            <strong className="text-slate-700">
+              {formatDate(
+                group.assigned_at,
+              )}
+            </strong>
+          </p>
+        </div>
+      </div>
+
+      <div className="border-t border-line bg-slate-50/60 p-5 sm:p-6">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+            Santri Ampuan
+          </p>
+
+          <h3 className="mt-2 text-lg font-bold text-ink">
+            Preview Santri
+          </h3>
+
+          <p className="mt-1 text-sm text-muted">
+            Menampilkan beberapa santri
+            aktif dari kelompok Anda.
+          </p>
+        </div>
+
+        {group.member_preview.length ===
+        0 ? (
+          <div className="mt-4 rounded-2xl border border-dashed border-line bg-white p-5 text-sm text-muted">
+            Belum ada santri aktif pada
+            kelompok ini.
+          </div>
+        ) : (
+          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {group.member_preview.map(
+              (student) => (
+                <StudentPreviewCard
+                  key={
+                    student.membership_id
+                  }
+                  student={
+                    student
+                  }
+                />
+              ),
+            )}
+          </div>
+        )}
+      </div>
+    </article>
+  );
+}
+
+export function PengasuhDashboard({
+  data,
+}: PengasuhDashboardProps) {
+  const {
+    staff,
+    academic_year:
+      academicYear,
+    summary,
+  } = data;
+
+  const hasOnlyMaleStudents =
+    summary.male_student_count >
+      0 &&
+    summary.female_student_count ===
+      0;
+
+  const hasOnlyFemaleStudents =
+    summary.female_student_count >
+      0 &&
+    summary.male_student_count ===
+      0;
+
+  const scopeLabel =
+    hasOnlyMaleStudents
+      ? "Santri Putra"
+      : hasOnlyFemaleStudents
+        ? "Santri Putri"
+        : "Santri Ampuan";
+
+  return (
+    <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <section className="overflow-hidden rounded-3xl border border-brand-100 bg-gradient-to-br from-brand-50 via-white to-white shadow-soft">
+        <div className="p-6 sm:p-8 lg:p-10">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+                Dashboard Pengasuh
+              </p>
+
+              <h1 className="mt-3 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+                Assalamu&apos;alaikum,{" "}
+                {staff.full_name}
+              </h1>
+
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-muted sm:text-base">
+                Pantau santri dan
+                kelompok pengasuhan
+                yang menjadi tanggung
+                jawab Anda.
+              </p>
+
+              <div className="mt-5 flex flex-wrap gap-2">
+                {data.profile.login_id && (
+                  <span className="rounded-full border border-brand-100 bg-white px-3 py-1.5 text-xs font-semibold text-brand-700">
+                    {
+                      data.profile.login_id
+                    }
+                  </span>
+                )}
+
+                {staff.position && (
+                  <span className="rounded-full border border-line bg-white px-3 py-1.5 text-xs font-semibold text-slate-600">
+                    {
+                      staff.position
+                    }
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-brand-100 bg-white/80 px-5 py-4 backdrop-blur">
+              <p className="text-xs font-semibold text-brand-600">
+                Tahun Ajaran Aktif
+              </p>
+
+              <p className="mt-1 text-lg font-bold text-brand-900">
+                {
+                  academicYear.name
+                }
+              </p>
+
+              <p className="mt-1 text-xs text-brand-600">
+                {formatDate(
+                  academicYear.start_date,
+                )}
+                {" – "}
+                {formatDate(
+                  academicYear.end_date,
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <article className="rounded-2xl border border-line bg-white p-5 shadow-soft">
+          <p className="text-sm font-medium text-muted">
+            Kelompok Saya
+          </p>
+
+          <p className="mt-3 text-3xl font-bold text-ink">
+            {numberFormatter.format(
+              summary.assigned_group_count,
+            )}
+          </p>
+
+          <p className="mt-2 text-xs text-slate-400">
+            Assignment aktif
+          </p>
+        </article>
+
+        <article className="rounded-2xl border border-line bg-white p-5 shadow-soft">
+          <p className="text-sm font-medium text-muted">
+            Santri Ampuan
+          </p>
+
+          <p className="mt-3 text-3xl font-bold text-ink">
+            {numberFormatter.format(
+              summary.active_student_count,
+            )}
+          </p>
+
+          <p className="mt-2 text-xs text-slate-400">
+            {scopeLabel}
+          </p>
+        </article>
+
+        <article className="rounded-2xl border border-line bg-white p-5 shadow-soft">
+          <p className="text-sm font-medium text-muted">
+            Santri Putra
+          </p>
+
+          <p className="mt-3 text-3xl font-bold text-ink">
+            {numberFormatter.format(
+              summary.male_student_count,
+            )}
+          </p>
+
+          <p className="mt-2 text-xs text-slate-400">
+            Dalam kelompok Anda
+          </p>
+        </article>
+
+        <article className="rounded-2xl border border-line bg-white p-5 shadow-soft">
+          <p className="text-sm font-medium text-muted">
+            Santri Putri
+          </p>
+
+          <p className="mt-3 text-3xl font-bold text-ink">
+            {numberFormatter.format(
+              summary.female_student_count,
+            )}
+          </p>
+
+          <p className="mt-2 text-xs text-slate-400">
+            Dalam kelompok Anda
+          </p>
+        </article>
+      </section>
+
+      <section className="mt-8">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+            Tanggung Jawab Saya
+          </p>
+
+          <h2 className="mt-2 text-2xl font-bold tracking-tight text-ink">
+            Kelompok Pengasuhan
+          </h2>
+
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
+            Hanya kelompok yang
+            mempunyai assignment aktif
+            untuk akun Anda yang
+            ditampilkan di sini.
+          </p>
+        </div>
+
+        {data.groups.length ===
+        0 ? (
+          <div className="mt-5 rounded-3xl border border-dashed border-amber-300 bg-amber-50 p-8 text-center">
+            <p className="font-semibold text-amber-800">
+              Belum ada kelompok
+              pengasuhan aktif.
+            </p>
+
+            <p className="mt-2 text-sm text-amber-700">
+              Hubungi Admin apabila
+              assignment kelompok belum
+              ditentukan.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-5 space-y-5">
+            {data.groups.map(
+              (group) => (
+                <CareGroupCard
+                  key={
+                    group.assignment_id
+                  }
+                  group={
+                    group
+                  }
+                />
+              ),
+            )}
+          </div>
+        )}
+      </section>
+
+      <section className="mt-8 rounded-3xl border border-line bg-white p-5 shadow-soft sm:p-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+          Tahap Berikutnya
+        </p>
+
+        <h2 className="mt-2 text-xl font-bold text-ink">
+          Jurnal Pengasuhan
+        </h2>
+
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
+          Setelah dashboard ini selesai
+          diverifikasi, modul berikutnya
+          akan digunakan untuk mencatat
+          kegiatan dan perkembangan
+          pengasuhan santri.
+        </p>
+      </section>
+    </div>
+  );
+}
