@@ -1,5 +1,9 @@
 import Link from "next/link";
 
+import {
+  ReturnLink,
+} from "@/components/navigation/navigation-state-link";
+
 import { setAdminStaffAccountStatus } from "../actions/set-admin-staff-account-status";
 import type { AdminStaffDetailData } from "../schemas/admin-staff-detail-schema";
 
@@ -95,19 +99,20 @@ export function AdminStaffDetail({
   return (
     <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <section className="mb-6">
-        <Link
-          href="/admin/staf"
+        <ReturnLink
+          fallbackHref="/admin/staf"
+          allowedPrefixes={["/admin/staf"]}
           className="inline-flex min-h-10 items-center justify-center rounded-xl border border-line bg-white px-4 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50"
         >
           <span
             aria-hidden="true"
             className="mr-2"
           >
-            ←
+            ?
           </span>
 
           Kembali ke Data Staf
-        </Link>
+        </ReturnLink>
 
         <div className="mt-6">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">

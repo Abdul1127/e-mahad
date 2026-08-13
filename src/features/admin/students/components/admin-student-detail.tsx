@@ -1,5 +1,9 @@
 import Link from "next/link";
 
+import {
+  ReturnLink,
+} from "@/components/navigation/navigation-state-link";
+
 import type { AdminStudentDetailData } from "../schemas/admin-student-detail-schema";
 
 import { StudentCurrentPlacement } from "./student-current-placement";
@@ -17,19 +21,20 @@ export function AdminStudentDetail({
   return (
     <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <section className="mb-6">
-        <Link
-          href="/admin/santri"
+        <ReturnLink
+          fallbackHref="/admin/santri"
+          allowedPrefixes={["/admin/santri"]}
           className="inline-flex min-h-10 items-center justify-center rounded-xl border border-line bg-white px-4 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50"
         >
           <span
             aria-hidden="true"
             className="mr-2"
           >
-            ←
+            ?
           </span>
 
           Kembali ke Data Santri
-        </Link>
+        </ReturnLink>
 
         <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="min-w-0">

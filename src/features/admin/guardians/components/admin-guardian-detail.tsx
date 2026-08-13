@@ -1,5 +1,9 @@
 import Link from "next/link";
 
+import {
+  ReturnLink,
+} from "@/components/navigation/navigation-state-link";
+
 import { deleteAdminGuardianStudentRelation } from "../actions/delete-admin-guardian-student-relation";
 import { setAdminGuardianAccountStatus } from "../actions/set-admin-guardian-account-status";
 import type { AdminGuardianDetailData } from "../schemas/admin-guardian-detail-schema";
@@ -58,19 +62,20 @@ export function AdminGuardianDetail({
   return (
     <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <section className="mb-6">
-        <Link
-          href="/admin/wali"
+        <ReturnLink
+          fallbackHref="/admin/wali"
+          allowedPrefixes={["/admin/wali"]}
           className="inline-flex min-h-10 items-center justify-center rounded-xl border border-line bg-white px-4 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50"
         >
           <span
             aria-hidden="true"
             className="mr-2"
           >
-            ←
+            ?
           </span>
 
           Kembali ke Data Wali
-        </Link>
+        </ReturnLink>
 
         <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -406,7 +411,7 @@ export function AdminGuardianDetail({
                         "Belum ada kelas aktif"}
 
                       {child.academic_year_name
-                        ? ` · ${child.academic_year_name}`
+                        ? `  ${child.academic_year_name}`
                         : ""}
                     </p>
 

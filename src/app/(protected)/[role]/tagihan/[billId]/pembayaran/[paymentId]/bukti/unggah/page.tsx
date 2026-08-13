@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import {
   notFound,
 } from "next/navigation";
@@ -7,6 +5,10 @@ import {
 import {
   z,
 } from "zod";
+
+import {
+  ReturnLink,
+} from "@/components/navigation/navigation-state-link";
 
 import {
   getRoleCodeBySlug,
@@ -45,7 +47,8 @@ export default async function BendaharaUploadPaymentProofPage({
     role,
     billId,
     paymentId,
-  } = await params;
+  } =
+    await params;
 
   const roleCode =
     getRoleCodeBySlug(
@@ -105,6 +108,9 @@ export default async function BendaharaUploadPaymentProofPage({
   const payment =
     paymentItem.payment;
 
+  const detailHref =
+    `/bendahara/tagihan/${data.bill.id}`;
+
   /*
    * =====================================================
    * CANCELLED PAYMENT
@@ -117,12 +123,17 @@ export default async function BendaharaUploadPaymentProofPage({
   ) {
     return (
       <div className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        <Link
-          href={`/bendahara/tagihan/${data.bill.id}`}
+        <ReturnLink
+          fallbackHref={
+            detailHref
+          }
+          allowedPrefixes={[
+            detailHref,
+          ]}
           className="text-sm font-semibold text-brand-700 transition hover:text-brand-800"
         >
           ← Kembali ke Detail Tagihan
-        </Link>
+        </ReturnLink>
 
         <section className="mt-6 rounded-2xl border border-red-100 bg-red-50 p-6">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-red-600">
@@ -162,12 +173,17 @@ export default async function BendaharaUploadPaymentProofPage({
   ) {
     return (
       <div className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        <Link
-          href={`/bendahara/tagihan/${data.bill.id}`}
+        <ReturnLink
+          fallbackHref={
+            detailHref
+          }
+          allowedPrefixes={[
+            detailHref,
+          ]}
           className="text-sm font-semibold text-brand-700 transition hover:text-brand-800"
         >
           ← Kembali ke Detail Tagihan
-        </Link>
+        </ReturnLink>
 
         <section className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50 p-6">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">
@@ -187,14 +203,14 @@ export default async function BendaharaUploadPaymentProofPage({
               }
             </strong>{" "}
             sudah mempunyai bukti
-            pembayaran yang tersimpan
-            pada private Storage
-            E-Ma&apos;had.
+            pembayaran yang
+            tersimpan pada private
+            Storage E-Ma&apos;had.
           </p>
 
           <p className="mt-3 text-sm leading-6 text-emerald-700">
-            Bukti dapat dibuka melalui
-            tombol{" "}
+            Bukti dapat dibuka
+            melalui tombol{" "}
             <strong>
               Lihat Bukti
             </strong>{" "}
@@ -202,12 +218,17 @@ export default async function BendaharaUploadPaymentProofPage({
           </p>
 
           <div className="mt-5">
-            <Link
-              href={`/bendahara/tagihan/${data.bill.id}`}
+            <ReturnLink
+              fallbackHref={
+                detailHref
+              }
+              allowedPrefixes={[
+                detailHref,
+              ]}
               className="inline-flex min-h-11 items-center justify-center rounded-xl bg-emerald-700 px-5 text-sm font-semibold text-white transition hover:bg-emerald-800"
             >
               Buka Detail Tagihan
-            </Link>
+            </ReturnLink>
           </div>
         </section>
       </div>
@@ -223,12 +244,17 @@ export default async function BendaharaUploadPaymentProofPage({
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <section>
-        <Link
-          href={`/bendahara/tagihan/${data.bill.id}`}
+        <ReturnLink
+          fallbackHref={
+            detailHref
+          }
+          allowedPrefixes={[
+            detailHref,
+          ]}
           className="text-sm font-semibold text-brand-700 transition hover:text-brand-800"
         >
           ← Kembali ke Detail Tagihan
-        </Link>
+        </ReturnLink>
 
         <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
           Dokumen Pembayaran
@@ -240,8 +266,9 @@ export default async function BendaharaUploadPaymentProofPage({
 
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
           Simpan foto atau dokumen
-          bukti pembayaran pada private
-          Storage E-Ma&apos;had.
+          bukti pembayaran pada
+          private Storage
+          E-Ma&apos;had.
         </p>
       </section>
 

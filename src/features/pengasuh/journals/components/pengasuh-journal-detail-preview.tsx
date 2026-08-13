@@ -1,4 +1,6 @@
-import Link from "next/link";
+import {
+  ReturnLink,
+} from "@/components/navigation/navigation-state-link";
 
 import type { CareJournalStatus } from "../schemas/pengasuh-journal-overview-schema";
 import type { PengasuhJournalDetailData } from "../schemas/pengasuh-journal-detail-schema";
@@ -99,12 +101,16 @@ export function PengasuhJournalDetailPreview({
           BACK
       ===================================================== */}
 
-      <Link
-        href={`/pengasuh/jurnal?date=${journal.journal_date}`}
+      <ReturnLink
+        fallbackHref={`/pengasuh/jurnal?date=${journal.journal_date}`}
+        allowedPrefixes={[
+          "/pengasuh/jurnal",
+          "/pengasuh/riwayat",
+        ]}
         className="text-sm font-semibold text-brand-700 transition hover:text-brand-800"
       >
         ← Kembali ke Jurnal
-      </Link>
+      </ReturnLink>
 
       {/* =====================================================
           JOURNAL HEADER
@@ -165,10 +171,6 @@ export function PengasuhJournalDetailPreview({
           </div>
         </div>
 
-        {/* =================================================
-            SUMMARY
-        ================================================= */}
-
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
           <div className="rounded-2xl bg-slate-50 p-4">
             <p className="text-xs text-muted">
@@ -203,10 +205,6 @@ export function PengasuhJournalDetailPreview({
           </div>
         </div>
 
-        {/* =================================================
-            PROGRESS BAR
-        ================================================= */}
-
         <div className="mt-5">
           <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
             <div
@@ -218,10 +216,6 @@ export function PengasuhJournalDetailPreview({
           </div>
         </div>
       </section>
-
-      {/* =====================================================
-          SUBMITTED NOTICE
-      ===================================================== */}
 
       {temporarilyLocked && (
         <section className="mt-5 rounded-2xl border border-blue-200 bg-blue-50 p-4 sm:p-5">
@@ -237,10 +231,6 @@ export function PengasuhJournalDetailPreview({
           </p>
         </section>
       )}
-
-      {/* =====================================================
-          REVISION REQUEST NOTICE
-      ===================================================== */}
 
       {journal.status ===
         "revision_requested" &&
@@ -259,10 +249,6 @@ export function PengasuhJournalDetailPreview({
           </section>
         )}
 
-      {/* =====================================================
-          REVIEWED NOTICE
-      ===================================================== */}
-
       {journal.status ===
         "reviewed" && (
         <section className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 sm:p-5">
@@ -279,10 +265,6 @@ export function PengasuhJournalDetailPreview({
           </p>
         </section>
       )}
-
-      {/* =====================================================
-          JOURNAL ENTRY HEADER + BULK NORMAL
-      ===================================================== */}
 
       <section className="mt-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
@@ -330,10 +312,6 @@ export function PengasuhJournalDetailPreview({
             )}
         </div>
 
-        {/* =================================================
-            ENTRY LIST
-        ================================================= */}
-
         {entries.length === 0 ? (
           <div className="mt-5 rounded-3xl border border-dashed border-line bg-white p-8 text-center">
             <p className="font-semibold text-ink">
@@ -360,10 +338,6 @@ export function PengasuhJournalDetailPreview({
           </div>
         )}
       </section>
-
-      {/* =====================================================
-          SUBMIT PANEL
-      ===================================================== */}
 
       <section className="sticky bottom-4 z-20 mt-6 rounded-2xl border border-line bg-white/95 p-4 shadow-lg backdrop-blur sm:p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -398,10 +372,6 @@ export function PengasuhJournalDetailPreview({
             )}
         </div>
       </section>
-
-      {/* =====================================================
-          REVIEW HISTORY
-      ===================================================== */}
 
       {reviews.length > 0 && (
         <section className="mt-6 rounded-3xl border border-line bg-white p-5 shadow-soft sm:p-6">

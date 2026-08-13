@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import {
   notFound,
 } from "next/navigation";
@@ -7,6 +5,10 @@ import {
 import {
   z,
 } from "zod";
+
+import {
+  ReturnLink,
+} from "@/components/navigation/navigation-state-link";
 
 import {
   getRoleCodeBySlug,
@@ -45,7 +47,8 @@ export default async function BendaharaCancelPaymentPage({
     role,
     billId,
     paymentId,
-  } = await params;
+  } =
+    await params;
 
   const roleCode =
     getRoleCodeBySlug(
@@ -105,32 +108,44 @@ export default async function BendaharaCancelPaymentPage({
   const payment =
     paymentItem.payment;
 
+  const detailHref =
+    `/bendahara/tagihan/${data.bill.id}`;
+
   if (
     payment.status ===
     "cancelled"
   ) {
     return (
       <div className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        <Link
-          href={`/bendahara/tagihan/${data.bill.id}`}
+        <ReturnLink
+          fallbackHref={
+            detailHref
+          }
+          allowedPrefixes={[
+            detailHref,
+          ]}
           className="text-sm font-semibold text-brand-700 transition hover:text-brand-800"
         >
           ← Kembali ke Detail Tagihan
-        </Link>
+        </ReturnLink>
 
         <section className="mt-6 rounded-2xl border border-red-100 bg-red-50 p-6">
           <h1 className="text-2xl font-bold text-red-900">
-            Pembayaran sudah dibatalkan
+            Pembayaran sudah
+            dibatalkan
           </h1>
 
           <p className="mt-3 text-sm leading-7 text-red-700">
             Transaksi{" "}
             <strong>
-              {payment.payment_code}
+              {
+                payment.payment_code
+              }
             </strong>{" "}
             sudah berstatus
-            Dibatalkan dan tidak dapat
-            dibatalkan kembali.
+            Dibatalkan dan tidak
+            dapat dibatalkan
+            kembali.
           </p>
 
           {payment.cancellation_reason && (
@@ -154,12 +169,17 @@ export default async function BendaharaCancelPaymentPage({
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <section>
-        <Link
-          href={`/bendahara/tagihan/${data.bill.id}`}
+        <ReturnLink
+          fallbackHref={
+            detailHref
+          }
+          allowedPrefixes={[
+            detailHref,
+          ]}
           className="text-sm font-semibold text-brand-700 transition hover:text-brand-800"
         >
           ← Kembali ke Detail Tagihan
-        </Link>
+        </ReturnLink>
 
         <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-red-600">
           Koreksi Transaksi

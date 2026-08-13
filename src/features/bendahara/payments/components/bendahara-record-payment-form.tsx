@@ -1,10 +1,12 @@
 "use client";
 
-import Link from "next/link";
-
 import {
   useActionState,
 } from "react";
+
+import {
+  ReturnLink,
+} from "@/components/navigation/navigation-state-link";
 
 import {
   recordBendaharaBillPaymentAction,
@@ -15,25 +17,34 @@ import {
 } from "../types/record-bendahara-payment-action-state";
 
 type Props = {
-  billId: string;
+  billId:
+    string;
 
-  studentName: string;
+  studentName:
+    string;
 
-  billTitle: string;
+  billTitle:
+    string;
 
-  billCode: string;
+  billCode:
+    string;
 
-  billAmount: number;
+  billAmount:
+    number;
 
-  paidAmount: number;
+  paidAmount:
+    number;
 
-  outstandingAmount: number;
+  outstandingAmount:
+    number;
 
-  today: string;
+  today:
+    string;
 };
 
 function formatCurrency(
-  value: number,
+  value:
+    number,
 ): string {
   return new Intl.NumberFormat(
     "id-ID",
@@ -68,7 +79,9 @@ function FieldError({
 
   return (
     <p className="mt-1 text-xs font-medium text-red-600">
-      {messages[0]}
+      {
+        messages[0]
+      }
     </p>
   );
 }
@@ -87,10 +100,14 @@ export function BendaharaRecordPaymentForm({
     state,
     formAction,
     pending,
-  ] = useActionState(
-    recordBendaharaBillPaymentAction,
-    initialRecordBendaharaPaymentActionState,
-  );
+  ] =
+    useActionState(
+      recordBendaharaBillPaymentAction,
+      initialRecordBendaharaPaymentActionState,
+    );
+
+  const detailHref =
+    `/bendahara/tagihan/${billId}`;
 
   return (
     <form
@@ -117,16 +134,22 @@ export function BendaharaRecordPaymentForm({
         </p>
 
         <h2 className="mt-2 text-xl font-bold text-ink">
-          {billTitle}
+          {
+            billTitle
+          }
         </h2>
 
         <p className="mt-1 text-sm text-muted">
-          {billCode}
+          {
+            billCode
+          }
         </p>
 
         <div className="mt-4">
           <p className="font-semibold text-ink">
-            {studentName}
+            {
+              studentName
+            }
           </p>
         </div>
 
@@ -182,7 +205,9 @@ export function BendaharaRecordPaymentForm({
           </p>
 
           <p className="mt-1 text-sm leading-6 text-red-700">
-            {state.message}
+            {
+              state.message
+            }
           </p>
         </section>
       )}
@@ -437,12 +462,17 @@ export function BendaharaRecordPaymentForm({
       =============================================== */}
 
       <section className="flex flex-col-reverse gap-3 border-t border-line pt-5 sm:flex-row sm:justify-end">
-        <Link
-          href={`/bendahara/tagihan/${billId}`}
+        <ReturnLink
+          fallbackHref={
+            detailHref
+          }
+          allowedPrefixes={[
+            detailHref,
+          ]}
           className="inline-flex min-h-11 items-center justify-center rounded-xl border border-line bg-white px-5 text-sm font-semibold text-muted transition hover:bg-slate-50 hover:text-ink"
         >
           Batal
-        </Link>
+        </ReturnLink>
 
         <button
           type="submit"

@@ -1,41 +1,57 @@
 "use client";
 
-import Link from "next/link";
-
-import {
+import type {
   ChangeEvent,
   FormEvent,
+} from "react";
+
+import {
   useState,
 } from "react";
 
 import {
   useRouter,
+  useSearchParams,
 } from "next/navigation";
+
+import {
+  ReturnLink,
+} from "@/components/navigation/navigation-state-link";
 
 import {
   createClient,
 } from "@/lib/supabase/client";
 
 type Props = {
-  billId: string;
+  billId:
+    string;
 
-  paymentId: string;
+  paymentId:
+    string;
 
-  paymentCode: string;
+  paymentCode:
+    string;
 
-  studentName: string;
+  studentName:
+    string;
 
-  billTitle: string;
+  billTitle:
+    string;
 
-  paymentAmount: number;
+  paymentAmount:
+    number;
 
-  paymentDate: string;
+  paymentDate:
+    string;
 
-  paymentMethod: string;
+  paymentMethod:
+    string;
 };
 
 const MAX_FILE_SIZE =
-  5 * 1024 * 1024;
+  5 *
+  1024 *
+  1024;
 
 const ALLOWED_TYPES = [
   "image/jpeg",
@@ -45,7 +61,8 @@ const ALLOWED_TYPES = [
 ] as const;
 
 function formatCurrency(
-  value: number,
+  value:
+    number,
 ): string {
   return new Intl.NumberFormat(
     "id-ID",
@@ -65,7 +82,8 @@ function formatCurrency(
 }
 
 function formatDate(
-  value: string,
+  value:
+    string,
 ): string {
   return new Intl.DateTimeFormat(
     "id-ID",
@@ -87,7 +105,8 @@ function formatDate(
 }
 
 function paymentMethodLabel(
-  value: string,
+  value:
+    string,
 ): string {
   switch (
     value
@@ -112,7 +131,8 @@ function paymentMethodLabel(
 }
 
 function getExtensionFromMimeType(
-  mimeType: string,
+  mimeType:
+    string,
 ): string | null {
   switch (
     mimeType
@@ -135,7 +155,8 @@ function getExtensionFromMimeType(
 }
 
 function formatFileSize(
-  size: number,
+  size:
+    number,
 ): string {
   if (
     size <
@@ -146,10 +167,12 @@ function formatFileSize(
 
   if (
     size <
-    1024 * 1024
+    1024 *
+      1024
   ) {
     return `${(
-      size / 1024
+      size /
+      1024
     ).toFixed(
       1,
     )} KB`;
@@ -157,10 +180,75 @@ function formatFileSize(
 
   return `${(
     size /
-    (1024 * 1024)
+    (
+      1024 *
+      1024
+    )
   ).toFixed(
     2,
   )} MB`;
+}
+
+/*
+ * =========================================================
+ * SAFE DETAIL RETURN URL
+ * =========================================================
+ *
+ * returnTo pada halaman upload harus menuju detail tagihan
+ * yang sama.
+ *
+ * Query string pada detail tetap dipertahankan karena
+ * query tersebut bisa berisi returnTo menuju daftar
+ * tagihan / riwayat pembayaran sebelumnya.
+ */
+function getSafeDetailReturnTo({
+  candidate,
+  detailHref,
+}: {
+  candidate:
+    string | null;
+
+  detailHref:
+    string;
+}): string {
+  if (!candidate) {
+    return detailHref;
+  }
+
+  try {
+    const baseUrl =
+      new URL(
+        "https://e-mahad.local",
+      );
+
+    const targetUrl =
+      new URL(
+        candidate,
+        baseUrl,
+      );
+
+    if (
+      targetUrl.origin !==
+      baseUrl.origin
+    ) {
+      return detailHref;
+    }
+
+    if (
+      targetUrl.pathname !==
+      detailHref
+    ) {
+      return detailHref;
+    }
+
+    return (
+      `${targetUrl.pathname}` +
+      `${targetUrl.search}` +
+      `${targetUrl.hash}`
+    );
+  } catch {
+    return detailHref;
+  }
 }
 
 export function BendaharaUploadPaymentProofForm({
@@ -176,31 +264,51 @@ export function BendaharaUploadPaymentProofForm({
   const router =
     useRouter();
 
+  const searchParams =
+    useSearchParams();
+
+  const detailHref =
+    `/bendahara/tagihan/${billId}`;
+
+  const detailReturnTo =
+    getSafeDetailReturnTo({
+      candidate:
+        searchParams.get(
+          "returnTo",
+        ),
+
+      detailHref,
+    });
+
   const [
     selectedFile,
     setSelectedFile,
-  ] = useState<File | null>(
-    null,
-  );
+  ] =
+    useState<File | null>(
+      null,
+    );
 
   const [
     errorMessage,
     setErrorMessage,
-  ] = useState<
-    string | null
-  >(
-    null,
-  );
+  ] =
+    useState<
+      string | null
+    >(
+      null,
+    );
 
   const [
     isUploading,
     setIsUploading,
-  ] = useState(
-    false,
-  );
+  ] =
+    useState(
+      false,
+    );
 
   function validateFile(
-    file: File,
+    file:
+      File,
   ): string | null {
     if (
       !ALLOWED_TYPES.includes(
@@ -397,9 +505,9 @@ export function BendaharaUploadPaymentProofForm({
         attachError
       ) {
         /*
-         * File sudah ter-upload tetapi DB attach gagal.
-         *
-         * Coba cleanup object supaya tidak orphan.
+         * File sudah ter-upload tetapi attach database
+         * gagal. Hapus kembali object agar tidak menjadi
+         * orphan file.
          */
 
         const {
@@ -431,10 +539,21 @@ export function BendaharaUploadPaymentProofForm({
        * ===============================================
        * 3. RETURN TO BILL DETAIL
        * ===============================================
+       *
+       * Sebelumnya:
+       *
+       * /bendahara/tagihan/{billId}
+       *
+       * Sekarang:
+       *
+       * /bendahara/tagihan/{billId}
+       * ?returnTo=/bendahara/tagihan?page=...
+       *
+       * sehingga state daftar tidak hilang.
        */
 
       router.replace(
-        `/bendahara/tagihan/${billId}`,
+        detailReturnTo,
       );
 
       router.refresh();
@@ -442,7 +561,8 @@ export function BendaharaUploadPaymentProofForm({
       error
     ) {
       setErrorMessage(
-        error instanceof Error
+        error instanceof
+          Error
           ? error.message
           : "Terjadi kesalahan saat meng-upload bukti pembayaran.",
       );
@@ -472,15 +592,21 @@ export function BendaharaUploadPaymentProofForm({
         <div className="mt-4 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 className="text-xl font-bold text-ink">
-              {paymentCode}
+              {
+                paymentCode
+              }
             </h2>
 
             <p className="mt-2 font-semibold text-ink">
-              {studentName}
+              {
+                studentName
+              }
             </p>
 
             <p className="mt-1 text-sm text-muted">
-              {billTitle}
+              {
+                billTitle
+              }
             </p>
           </div>
 
@@ -555,7 +681,8 @@ export function BendaharaUploadPaymentProofForm({
 
           <span className="mt-2 block text-xs leading-5 text-brand-700">
             JPG, PNG, WebP atau PDF
-            • Maksimal 5 MB
+            {" • "}
+            Maksimal 5 MB
           </span>
 
           <input
@@ -628,7 +755,9 @@ export function BendaharaUploadPaymentProofForm({
           </p>
 
           <p className="mt-1 break-words text-sm leading-6 text-red-700">
-            {errorMessage}
+            {
+              errorMessage
+            }
           </p>
         </section>
       )}
@@ -638,12 +767,17 @@ export function BendaharaUploadPaymentProofForm({
       =============================================== */}
 
       <section className="flex flex-col-reverse gap-3 border-t border-line pt-5 sm:flex-row sm:justify-end">
-        <Link
-          href={`/bendahara/tagihan/${billId}`}
+        <ReturnLink
+          fallbackHref={
+            detailHref
+          }
+          allowedPrefixes={[
+            detailHref,
+          ]}
           className="inline-flex min-h-11 items-center justify-center rounded-xl border border-line bg-white px-5 text-sm font-semibold text-muted transition hover:bg-slate-50 hover:text-ink"
         >
           Batal
-        </Link>
+        </ReturnLink>
 
         <button
           type="submit"

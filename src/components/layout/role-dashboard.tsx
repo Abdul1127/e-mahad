@@ -51,28 +51,56 @@ const workspaceByRole: Record<
 
     modules: [
       {
-        label: "Data Santri",
-        description: "Kelola data santri.",
-        href: "/admin/santri",
-        available: true,
+        label:
+          "Data Santri",
+
+        description:
+          "Kelola data dan penempatan santri.",
+
+        href:
+          "/admin/santri",
+
+        available:
+          true,
       },
       {
-        label: "Orang Tua/Wali",
-        description: "Kelola wali dan hubungan dengan santri.",
-        href: "/admin/wali",
-        available: true,
+        label:
+          "Orang Tua/Wali",
+
+        description:
+          "Kelola wali dan hubungan dengan santri.",
+
+        href:
+          "/admin/wali",
+
+        available:
+          true,
       },
       {
-        label: "Staf dan Akun",
-        description: "Kelola staf, akun, dan role.",
-        href: "/admin/staf",
-        available: true,
+        label:
+          "Staf dan Akun",
+
+        description:
+          "Kelola staf, akun login, dan role.",
+
+        href:
+          "/admin/staf",
+
+        available:
+          true,
       },
       {
-        label: "Kelompok dan Assignment",
-        description: "Kelola kelompok dan penugasan.",
-        href: "/admin/kelompok",
-        available: true,
+        label:
+          "Kelompok dan Assignment",
+
+        description:
+          "Kelola kelompok serta penugasan staf.",
+
+        href:
+          "/admin/kelompok",
+
+        available:
+          true,
       },
     ],
   },
@@ -82,31 +110,47 @@ const workspaceByRole: Record<
       "Pantau operasional Ma'had",
 
     focusDescription:
-      "Penanggung Jawab memonitor kegiatan asrama dan kinerja Kepala Ma'had tanpa mengelola keuangan.",
+      "Penanggung Jawab memonitor kondisi operasional asrama, kinerja Kepala Ma'had, dan perkembangan Tahfiz tanpa mengakses keuangan.",
 
     modules: [
       {
-        label: "Jurnal Kepala Ma'had",
+        label:
+          "Monitoring Asrama",
+
         description:
-          "Pantau jurnal kegiatan dan kinerja Kepala Ma'had yang sudah dikirim.",
+          "Lihat ringkasan Pengasuhan, Jurnal Kepala Ma'had, dan kelengkapan laporan Tahfiz pekan berjalan.",
+
         href:
-          "/penanggung-jawab/jurnal",
+          "/penanggung-jawab/monitoring",
+
         available:
           true,
       },
       {
-        label: "Monitoring Asrama",
+        label:
+          "Jurnal Kepala Ma'had",
+
         description:
-          "Ringkasan pengasuhan dan kegiatan operasional.",
+          "Pantau jurnal kegiatan dan kinerja Kepala Ma'had.",
+
+        href:
+          "/penanggung-jawab/jurnal",
+
         available:
-          false,
+          true,
       },
       {
-        label: "Perkembangan Tahfiz",
+        label:
+          "Perkembangan Tahfiz",
+
         description:
-          "Monitoring laporan Tahfiz secara read-only.",
+          "Pantau laporan Tahfiz published seluruh santri secara read-only.",
+
+        href:
+          "/penanggung-jawab/tahfiz",
+
         available:
-          false,
+          true,
       },
     ],
   },
@@ -116,151 +160,234 @@ const workspaceByRole: Record<
       "Kendalikan operasional harian Ma'had",
 
     focusDescription:
-      "Kepala Ma'had mereview pengasuhan, mencatat jurnal operasional, serta memonitor Tahfiz dan keuangan.",
+      "Kepala Ma'had mereview pengasuhan, mencatat jurnal operasional, serta memonitor perkembangan Tahfiz dan keuangan.",
 
     modules: [
       {
-        label: "Review Jurnal Pengasuhan",
+        label:
+          "Jurnal Pengasuhan",
+
         description:
-          "Review jurnal Pengasuh dan tindak lanjutnya.",
+          "Review jurnal dan kondisi santri dari Pengasuh.",
+
         href:
           "/kepala-mahad/pengasuhan",
+
         available:
           true,
       },
       {
-        label: "Jurnal Kepala Ma'had",
+        label:
+          "Jurnal Kepala Ma'had",
+
         description:
-          "Catat kegiatan, kinerja, bukti, serta kendala operasional.",
+          "Catat kegiatan dan kinerja operasional Kepala Ma'had.",
+
         href:
           "/kepala-mahad/jurnal",
+
         available:
           true,
       },
       {
-        label: "Perkembangan Tahfiz",
+        label:
+          "Perkembangan Tahfiz",
+
         description:
-          "Pantau laporan mingguan Tahfiz.",
+          "Pantau laporan Tahfiz published seluruh santri.",
+
+        href:
+          "/kepala-mahad/tahfiz",
+
         available:
-          false,
+          true,
       },
       {
-        label: "Ringkasan Keuangan",
+        label:
+          "Ringkasan Keuangan",
+
         description:
-          "Lihat posisi tagihan dan pembayaran secara read-only.",
+          "Pantau tagihan, penerimaan, sisa kewajiban, dan transaksi terbaru secara read-only.",
+
+        href:
+          "/kepala-mahad/keuangan",
+
         available:
-          false,
+          true,
       },
     ],
   },
 
   pengasuh: {
     focusTitle:
-      "Pantau kondisi santri ampuan",
+      "Pantau kondisi santri dalam pengasuhan",
 
     focusDescription:
-      "Pengasuh mengelola santri sesuai penugasan dan mencatat Jurnal Pengasuhan.",
+      "Pengasuh mengelola Jurnal Pengasuhan sesuai kelompok dan assignment yang diberikan.",
 
     modules: [
       {
-        label: "Santri Ampuan",
-        description: "Lihat santri yang diampu.",
-        href: "/pengasuh/santri",
-        available: true,
+        label:
+          "Santri Ampuan",
+
+        description:
+          "Lihat santri sesuai kelompok pengasuhan.",
+
+        href:
+          "/pengasuh/santri",
+
+        available:
+          true,
       },
       {
-        label: "Jurnal Pengasuhan",
-        description: "Isi Jurnal Pengasuhan.",
-        href: "/pengasuh/jurnal",
-        available: true,
+        label:
+          "Jurnal Pengasuhan",
+
+        description:
+          "Isi kondisi santri dan kirim jurnal untuk direview.",
+
+        href:
+          "/pengasuh/jurnal",
+
+        available:
+          true,
       },
       {
-        label: "Riwayat Pengasuhan",
-        description: "Lihat riwayat jurnal dan review.",
-        href: "/pengasuh/riwayat",
-        available: true,
+        label:
+          "Riwayat Pengasuhan",
+
+        description:
+          "Lihat jurnal terdahulu dan tindak lanjut review.",
+
+        href:
+          "/pengasuh/riwayat",
+
+        available:
+          true,
       },
     ],
   },
 
   pembina_tahfiz: {
     focusTitle:
-      "Kelola perkembangan Tahfiz mingguan",
+      "Perbarui perkembangan Tahfiz mingguan",
 
     focusDescription:
-      "Pembina membuat dan mempublikasikan laporan Tahfiz santri.",
+      "Pembina membuat dan mempublikasikan laporan Tahfiz individu santri sesuai kelompok yang diampu.",
 
     modules: [
       {
-        label: "Laporan Mingguan",
-        description: "Isi perkembangan Tahfiz.",
+        label:
+          "Laporan Mingguan",
+
+        description:
+          "Isi dan publikasikan laporan Tahfiz per santri.",
+
         href:
           "/pembina-tahfiz/laporan",
-        available: true,
+
+        available:
+          true,
       },
       {
-        label: "Riwayat Laporan",
-        description: "Lihat laporan yang pernah dibuat.",
+        label:
+          "Riwayat Laporan",
+
+        description:
+          "Lihat kembali laporan mingguan yang pernah dibuat.",
+
         href:
           "/pembina-tahfiz/laporan/riwayat",
-        available: true,
+
+        available:
+          true,
       },
     ],
   },
 
   bendahara: {
     focusTitle:
-      "Kelola tagihan dan pembayaran",
+      "Kelola tagihan dan pembayaran santri",
 
     focusDescription:
-      "Bendahara mengelola tagihan, pembayaran, bukti transaksi, dan riwayat.",
+      "Bendahara membuat tagihan, mencatat pembayaran, menyimpan bukti, dan melakukan koreksi transaksi.",
 
     modules: [
       {
-        label: "Tagihan Santri",
-        description: "Kelola tagihan.",
-        href: "/bendahara/tagihan",
-        available: true,
+        label:
+          "Tagihan",
+
+        description:
+          "Kelola tagihan dan status pembayaran santri.",
+
+        href:
+          "/bendahara/tagihan",
+
+        available:
+          true,
       },
       {
-        label: "Pembayaran",
-        description: "Kelola riwayat pembayaran.",
-        href: "/bendahara/pembayaran",
-        available: true,
+        label:
+          "Pembayaran",
+
+        description:
+          "Pantau riwayat transaksi pembayaran.",
+
+        href:
+          "/bendahara/pembayaran",
+
+        available:
+          true,
       },
       {
-        label: "Laporan Keuangan",
-        description: "Rekap berdasarkan periode.",
-        available: false,
+        label:
+          "Laporan Keuangan",
+
+        description:
+          "Lihat rekap tagihan dan pembayaran berdasarkan periode laporan.",
+
+        href:
+          "/bendahara/laporan",
+
+        available:
+          true,
       },
     ],
   },
 
   guardian: {
     focusTitle:
-      "Pantau perkembangan anak",
+      "Pantau informasi anak",
 
     focusDescription:
-      "Orang tua melihat Tahfiz serta informasi tagihan dan pembayaran anak.",
+      "Orang tua atau wali hanya dapat melihat data anak yang terhubung dengan akun.",
 
     modules: [
       {
-        label: "Perkembangan Tahfiz",
-        description: "Lihat laporan Tahfiz anak.",
-        href: "/wali/dashboard",
-        available: true,
+        label:
+          "Tagihan",
+
+        description:
+          "Lihat tagihan anak pada tahun ajaran aktif.",
+
+        href:
+          "/wali/tagihan",
+
+        available:
+          true,
       },
       {
-        label: "Tagihan",
-        description: "Lihat tagihan anak.",
-        href: "/wali/tagihan",
-        available: true,
-      },
-      {
-        label: "Riwayat Pembayaran",
-        description: "Lihat pembayaran anak.",
-        href: "/wali/pembayaran",
-        available: true,
+        label:
+          "Riwayat Pembayaran",
+
+        description:
+          "Lihat pembayaran dan bukti transaksi anak.",
+
+        href:
+          "/wali/pembayaran",
+
+        available:
+          true,
       },
     ],
   },
@@ -278,7 +405,7 @@ export function RoleDashboard({
   roleCode,
   context,
 }: RoleDashboardProps) {
-  const role =
+  const roleDefinition =
     roleDefinitions[
       roleCode
     ];
@@ -288,43 +415,36 @@ export function RoleDashboard({
       roleCode
     ];
 
-  const availableCount =
-    workspace.modules.filter(
-      (item) =>
-        item.available,
-    ).length;
-
-  const developmentCount =
-    workspace.modules.length -
-    availableCount;
-
   return (
     <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-      <section className="rounded-3xl border border-brand-100 bg-white p-6 shadow-soft sm:p-8 lg:p-10">
-        <div className="grid gap-7 xl:grid-cols-[1fr_340px]">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-700">
+      <section className="overflow-hidden rounded-3xl border border-brand-100 bg-white shadow-soft">
+        <div className="grid gap-8 p-6 sm:p-8 xl:grid-cols-[minmax(0,1fr)_340px] xl:p-10">
+          <div className="min-w-0">
+            <div className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-700">
               <span className="size-2 rounded-full bg-brand-500" />
-              Dashboard{" "}
-              {role.label}
-            </span>
 
-            <h1 className="mt-5 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+              Dashboard{" "}
+              {
+                roleDefinition.label
+              }
+            </div>
+
+            <h2 className="mt-5 max-w-3xl text-3xl font-bold tracking-tight text-ink sm:text-4xl">
               Assalamu&apos;alaikum,{" "}
               {
                 context.fullName
               }
-            </h1>
+            </h2>
 
-            <p className="mt-4 max-w-3xl leading-7 text-muted">
+            <p className="mt-4 max-w-3xl text-base leading-7 text-muted">
               {
-                role.description
+                roleDefinition.description
               }
             </p>
           </div>
 
-          <div className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
-            <div className="flex gap-3">
+          <div className="rounded-2xl border border-brand-100 bg-brand-50/70 p-5">
+            <div className="flex items-start gap-3">
               <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-700 text-white">
                 <AppIcon
                   name="shield"
@@ -338,9 +458,10 @@ export function RoleDashboard({
                 </p>
 
                 <p className="mt-1 text-sm leading-6 text-brand-700">
-                  Proteksi route dan
-                  pembatasan akses telah
-                  diterapkan.
+                  Menu dan data
+                  dibatasi sesuai
+                  kewenangan role
+                  pengguna.
                 </p>
               </div>
             </div>
@@ -348,17 +469,17 @@ export function RoleDashboard({
         </div>
       </section>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_1fr]">
-        <section className="rounded-3xl border border-line bg-white p-6 shadow-soft">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+        <section className="rounded-3xl border border-line bg-white p-6 shadow-soft sm:p-7">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
             Fokus Utama
           </p>
 
-          <h2 className="mt-3 text-2xl font-bold text-ink">
+          <h3 className="mt-3 text-2xl font-bold tracking-tight text-ink">
             {
               workspace.focusTitle
             }
-          </h2>
+          </h3>
 
           <p className="mt-3 leading-7 text-muted">
             {
@@ -366,53 +487,86 @@ export function RoleDashboard({
             }
           </p>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl bg-brand-50 p-4">
-              <p className="text-xs text-brand-700">
-                Modul tersedia
-              </p>
+          <div className="mt-6 rounded-2xl border border-brand-100 bg-brand-50 p-5">
+            <p className="font-semibold text-brand-900">
+              E-Ma&apos;had
+            </p>
 
-              <p className="mt-2 text-3xl font-bold text-brand-900">
-                {
-                  availableCount
-                }
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-slate-50 p-4">
-              <p className="text-xs text-muted">
-                Dalam pengembangan
-              </p>
-
-              <p className="mt-2 text-3xl font-bold text-ink">
-                {
-                  developmentCount
-                }
-              </p>
-            </div>
+            <p className="mt-2 text-sm leading-6 text-brand-700">
+              Gunakan ruang kerja
+              sesuai tugas dan
+              kewenangan untuk
+              menjaga data tetap
+              konsisten dan mudah
+              dipantau.
+            </p>
           </div>
         </section>
 
-        <section className="rounded-3xl border border-line bg-white p-6 shadow-soft">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+        <section className="rounded-3xl border border-line bg-white p-6 shadow-soft sm:p-7">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
             Ruang Kerja
           </p>
 
+          <h3 className="mt-3 text-xl font-bold text-ink">
+            Modul Tersedia
+          </h3>
+
           <div className="mt-5 space-y-3">
             {workspace.modules.map(
-              (module) =>
-                module.available &&
-                module.href ? (
-                  <Link
+              (
+                module,
+              ) => {
+                if (
+                  module.available &&
+                  module.href
+                ) {
+                  return (
+                    <Link
+                      key={
+                        module.label
+                      }
+                      href={
+                        module.href
+                      }
+                      className="group flex min-h-16 items-center gap-4 rounded-2xl border border-line bg-slate-50/70 px-4 py-3 transition hover:border-brand-200 hover:bg-brand-50"
+                    >
+                      <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-white text-brand-700 shadow-sm">
+                        <AppIcon
+                          name="chevron-right"
+                          className="size-4 transition group-hover:translate-x-0.5"
+                        />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-ink">
+                          {
+                            module.label
+                          }
+                        </p>
+
+                        <p className="mt-1 text-xs leading-5 text-muted">
+                          {
+                            module.description
+                          }
+                        </p>
+                      </div>
+
+                      <span className="hidden text-xs font-semibold text-brand-700 sm:block">
+                        Buka
+                      </span>
+                    </Link>
+                  );
+                }
+
+                return (
+                  <div
                     key={
                       module.label
                     }
-                    href={
-                      module.href
-                    }
-                    className="flex items-center gap-3 rounded-2xl border border-line p-4 transition hover:border-brand-200 hover:bg-brand-50/40"
+                    className="flex min-h-16 items-center gap-4 rounded-2xl border border-line bg-slate-50/70 px-4 py-3"
                   >
-                    <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-700">
+                    <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-white text-slate-400 shadow-sm">
                       <AppIcon
                         name="chevron-right"
                         className="size-4"
@@ -420,7 +574,7 @@ export function RoleDashboard({
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-ink">
+                      <p className="text-sm font-semibold text-slate-600">
                         {
                           module.label
                         }
@@ -433,43 +587,12 @@ export function RoleDashboard({
                       </p>
                     </div>
 
-                    <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[9px] font-bold uppercase text-emerald-700">
-                      Tersedia
-                    </span>
-                  </Link>
-                ) : (
-                  <div
-                    key={
-                      module.label
-                    }
-                    className="flex items-center gap-3 rounded-2xl border border-line bg-slate-50/70 p-4"
-                  >
-                    <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-white text-slate-400">
-                      <AppIcon
-                        name="chevron-right"
-                        className="size-4"
-                      />
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-slate-700">
-                        {
-                          module.label
-                        }
-                      </p>
-
-                      <p className="mt-1 text-xs leading-5 text-slate-500">
-                        {
-                          module.description
-                        }
-                      </p>
-                    </div>
-
-                    <span className="rounded-full bg-slate-200 px-2.5 py-1 text-[9px] font-bold uppercase text-slate-500">
+                    <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                       Belum tersedia
                     </span>
                   </div>
-                ),
+                );
+              },
             )}
           </div>
         </section>

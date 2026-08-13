@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-
 import {
   usePathname,
 } from "next/navigation";
@@ -22,12 +21,77 @@ type SidebarNavigationProps = {
     () => void;
 };
 
+/**
+ * =========================================================
+ * GET MOST SPECIFIC ACTIVE ITEM
+ * =========================================================
+ *
+ * Contoh:
+ *
+ * /pembina-tahfiz/laporan
+ *
+ * cocok dengan:
+ * - /pembina-tahfiz/laporan
+ *
+ * sedangkan:
+ *
+ * /pembina-tahfiz/laporan/riwayat
+ *
+ * sebenarnya cocok dengan:
+ * - /pembina-tahfiz/laporan
+ * - /pembina-tahfiz/laporan/riwayat
+ *
+ * Karena itu kita pilih href yang paling panjang /
+ * paling spesifik.
+ */
+function getActiveNavigationHref(
+  items:
+    RoleNavigationItem[],
+
+  pathname:
+    string,
+): string | null {
+  const matchedItems =
+    items
+      .filter(
+        (item) =>
+          item.available &&
+          (
+            pathname ===
+              item.href ||
+            pathname.startsWith(
+              `${item.href}/`,
+            )
+          ),
+      )
+      .sort(
+        (
+          firstItem,
+          secondItem,
+        ) =>
+          secondItem.href.length -
+          firstItem.href.length,
+      );
+
+  return (
+    matchedItems[0]
+      ?.href ??
+    null
+  );
+}
+
 export function SidebarNavigation({
   items,
   onNavigate,
 }: SidebarNavigationProps) {
   const pathname =
     usePathname();
+
+  const activeHref =
+    getActiveNavigationHref(
+      items,
+      pathname,
+    );
 
   return (
     <nav
@@ -38,24 +102,8 @@ export function SidebarNavigation({
         (item) => {
           const isActive =
             item.available &&
-            (
-              pathname ===
-                item.href ||
-              pathname.startsWith(
-                `${item.href}/`,
-              )
-            );
-
-          /*
-           * =================================================
-           * FALLBACK UNTUK FITUR BELUM TERSEDIA
-           *
-           * Normalnya menu seperti ini tidak dimasukkan ke
-           * navigation sampai modul benar-benar siap.
-           *
-           * Ini hanya safeguard.
-           * =================================================
-           */
+            item.href ===
+              activeHref;
 
           if (
             !item.available
@@ -66,8 +114,7 @@ export function SidebarNavigation({
                   item.href
                 }
                 aria-disabled="true"
-                title="Fitur belum tersedia"
-                className="flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-white/40"
+                className="flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-white/45"
               >
                 <AppIcon
                   name={
@@ -80,10 +127,6 @@ export function SidebarNavigation({
                   {
                     item.label
                   }
-                </span>
-
-                <span className="rounded-full bg-white/8 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white/40">
-                  Belum tersedia
                 </span>
               </div>
             );

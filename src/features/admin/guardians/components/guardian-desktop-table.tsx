@@ -1,4 +1,6 @@
-import Link from "next/link";
+import {
+  PreserveStateLink,
+} from "@/components/navigation/navigation-state-link";
 
 import type { AdminGuardianListItem } from "../schemas/admin-guardian-list-schema";
 
@@ -188,12 +190,12 @@ export function GuardianDesktopTable({
                 </td>
 
                 <td className="px-5 py-4 text-right">
-                  <Link
+                  <PreserveStateLink
                     href={`/admin/wali/${guardian.id}`}
                     className="inline-flex min-h-9 items-center justify-center rounded-xl border border-line bg-white px-3.5 text-xs font-semibold text-slate-600 transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700"
                   >
                     Lihat detail
-                  </Link>
+                  </PreserveStateLink>
                 </td>
               </tr>
             ))}

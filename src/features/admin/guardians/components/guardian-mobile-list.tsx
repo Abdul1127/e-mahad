@@ -1,4 +1,6 @@
-import Link from "next/link";
+import {
+  PreserveStateLink,
+} from "@/components/navigation/navigation-state-link";
 
 import type { AdminGuardianListItem } from "../schemas/admin-guardian-list-schema";
 
@@ -173,12 +175,12 @@ export function GuardianMobileList({
             </div>
           )}
 
-          <Link
+          <PreserveStateLink
             href={`/admin/wali/${guardian.id}`}
             className="mt-4 inline-flex min-h-10 w-full items-center justify-center rounded-xl border border-line bg-white px-4 text-sm font-semibold text-slate-600 transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700"
           >
             Lihat detail wali
-          </Link>
+          </PreserveStateLink>
         </article>
       ))}
     </div>

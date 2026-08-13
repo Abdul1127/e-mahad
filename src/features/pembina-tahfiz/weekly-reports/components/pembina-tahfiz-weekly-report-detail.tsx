@@ -1,4 +1,6 @@
-import Link from "next/link";
+import {
+  ReturnLink,
+} from "@/components/navigation/navigation-state-link";
 
 import type {
   PembinaTahfizWeeklyReportDetailData,
@@ -44,12 +46,15 @@ export function PembinaTahfizWeeklyReportDetail({
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-      <Link
-        href={`/pembina-tahfiz/laporan?week=${data.week.start}`}
+      <ReturnLink
+        fallbackHref={`/pembina-tahfiz/laporan?week=${data.week.start}`}
+        allowedPrefixes={[
+          "/pembina-tahfiz/laporan",
+        ]}
         className="text-sm font-semibold text-brand-700 transition hover:text-brand-800"
       >
         ← Kembali ke Laporan
-      </Link>
+      </ReturnLink>
 
       {/* =====================================================
           HEADER

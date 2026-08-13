@@ -1,4 +1,6 @@
-import Link from "next/link";
+import {
+  PreserveStateLink,
+} from "@/components/navigation/navigation-state-link";
 
 import type { AdminStudentListItem } from "../schemas/admin-student-list-schema";
 
@@ -140,12 +142,12 @@ export function StudentDesktopTable({
                 </td>
 
                 <td className="px-5 py-4 text-right">
-                  <Link
+                  <PreserveStateLink
                     href={`/admin/santri/${student.id}`}
                     className="inline-flex min-h-9 items-center justify-center rounded-xl border border-brand-200 bg-brand-50 px-3.5 text-xs font-semibold text-brand-700 transition hover:bg-brand-100"
                   >
                     Lihat detail
-                  </Link>
+                  </PreserveStateLink>
                 </td>
               </tr>
             ))}

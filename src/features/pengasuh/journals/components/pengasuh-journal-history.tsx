@@ -1,5 +1,9 @@
 import Link from "next/link";
 
+import {
+  PreserveStateLink,
+} from "@/components/navigation/navigation-state-link";
+
 import type {
   PengasuhJournalHistoryData,
   PengasuhJournalHistoryItem,
@@ -17,8 +21,7 @@ function getSessionLabel(
   session:
     "morning" | "evening",
 ): string {
-  return session ===
-    "morning"
+  return session === "morning"
     ? "Pagi"
     : "Sore";
 }
@@ -292,12 +295,12 @@ function JournalHistoryCard({
       )}
 
       <div className="mt-5 border-t border-line pt-4">
-        <Link
+        <PreserveStateLink
           href={`/pengasuh/jurnal/${journal.id}`}
           className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-brand-700 px-4 text-sm font-semibold text-white transition hover:bg-brand-800 sm:w-auto"
         >
           Lihat Detail
-        </Link>
+        </PreserveStateLink>
       </div>
     </article>
   );

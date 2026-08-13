@@ -9,6 +9,10 @@ import {
 } from "next/navigation";
 
 import {
+  getServerActionReturnTo,
+} from "@/lib/navigation/get-server-action-return-to";
+
+import {
   createClient,
 } from "@/lib/supabase/server";
 
@@ -27,6 +31,12 @@ export async function recordBendaharaBillPaymentAction(
   formData:
     FormData,
 ): Promise<RecordBendaharaPaymentActionState> {
+  /*
+   * =====================================================
+   * RAW VALUES
+   * =====================================================
+   */
+
   const rawValues = {
     billId:
       String(
@@ -71,6 +81,12 @@ export async function recordBendaharaBillPaymentAction(
       ),
   };
 
+  /*
+   * =====================================================
+   * VALIDATION
+   * =====================================================
+   */
+
   const validation =
     recordBendaharaPaymentSchema.safeParse(
       rawValues,
@@ -112,6 +128,12 @@ export async function recordBendaharaBillPaymentAction(
 
   const input =
     validation.data;
+
+  /*
+   * =====================================================
+   * DATABASE
+   * =====================================================
+   */
 
   const supabase =
     await createClient();
@@ -168,6 +190,12 @@ export async function recordBendaharaBillPaymentAction(
     };
   }
 
+  /*
+   * =====================================================
+   * REVALIDATION
+   * =====================================================
+   */
+
   revalidatePath(
     "/bendahara/dashboard",
   );
@@ -180,7 +208,43 @@ export async function recordBendaharaBillPaymentAction(
     `/bendahara/tagihan/${input.billId}`,
   );
 
+  revalidatePath(
+    "/bendahara/pembayaran",
+  );
+
+  /*
+   * =====================================================
+   * REDIRECT
+   * =====================================================
+   *
+   * Contoh alur:
+   *
+   * /bendahara/tagihan?page=3
+   *       ↓
+   * /bendahara/tagihan/BILL
+   *   ?returnTo=/bendahara/tagihan?page=3
+   *       ↓
+   * /bendahara/tagihan/BILL/pembayaran/baru
+   *   ?returnTo=/bendahara/tagihan/BILL?returnTo=...
+   *       ↓
+   * pembayaran berhasil
+   *       ↓
+   * kembali ke detail BILL dengan returnTo daftar tetap utuh
+   */
+
+  const detailHref =
+    `/bendahara/tagihan/${input.billId}`;
+
+  const redirectTarget =
+    await getServerActionReturnTo({
+      fallbackHref:
+        detailHref,
+
+      expectedPath:
+        detailHref,
+    });
+
   redirect(
-    `/bendahara/tagihan/${input.billId}`,
+    redirectTarget,
   );
 }

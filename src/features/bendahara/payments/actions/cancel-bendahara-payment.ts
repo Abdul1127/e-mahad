@@ -9,6 +9,10 @@ import {
 } from "next/navigation";
 
 import {
+  getServerActionReturnTo,
+} from "@/lib/navigation/get-server-action-return-to";
+
+import {
   createClient,
 } from "@/lib/supabase/server";
 
@@ -27,6 +31,12 @@ export async function cancelBendaharaPaymentAction(
   formData:
     FormData,
 ): Promise<CancelBendaharaPaymentActionState> {
+  /*
+   * =====================================================
+   * RAW VALUES
+   * =====================================================
+   */
+
   const rawValues = {
     billId:
       String(
@@ -49,6 +59,12 @@ export async function cancelBendaharaPaymentAction(
         ) ?? "",
       ),
   };
+
+  /*
+   * =====================================================
+   * VALIDATION
+   * =====================================================
+   */
 
   const validation =
     cancelBendaharaPaymentSchema.safeParse(
@@ -83,6 +99,12 @@ export async function cancelBendaharaPaymentAction(
   const input =
     validation.data;
 
+  /*
+   * =====================================================
+   * DATABASE
+   * =====================================================
+   */
+
   const supabase =
     await createClient();
 
@@ -114,6 +136,12 @@ export async function cancelBendaharaPaymentAction(
     };
   }
 
+  /*
+   * =====================================================
+   * REVALIDATION
+   * =====================================================
+   */
+
   revalidatePath(
     "/bendahara/dashboard",
   );
@@ -130,7 +158,25 @@ export async function cancelBendaharaPaymentAction(
     "/bendahara/pembayaran",
   );
 
+  /*
+   * =====================================================
+   * REDIRECT
+   * =====================================================
+   */
+
+  const detailHref =
+    `/bendahara/tagihan/${input.billId}`;
+
+  const redirectTarget =
+    await getServerActionReturnTo({
+      fallbackHref:
+        detailHref,
+
+      expectedPath:
+        detailHref,
+    });
+
   redirect(
-    `/bendahara/tagihan/${input.billId}`,
+    redirectTarget,
   );
 }

@@ -1,4 +1,6 @@
-import Link from "next/link";
+import {
+  ReturnLink,
+} from "@/components/navigation/navigation-state-link";
 
 import type {
   KepalaMahadCareJournalDetailData,
@@ -123,16 +125,15 @@ export function KepalaMahadCareJournalDetail({
 
   return (
     <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-      <Link
-        href="/kepala-mahad/pengasuhan"
+      <ReturnLink
+        fallbackHref="/kepala-mahad/pengasuhan"
+        allowedPrefixes={[
+          "/kepala-mahad/pengasuhan",
+        ]}
         className="text-sm font-semibold text-brand-700 transition hover:text-brand-800"
       >
         ← Kembali ke Jurnal
-      </Link>
-
-      {/* =====================================================
-          HEADER
-      ===================================================== */}
+      </ReturnLink>
 
       <section className="mt-5 rounded-3xl border border-line bg-white p-5 shadow-soft sm:p-6">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
@@ -217,10 +218,6 @@ export function KepalaMahadCareJournalDetail({
         </div>
       </section>
 
-      {/* =====================================================
-          STATUS NOTICE
-      ===================================================== */}
-
       {journal.status ===
         "submitted" && (
           <section className="mt-5 rounded-2xl border border-blue-200 bg-blue-50 p-4 sm:p-5">
@@ -272,10 +269,6 @@ export function KepalaMahadCareJournalDetail({
             </p>
           </section>
         )}
-
-      {/* =====================================================
-          STUDENT ENTRIES
-      ===================================================== */}
 
       <section className="mt-6">
         <div>
@@ -432,10 +425,6 @@ export function KepalaMahadCareJournalDetail({
         )}
       </section>
 
-      {/* =====================================================
-          REVIEW PANEL
-      ===================================================== */}
-
       {journal.status ===
         "submitted" && (
           <KepalaMahadCareJournalReviewPanel
@@ -447,10 +436,6 @@ export function KepalaMahadCareJournalDetail({
             }
           />
         )}
-
-      {/* =====================================================
-          REVIEW HISTORY
-      ===================================================== */}
 
       {reviews.length >
         0 && (

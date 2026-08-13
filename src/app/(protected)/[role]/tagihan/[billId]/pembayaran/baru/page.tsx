@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import {
   notFound,
 } from "next/navigation";
@@ -7,6 +5,10 @@ import {
 import {
   z,
 } from "zod";
+
+import {
+  ReturnLink,
+} from "@/components/navigation/navigation-state-link";
 
 import {
   getRoleCodeBySlug,
@@ -27,8 +29,11 @@ import {
 type PageProps = {
   params:
     Promise<{
-      role: string;
-      billId: string;
+      role:
+        string;
+
+      billId:
+        string;
     }>;
 };
 
@@ -41,7 +46,8 @@ function getTodayInputValue(): string {
 
   const month =
     String(
-      now.getMonth() + 1,
+      now.getMonth() +
+        1,
     ).padStart(
       2,
       "0",
@@ -64,7 +70,8 @@ export default async function BendaharaRecordPaymentPage({
   const {
     role,
     billId,
-  } = await params;
+  } =
+    await params;
 
   const roleCode =
     getRoleCodeBySlug(
@@ -100,18 +107,26 @@ export default async function BendaharaRecordPaymentPage({
       billIdValidation.data,
     );
 
+  const detailHref =
+    `/bendahara/tagihan/${billIdValidation.data}`;
+
   if (
     !data.bill
       .can_record_payment
   ) {
     return (
       <div className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        <Link
-          href={`/bendahara/tagihan/${billIdValidation.data}`}
+        <ReturnLink
+          fallbackHref={
+            detailHref
+          }
+          allowedPrefixes={[
+            detailHref,
+          ]}
           className="text-sm font-semibold text-brand-700 hover:text-brand-800"
         >
           ← Kembali ke Detail Tagihan
-        </Link>
+        </ReturnLink>
 
         <div className="mt-6 rounded-2xl border border-line bg-white p-8 shadow-soft">
           <h1 className="text-2xl font-bold text-ink">
@@ -119,9 +134,10 @@ export default async function BendaharaRecordPaymentPage({
           </h1>
 
           <p className="mt-3 text-sm leading-7 text-muted">
-            Tagihan ini sudah lunas,
-            telah dibatalkan, atau
-            tidak memiliki sisa
+            Tagihan ini sudah
+            lunas, telah
+            dibatalkan, atau tidak
+            memiliki sisa
             pembayaran.
           </p>
         </div>
@@ -132,12 +148,17 @@ export default async function BendaharaRecordPaymentPage({
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <section>
-        <Link
-          href={`/bendahara/tagihan/${data.bill.id}`}
+        <ReturnLink
+          fallbackHref={
+            detailHref
+          }
+          allowedPrefixes={[
+            detailHref,
+          ]}
           className="text-sm font-semibold text-brand-700 transition hover:text-brand-800"
         >
           ← Kembali ke Detail Tagihan
-        </Link>
+        </ReturnLink>
 
         <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
           Bendahara
@@ -149,7 +170,8 @@ export default async function BendaharaRecordPaymentPage({
 
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
           Catat pembayaran santri
-          untuk tagihan yang dipilih.
+          untuk tagihan yang
+          dipilih.
         </p>
       </section>
 

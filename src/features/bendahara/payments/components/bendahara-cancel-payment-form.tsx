@@ -1,10 +1,12 @@
 "use client";
 
-import Link from "next/link";
-
 import {
   useActionState,
 } from "react";
+
+import {
+  ReturnLink,
+} from "@/components/navigation/navigation-state-link";
 
 import {
   cancelBendaharaPaymentAction,
@@ -44,7 +46,8 @@ type Props = {
 };
 
 function formatCurrency(
-  value: number,
+  value:
+    number,
 ): string {
   return new Intl.NumberFormat(
     "id-ID",
@@ -64,7 +67,8 @@ function formatCurrency(
 }
 
 function formatDate(
-  value: string,
+  value:
+    string,
 ): string {
   return new Intl.DateTimeFormat(
     "id-ID",
@@ -86,7 +90,8 @@ function formatDate(
 }
 
 function paymentMethodLabel(
-  value: string,
+  value:
+    string,
 ): string {
   switch (
     value
@@ -125,10 +130,14 @@ export function BendaharaCancelPaymentForm({
     state,
     formAction,
     pending,
-  ] = useActionState(
-    cancelBendaharaPaymentAction,
-    initialCancelBendaharaPaymentActionState,
-  );
+  ] =
+    useActionState(
+      cancelBendaharaPaymentAction,
+      initialCancelBendaharaPaymentActionState,
+    );
+
+  const detailHref =
+    `/bendahara/tagihan/${billId}`;
 
   return (
     <form
@@ -165,15 +174,21 @@ export function BendaharaCancelPaymentForm({
         <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 className="text-xl font-bold text-ink">
-              {paymentCode}
+              {
+                paymentCode
+              }
             </h2>
 
             <p className="mt-2 font-semibold text-ink">
-              {studentName}
+              {
+                studentName
+              }
             </p>
 
             <p className="mt-1 text-sm text-muted">
-              {billTitle}
+              {
+                billTitle
+              }
             </p>
           </div>
 
@@ -264,7 +279,9 @@ export function BendaharaCancelPaymentForm({
           </p>
 
           <p className="mt-1 text-sm leading-6 text-red-700">
-            {state.message}
+            {
+              state.message
+            }
           </p>
         </section>
       )}
@@ -327,12 +344,17 @@ export function BendaharaCancelPaymentForm({
       =============================================== */}
 
       <section className="flex flex-col-reverse gap-3 border-t border-line pt-5 sm:flex-row sm:justify-end">
-        <Link
-          href={`/bendahara/tagihan/${billId}`}
+        <ReturnLink
+          fallbackHref={
+            detailHref
+          }
+          allowedPrefixes={[
+            detailHref,
+          ]}
           className="inline-flex min-h-11 items-center justify-center rounded-xl border border-line bg-white px-5 text-sm font-semibold text-muted transition hover:bg-slate-50 hover:text-ink"
         >
           Kembali
-        </Link>
+        </ReturnLink>
 
         <button
           type="submit"

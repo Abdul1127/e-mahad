@@ -1,5 +1,9 @@
 import Link from "next/link";
 
+import {
+  PreserveStateLink,
+} from "@/components/navigation/navigation-state-link";
+
 import type {
   BendaharaPaymentHistoryData,
   BendaharaPaymentMethod,
@@ -837,12 +841,12 @@ export function BendaharaPaymentHistory({
                                 </p>
                               </div>
 
-                              <Link
+                              <PreserveStateLink
                                 href={`/bendahara/tagihan/${allocation.bill.id}`}
                                 className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-xl border border-brand-200 bg-white px-4 text-sm font-semibold text-brand-700 transition hover:bg-brand-50"
                               >
                                 Lihat Tagihan
-                              </Link>
+                              </PreserveStateLink>
                             </div>
                           ),
                         )}
@@ -923,11 +927,10 @@ export function BendaharaPaymentHistory({
                       </p>
 
                       <p className="mt-1 text-xs leading-5 text-emerald-700">
-                        File bukti akan
-                        dapat dibuka setelah
+                        Bukti transaksi
+                        tersimpan pada
                         private Storage
-                        pembayaran
-                        diaktifkan.
+                        pembayaran.
                       </p>
                     </div>
                   )}

@@ -1,4 +1,6 @@
-import Link from "next/link";
+import {
+  PreserveStateLink,
+} from "@/components/navigation/navigation-state-link";
 
 import type {
   KepalaMahadCareJournalOverviewData,
@@ -139,7 +141,7 @@ function JournalCard({
               journal.latest_review
                 .action,
             )}
-            {" · "}
+            {"  "}
             {
               journal.latest_review
                 .reviewer_name
@@ -148,7 +150,7 @@ function JournalCard({
         </div>
       )}
 
-      <Link
+      <PreserveStateLink
         href={`/kepala-mahad/pengasuhan/${journal.id}`}
         className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-brand-700 px-4 text-sm font-semibold text-white transition hover:bg-brand-800"
       >
@@ -156,7 +158,7 @@ function JournalCard({
         "submitted"
           ? "Review Jurnal"
           : "Lihat Detail"}
-      </Link>
+      </PreserveStateLink>
     </article>
   );
 }

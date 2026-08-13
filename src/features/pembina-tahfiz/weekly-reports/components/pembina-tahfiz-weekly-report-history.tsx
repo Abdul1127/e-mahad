@@ -1,5 +1,9 @@
 import Link from "next/link";
 
+import {
+  PreserveStateLink,
+} from "@/components/navigation/navigation-state-link";
+
 import type {
   PembinaTahfizWeeklyReportHistoryData,
 } from "../schemas/pembina-tahfiz-weekly-report-history-schema";
@@ -79,7 +83,9 @@ export function PembinaTahfizWeeklyReportHistory({
 }: Props) {
   return (
     <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-      {/* HEADER */}
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
 
       <section>
         <Link
@@ -115,7 +121,9 @@ export function PembinaTahfizWeeklyReportHistory({
         </div>
       </section>
 
-      {/* SUMMARY */}
+      {/* =====================================================
+          SUMMARY
+      ===================================================== */}
 
       <section className="mt-6 grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-line bg-white p-5 shadow-soft">
@@ -158,7 +166,9 @@ export function PembinaTahfizWeeklyReportHistory({
         </div>
       </section>
 
-      {/* FILTER */}
+      {/* =====================================================
+          FILTER
+      ===================================================== */}
 
       <section className="mt-6 rounded-2xl border border-line bg-white p-4 shadow-soft sm:p-5">
         <form
@@ -241,7 +251,9 @@ export function PembinaTahfizWeeklyReportHistory({
         )}
       </section>
 
-      {/* LIST */}
+      {/* =====================================================
+          LIST
+      ===================================================== */}
 
       <section className="mt-7">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -382,7 +394,7 @@ export function PembinaTahfizWeeklyReportHistory({
                       )}
                     </div>
 
-                    <Link
+                    <PreserveStateLink
                       href={`/pembina-tahfiz/laporan/${item.student.id}?week=${item.report.week_start}`}
                       className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-brand-700 px-5 text-sm font-semibold text-white transition hover:bg-brand-800"
                     >
@@ -391,7 +403,7 @@ export function PembinaTahfizWeeklyReportHistory({
                       "draft"
                         ? "Lanjutkan Laporan"
                         : "Lihat Laporan"}
-                    </Link>
+                    </PreserveStateLink>
                   </div>
                 </article>
               ),
@@ -400,7 +412,9 @@ export function PembinaTahfizWeeklyReportHistory({
         )}
       </section>
 
-      {/* PAGINATION */}
+      {/* =====================================================
+          PAGINATION
+      ===================================================== */}
 
       {(
         data.pagination

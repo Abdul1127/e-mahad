@@ -1,5 +1,9 @@
 import Link from "next/link";
 
+import {
+  PreserveStateLink,
+} from "@/components/navigation/navigation-state-link";
+
 import type {
   BendaharaBillFilterStatus,
   BendaharaBillListData,
@@ -651,12 +655,12 @@ export function BendaharaBillList({
                         )}
                     </div>
 
-                    <Link
+                    <PreserveStateLink
                       href={`/bendahara/tagihan/${bill.id}`}
                       className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-xl border border-brand-200 bg-brand-50 px-4 text-sm font-semibold text-brand-700 transition hover:bg-brand-100"
                     >
                       Lihat Detail
-                    </Link>
+                    </PreserveStateLink>
                   </div>
                 </article>
               ),

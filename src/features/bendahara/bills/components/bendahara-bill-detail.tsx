@@ -1,4 +1,7 @@
-import Link from "next/link";
+import {
+  PreserveStateLink,
+  ReturnLink,
+} from "@/components/navigation/navigation-state-link";
 
 import {
   BendaharaPaymentProofButton,
@@ -274,12 +277,16 @@ export function BendaharaBillDetail({
       =================================================== */}
 
       <section>
-        <Link
-          href="/bendahara/tagihan"
+        <ReturnLink
+          fallbackHref="/bendahara/tagihan"
+          allowedPrefixes={[
+            "/bendahara/tagihan",
+            "/bendahara/pembayaran",
+          ]}
           className="text-sm font-semibold text-brand-700 transition hover:text-brand-800"
         >
-          ← Kembali ke Tagihan
-        </Link>
+          ← Kembali ke Daftar
+        </ReturnLink>
 
         <div className="mt-6 flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div>
@@ -315,12 +322,12 @@ export function BendaharaBillDetail({
           </div>
 
           {bill.can_record_payment && (
-            <Link
+            <PreserveStateLink
               href={`/bendahara/tagihan/${bill.id}/pembayaran/baru`}
               className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 px-5 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
               + Catat Pembayaran
-            </Link>
+            </PreserveStateLink>
           )}
         </div>
       </section>
@@ -602,12 +609,12 @@ export function BendaharaBillDetail({
             </p>
 
             {bill.can_record_payment && (
-              <Link
+              <PreserveStateLink
                 href={`/bendahara/tagihan/${bill.id}/pembayaran/baru`}
                 className="mt-5 inline-flex min-h-10 items-center justify-center rounded-xl bg-brand-600 px-5 text-sm font-semibold text-white transition hover:bg-brand-700"
               >
                 + Catat Pembayaran
-              </Link>
+              </PreserveStateLink>
             )}
           </div>
         ) : (
@@ -769,12 +776,12 @@ export function BendaharaBillDetail({
                             </p>
                           </div>
 
-                          <Link
+                          <PreserveStateLink
                             href={`/bendahara/tagihan/${bill.id}/pembayaran/${payment.id}/bukti/unggah`}
                             className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700"
                           >
                             Upload Bukti
-                          </Link>
+                          </PreserveStateLink>
                         </div>
                       )
                     )}
@@ -786,12 +793,12 @@ export function BendaharaBillDetail({
                     {payment.status ===
                     "recorded" ? (
                       <div className="mt-4 flex justify-end border-t border-line pt-4">
-                        <Link
+                        <PreserveStateLink
                           href={`/bendahara/tagihan/${bill.id}/pembayaran/${payment.id}/batalkan`}
                           className="inline-flex min-h-10 items-center justify-center rounded-xl border border-red-200 bg-red-50 px-4 text-sm font-semibold text-red-700 transition hover:bg-red-100"
                         >
                           Batalkan Pembayaran
-                        </Link>
+                        </PreserveStateLink>
                       </div>
                     ) : (
                       <div className="mt-4 rounded-xl border border-red-100 bg-red-50 p-4">
@@ -855,12 +862,12 @@ export function BendaharaBillDetail({
             </p>
           </div>
 
-          <Link
+          <PreserveStateLink
             href={`/bendahara/tagihan/${bill.id}/pembayaran/baru`}
             className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 px-5 text-sm font-semibold text-white transition hover:bg-brand-700"
           >
             + Catat Pembayaran
-          </Link>
+          </PreserveStateLink>
         </section>
       )}
 

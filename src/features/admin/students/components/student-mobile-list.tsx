@@ -1,4 +1,6 @@
-import Link from "next/link";
+import {
+  PreserveStateLink,
+} from "@/components/navigation/navigation-state-link";
 
 import type { AdminStudentListItem } from "../schemas/admin-student-list-schema";
 
@@ -109,12 +111,12 @@ export function StudentMobileList({
             </div>
           </dl>
 
-          <Link
+          <PreserveStateLink
             href={`/admin/santri/${student.id}`}
             className="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-brand-700 px-4 text-sm font-semibold text-white transition hover:bg-brand-800"
           >
             Lihat detail santri
-          </Link>
+          </PreserveStateLink>
         </article>
       ))}
     </div>
