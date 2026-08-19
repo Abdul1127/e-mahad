@@ -1,0 +1,4669 @@
+﻿============================================================
+FILE: src\app\(protected)\[role]\pengasuhan\page.tsx
+============================================================
+import type {
+  Metadata,
+} from "next";
+
+import {
+  notFound,
+} from "next/navigation";
+
+import {
+  getRoleCodeBySlug,
+} from "@/config/roles";
+
+import {
+  KepalaMahadCareJournalOverview,
+} from "@/features/kepala-mahad/care-journals/components/kepala-mahad-care-journal-overview";
+
+import {
+  getKepalaMahadCareJournalOverview,
+} from "@/features/kepala-mahad/care-journals/data/get-kepala-mahad-care-journal-overview";
+
+import {
+  parseKepalaMahadCareJournalQuery,
+  type KepalaMahadCareJournalSearchParams,
+} from "@/features/kepala-mahad/care-journals/lib/parse-kepala-mahad-care-journal-query";
+
+import {
+  requireRole,
+} from "@/lib/auth/guards";
+
+export const metadata: Metadata = {
+  title:
+    "Jurnal Pengasuhan",
+
+  description:
+    "Review Jurnal Pengasuhan Kepala Ma'had.",
+};
+
+type Props = {
+  params: Promise<{
+    role: string;
+  }>;
+
+  searchParams: Promise<KepalaMahadCareJournalSearchParams>;
+};
+
+export default async function Page({
+  params,
+  searchParams,
+}: Props) {
+  const {
+    role,
+  } = await params;
+
+  if (
+    getRoleCodeBySlug(
+      role,
+    ) !==
+    "kepala_mahad"
+  ) {
+    notFound();
+  }
+
+  await requireRole(
+    "kepala_mahad",
+  );
+
+  const query =
+    parseKepalaMahadCareJournalQuery(
+      await searchParams,
+    );
+
+  const data =
+    await getKepalaMahadCareJournalOverview(
+      query,
+    );
+
+  return (
+    <KepalaMahadCareJournalOverview
+      data={
+        data
+      }
+    />
+  );
+}
+
+============================================================
+FILE: src\app\(protected)\[role]\pengasuhan\[journalId]\page.tsx
+============================================================
+import {
+  notFound,
+} from "next/navigation";
+
+import {
+  z,
+} from "zod";
+
+import {
+  getRoleCodeBySlug,
+} from "@/config/roles";
+
+import {
+  KepalaMahadCareJournalDetail,
+} from "@/features/kepala-mahad/care-journals/components/kepala-mahad-care-journal-detail";
+
+import {
+  getKepalaMahadCareJournalDetail,
+} from "@/features/kepala-mahad/care-journals/data/get-kepala-mahad-care-journal-detail";
+
+import {
+  requireRole,
+} from "@/lib/auth/guards";
+
+const journalIdSchema =
+  z.string().uuid();
+
+type Props = {
+  params: Promise<{
+    role: string;
+    journalId: string;
+  }>;
+};
+
+export default async function Page({
+  params,
+}: Props) {
+  const {
+    role,
+    journalId,
+  } = await params;
+
+  if (
+    getRoleCodeBySlug(
+      role,
+    ) !==
+    "kepala_mahad"
+  ) {
+    notFound();
+  }
+
+  const validation =
+    journalIdSchema.safeParse(
+      journalId,
+    );
+
+  if (!validation.success) {
+    notFound();
+  }
+
+  await requireRole(
+    "kepala_mahad",
+  );
+
+  const data =
+    await getKepalaMahadCareJournalDetail(
+      validation.data,
+    );
+
+  return (
+    <KepalaMahadCareJournalDetail
+      data={
+        data
+      }
+    />
+  );
+}
+
+============================================================
+FILE: src\features\kepala-mahad\care-journals\components\kepala-mahad-care-journal-overview.tsx
+============================================================
+import {
+  PreserveStateLink,
+} from "@/components/navigation/navigation-state-link";
+
+import type {
+  KepalaMahadCareJournalOverviewData,
+  KepalaMahadCareJournalOverviewItem,
+  KepalaMahadCareJournalStatus,
+} from "../schemas/kepala-mahad-care-journal-overview-schema";
+
+type Props = {
+  data:
+    KepalaMahadCareJournalOverviewData;
+};
+
+function statusLabel(
+  status:
+    KepalaMahadCareJournalStatus,
+): string {
+  switch (status) {
+    case "draft":
+      return "Draft";
+
+    case "submitted":
+      return "Menunggu Review";
+
+    case "revision_requested":
+      return "Perlu Revisi";
+
+    case "reviewed":
+      return "Sudah Direview";
+  }
+}
+
+function sessionLabel(
+  session:
+    "morning" | "evening",
+): string {
+  return session ===
+    "morning"
+    ? "Pagi"
+    : "Sore";
+}
+
+function statusClass(
+  status:
+    KepalaMahadCareJournalStatus,
+): string {
+  switch (status) {
+    case "draft":
+      return "bg-slate-100 text-slate-700";
+
+    case "submitted":
+      return "bg-blue-50 text-blue-700";
+
+    case "revision_requested":
+      return "bg-amber-50 text-amber-700";
+
+    case "reviewed":
+      return "bg-emerald-50 text-emerald-700";
+  }
+}
+
+function JournalCard({
+  journal,
+}: {
+  journal:
+    KepalaMahadCareJournalOverviewItem;
+}) {
+  return (
+    <article className="rounded-2xl border border-line bg-white p-5 shadow-soft">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <div className="flex flex-wrap gap-2">
+            <span
+              className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass(
+                journal.status,
+              )}`}
+            >
+              {statusLabel(
+                journal.status,
+              )}
+            </span>
+
+            <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700">
+              {sessionLabel(
+                journal.session,
+              )}
+            </span>
+
+            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500">
+              {
+                journal.journal_date
+              }
+            </span>
+          </div>
+
+          <h2 className="mt-3 text-xl font-bold text-ink">
+            {
+              journal.care_group
+                .name
+            }
+          </h2>
+
+          <p className="mt-2 text-sm text-muted">
+            Dikirim oleh{" "}
+            <strong className="text-slate-700">
+              {journal.submitted_by
+                ?.full_name ??
+                journal.created_by
+                  .full_name}
+            </strong>
+          </p>
+        </div>
+
+        <div className="rounded-2xl bg-slate-50 px-4 py-3 text-center">
+          <p className="text-xl font-bold text-ink">
+            {
+              journal.complete_entry_count
+            }
+            {" / "}
+            {
+              journal.entry_count
+            }
+          </p>
+
+          <p className="mt-1 text-xs text-muted">
+            data lengkap
+          </p>
+        </div>
+      </div>
+
+      {journal.latest_review && (
+        <div className="mt-4 rounded-xl bg-slate-50 p-3">
+          <p className="text-xs font-semibold text-slate-500">
+            Review terakhir
+          </p>
+
+          <p className="mt-1 text-sm text-slate-700">
+            {statusLabel(
+              journal.latest_review
+                .action,
+            )}
+            {"  "}
+            {
+              journal.latest_review
+                .reviewer_name
+            }
+          </p>
+        </div>
+      )}
+
+      <PreserveStateLink
+        href={`/kepala-mahad/pengasuhan/${journal.id}`}
+        className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-brand-700 px-4 text-sm font-semibold text-white transition hover:bg-brand-800"
+      >
+        {journal.status ===
+        "submitted"
+          ? "Review Jurnal"
+          : "Lihat Detail"}
+      </PreserveStateLink>
+    </article>
+  );
+}
+
+export function KepalaMahadCareJournalOverview({
+  data,
+}: Props) {
+  return (
+    <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <section>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+          Kepala Ma&apos;had
+        </p>
+
+        <h1 className="mt-2 text-3xl font-bold text-ink">
+          Jurnal Pengasuhan
+        </h1>
+
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-muted">
+          Pantau jurnal Pengasuh,
+          periksa kondisi santri,
+          dan tindak lanjuti jurnal
+          yang menunggu review.
+        </p>
+
+        <p className="mt-2 text-sm font-semibold text-slate-600">
+          Tahun Ajaran{" "}
+          {
+            data.academic_year
+              .name
+          }
+        </p>
+      </section>
+
+      <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
+          <p className="text-xs font-medium text-blue-700">
+            Menunggu Review
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-blue-900">
+            {
+              data.summary
+                .submitted_count
+            }
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
+          <p className="text-xs font-medium text-amber-700">
+            Perlu Revisi
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-amber-900">
+            {
+              data.summary
+                .revision_requested_count
+            }
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+          <p className="text-xs font-medium text-emerald-700">
+            Sudah Direview
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-emerald-900">
+            {
+              data.summary
+                .reviewed_count
+            }
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-line bg-white p-4 shadow-soft">
+          <p className="text-xs text-muted">
+            Total Jurnal
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-ink">
+            {
+              data.summary
+                .total_count
+            }
+          </p>
+        </div>
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-line bg-white p-4 shadow-soft">
+        <form
+          action="/kepala-mahad/pengasuhan"
+          method="get"
+          className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]"
+        >
+          <div>
+            <label
+              htmlFor="status"
+              className="mb-2 block text-xs font-semibold text-slate-500"
+            >
+              Status
+            </label>
+
+            <select
+              id="status"
+              name="status"
+              defaultValue={
+                data.filters.status ??
+                "all"
+              }
+              className="min-h-11 w-full rounded-xl border border-line bg-white px-3 text-sm text-ink"
+            >
+              <option value="submitted">
+                Menunggu Review
+              </option>
+
+              <option value="revision_requested">
+                Perlu Revisi
+              </option>
+
+              <option value="reviewed">
+                Sudah Direview
+              </option>
+
+              <option value="draft">
+                Draft
+              </option>
+
+              <option value="all">
+                Semua Status
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor="date"
+              className="mb-2 block text-xs font-semibold text-slate-500"
+            >
+              Tanggal
+            </label>
+
+            <input
+              id="date"
+              name="date"
+              type="date"
+              defaultValue={
+                data.filters.date ??
+                ""
+              }
+              min={
+                data.academic_year
+                  .start_date
+              }
+              max={
+                data.academic_year
+                  .end_date
+              }
+              className="min-h-11 w-full rounded-xl border border-line bg-white px-3 text-sm text-ink"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="min-h-11 self-end rounded-xl bg-brand-700 px-5 text-sm font-semibold text-white hover:bg-brand-800"
+          >
+            Tampilkan
+          </button>
+        </form>
+      </section>
+
+      {data.items.length ===
+      0 ? (
+        <section className="mt-6 rounded-3xl border border-dashed border-line bg-white p-10 text-center">
+          <h2 className="font-bold text-ink">
+            Tidak ada jurnal
+          </h2>
+
+          <p className="mt-2 text-sm text-muted">
+            Tidak ada jurnal yang
+            sesuai dengan filter
+            saat ini.
+          </p>
+        </section>
+      ) : (
+        <section className="mt-6 grid gap-4 xl:grid-cols-2">
+          {data.items.map(
+            (journal) => (
+              <JournalCard
+                key={
+                  journal.id
+                }
+                journal={
+                  journal
+                }
+              />
+            ),
+          )}
+        </section>
+      )}
+    </div>
+  );
+}
+
+============================================================
+FILE: src\features\kepala-mahad\care-journals\components\kepala-mahad-care-journal-detail.tsx
+============================================================
+import {
+  ReturnLink,
+} from "@/components/navigation/navigation-state-link";
+
+import type {
+  KepalaMahadCareJournalDetailData,
+} from "../schemas/kepala-mahad-care-journal-detail-schema";
+
+import {
+  KepalaMahadCareJournalReviewPanel,
+} from "./kepala-mahad-care-journal-review-panel";
+
+type Props = {
+  data:
+    KepalaMahadCareJournalDetailData;
+};
+
+function readable(
+  value:
+    string | boolean | null,
+): string {
+  switch (value) {
+    case "healthy":
+      return "Sehat";
+
+    case "unwell":
+      return "Kurang Fit";
+
+    case "on_time":
+      return "Tepat Waktu";
+
+    case "needs_reminder":
+      return "Perlu Teguran";
+
+    case "cheerful":
+      return "Ceria";
+
+    case "gloomy":
+      return "Murung";
+
+    case "quiet":
+      return "Pendiam";
+
+    case "homesick":
+      return "Homesick";
+
+    case "emotional":
+      return "Emosional";
+
+    case true:
+      return "Ada";
+
+    case false:
+      return "Tidak Ada";
+
+    default:
+      return "-";
+  }
+}
+
+function getStatusLabel(
+  status:
+    | "draft"
+    | "submitted"
+    | "revision_requested"
+    | "reviewed",
+): string {
+  switch (status) {
+    case "draft":
+      return "Draft";
+
+    case "submitted":
+      return "Menunggu Review";
+
+    case "revision_requested":
+      return "Perlu Revisi";
+
+    case "reviewed":
+      return "Sudah Direview";
+  }
+}
+
+function getStatusClassName(
+  status:
+    | "draft"
+    | "submitted"
+    | "revision_requested"
+    | "reviewed",
+): string {
+  switch (status) {
+    case "draft":
+      return "bg-slate-100 text-slate-700";
+
+    case "submitted":
+      return "bg-blue-50 text-blue-700";
+
+    case "revision_requested":
+      return "bg-amber-50 text-amber-700";
+
+    case "reviewed":
+      return "bg-emerald-50 text-emerald-700";
+  }
+}
+
+function reviewActionLabel(
+  action:
+    | "reviewed"
+    | "revision_requested",
+): string {
+  return action ===
+    "reviewed"
+    ? "Selesai Direview"
+    : "Minta Revisi";
+}
+
+export function KepalaMahadCareJournalDetail({
+  data,
+}: Props) {
+  const {
+    journal,
+    summary,
+    entries,
+    reviews,
+  } = data;
+
+  return (
+    <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <ReturnLink
+        fallbackHref="/kepala-mahad/pengasuhan"
+        allowedPrefixes={[
+          "/kepala-mahad/pengasuhan",
+        ]}
+        className="text-sm font-semibold text-brand-700 transition hover:text-brand-800"
+      >
+        â† Kembali ke Jurnal
+      </ReturnLink>
+
+      <section className="mt-5 rounded-3xl border border-line bg-white p-5 shadow-soft sm:p-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+          Review Jurnal Pengasuhan
+        </p>
+
+        <h1 className="mt-2 text-3xl font-bold text-ink">
+          {
+            journal.care_group
+              .name
+          }
+        </h1>
+
+        <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
+          <span className="rounded-full bg-brand-50 px-3 py-1 text-brand-700">
+            {journal.session ===
+            "morning"
+              ? "Pagi"
+              : "Sore"}
+          </span>
+
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-600">
+            {
+              journal.journal_date
+            }
+          </span>
+
+          <span
+            className={`rounded-full px-3 py-1 ${getStatusClassName(
+              journal.status,
+            )}`}
+          >
+            {getStatusLabel(
+              journal.status,
+            )}
+          </span>
+
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-600">
+            Submission{" "}
+            {
+              journal.submission_version
+            }
+          </span>
+        </div>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="rounded-2xl bg-slate-50 p-4">
+            <p className="text-xs text-muted">
+              Total Santri
+            </p>
+
+            <p className="mt-2 text-2xl font-bold text-ink">
+              {
+                summary.entry_count
+              }
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-brand-50 p-4">
+            <p className="text-xs text-brand-600">
+              Data Lengkap
+            </p>
+
+            <p className="mt-2 text-2xl font-bold text-brand-900">
+              {
+                summary.complete_entry_count
+              }
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-slate-50 p-4">
+            <p className="text-xs text-muted">
+              Dikirim Oleh
+            </p>
+
+            <p className="mt-2 font-bold text-ink">
+              {journal.submitted_by
+                ?.full_name ??
+                "-"}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {journal.status ===
+        "submitted" && (
+          <section className="mt-5 rounded-2xl border border-blue-200 bg-blue-50 p-4 sm:p-5">
+            <p className="font-semibold text-blue-800">
+              Jurnal menunggu keputusan
+              review
+            </p>
+
+            <p className="mt-1 text-sm leading-6 text-blue-700">
+              Periksa kondisi seluruh
+              santri. Setelah selesai,
+              jurnal dapat dinyatakan
+              selesai direview atau
+              dikembalikan kepada
+              Pengasuh untuk revisi.
+            </p>
+          </section>
+        )}
+
+      {journal.status ===
+        "revision_requested" && (
+          <section className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:p-5">
+            <p className="font-semibold text-amber-800">
+              Jurnal sudah dikembalikan
+              untuk revisi
+            </p>
+
+            <p className="mt-1 text-sm leading-6 text-amber-700">
+              Pengasuh dapat memperbaiki
+              jurnal berdasarkan catatan
+              review kemudian
+              mengirimkannya kembali.
+            </p>
+          </section>
+        )}
+
+      {journal.status ===
+        "reviewed" && (
+          <section className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 sm:p-5">
+            <p className="font-semibold text-emerald-800">
+              Jurnal sudah selesai
+              direview
+            </p>
+
+            <p className="mt-1 text-sm leading-6 text-emerald-700">
+              Submission ini sudah
+              diperiksa oleh Kepala
+              Ma&apos;had.
+            </p>
+          </section>
+        )}
+
+      <section className="mt-6">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+            Detail Santri
+          </p>
+
+          <h2 className="mt-2 text-2xl font-bold text-ink">
+            Kondisi Santri
+          </h2>
+
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
+            Data berikut merupakan
+            kondisi yang dicatat oleh
+            Pengasuh pada jurnal ini.
+          </p>
+        </div>
+
+        {entries.length ===
+        0 ? (
+          <div className="mt-5 rounded-3xl border border-dashed border-line bg-white p-8 text-center">
+            <p className="font-semibold text-ink">
+              Tidak ada data santri.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-5 space-y-3">
+            {entries.map(
+              (entry) => (
+                <article
+                  key={
+                    entry.id
+                  }
+                  className="rounded-2xl border border-line bg-white p-4 shadow-soft sm:p-5"
+                >
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <p className="font-bold text-ink">
+                        {
+                          entry.full_name
+                        }
+                      </p>
+
+                      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-400">
+                        {entry.nis && (
+                          <span>
+                            NIS{" "}
+                            {
+                              entry.nis
+                            }
+                          </span>
+                        )}
+
+                        {entry.class && (
+                          <span>
+                            Kelas{" "}
+                            {
+                              entry.class
+                                .name
+                            }
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {(entry.case_notes ||
+                      entry.handling_notes) && (
+                      <span className="w-fit rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
+                        Ada Catatan
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                    <div className="rounded-xl bg-slate-50 p-3">
+                      <p className="text-xs text-muted">
+                        Kesehatan
+                      </p>
+
+                      <p className="mt-1 text-sm font-semibold text-ink">
+                        {readable(
+                          entry.health_condition,
+                        )}
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl bg-slate-50 p-3">
+                      <p className="text-xs text-muted">
+                        Jam Tidur
+                      </p>
+
+                      <p className="mt-1 text-sm font-semibold text-ink">
+                        {readable(
+                          entry.sleep_compliance,
+                        )}
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl bg-slate-50 p-3">
+                      <p className="text-xs text-muted">
+                        Psikologis
+                      </p>
+
+                      <p className="mt-1 text-sm font-semibold text-ink">
+                        {readable(
+                          entry.psychological_condition,
+                        )}
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl bg-slate-50 p-3">
+                      <p className="text-xs text-muted">
+                        Kunjungan Orang Tua
+                      </p>
+
+                      <p className="mt-1 text-sm font-semibold text-ink">
+                        {readable(
+                          entry.parent_visit,
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  {(entry.case_notes ||
+                    entry.handling_notes) && (
+                      <div className="mt-4 grid gap-3 lg:grid-cols-2">
+                        <div className="rounded-xl border border-amber-100 bg-amber-50 p-4">
+                          <p className="text-xs font-semibold text-amber-700">
+                            Kasus / Kejadian
+                          </p>
+
+                          <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-amber-900">
+                            {entry.case_notes ??
+                              "-"}
+                          </p>
+                        </div>
+
+                        <div className="rounded-xl border border-brand-100 bg-brand-50 p-4">
+                          <p className="text-xs font-semibold text-brand-700">
+                            Penanganan
+                          </p>
+
+                          <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-brand-900">
+                            {entry.handling_notes ??
+                              "-"}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                </article>
+              ),
+            )}
+          </div>
+        )}
+      </section>
+
+      {journal.status ===
+        "submitted" && (
+          <KepalaMahadCareJournalReviewPanel
+            journalId={
+              journal.id
+            }
+            submissionVersion={
+              journal.submission_version
+            }
+          />
+        )}
+
+      {reviews.length >
+        0 && (
+        <section className="mt-6 rounded-3xl border border-line bg-white p-5 shadow-soft sm:p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+            Audit Review
+          </p>
+
+          <h2 className="mt-2 text-xl font-bold text-ink">
+            Riwayat Review
+          </h2>
+
+          <div className="mt-5 space-y-3">
+            {reviews.map(
+              (review) => (
+                <article
+                  key={
+                    review.id
+                  }
+                  className="rounded-2xl border border-line bg-slate-50 p-4"
+                >
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <p className="font-semibold text-ink">
+                        {
+                          review.reviewer
+                            .full_name
+                        }
+                      </p>
+
+                      <p className="mt-1 text-xs text-slate-400">
+                        Submission{" "}
+                        {
+                          review.submission_version
+                        }
+                      </p>
+                    </div>
+
+                    <span
+                      className={
+                        review.action ===
+                        "reviewed"
+                          ? "w-fit rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700"
+                          : "w-fit rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700"
+                      }
+                    >
+                      {reviewActionLabel(
+                        review.action,
+                      )}
+                    </span>
+                  </div>
+
+                  {review.note && (
+                    <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-600">
+                      {
+                        review.note
+                      }
+                    </p>
+                  )}
+                </article>
+              ),
+            )}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}
+
+============================================================
+FILE: src\features\kepala-mahad\care-journals\data\get-kepala-mahad-care-journal-overview.ts
+============================================================
+import {
+  createClient,
+} from "@/lib/supabase/server";
+
+import type {
+  KepalaMahadCareJournalQuery,
+} from "../lib/parse-kepala-mahad-care-journal-query";
+
+import {
+  kepalaMahadCareJournalOverviewSchema,
+  type KepalaMahadCareJournalOverviewData,
+} from "../schemas/kepala-mahad-care-journal-overview-schema";
+
+export async function getKepalaMahadCareJournalOverview(
+  query:
+    KepalaMahadCareJournalQuery,
+): Promise<KepalaMahadCareJournalOverviewData> {
+  const supabase =
+    await createClient();
+
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "get_kepala_mahad_care_journal_overview",
+    {
+      p_status:
+        query.status,
+
+      p_date:
+        query.date,
+    },
+  );
+
+  if (error) {
+    throw new Error(
+      `Gagal mengambil Jurnal Pengasuhan Kepala Ma'had: ${error.message}`,
+    );
+  }
+
+  const validation =
+    kepalaMahadCareJournalOverviewSchema.safeParse(
+      data,
+    );
+
+  if (!validation.success) {
+    console.error(
+      "Format overview jurnal Kepala Ma'had tidak valid:",
+      validation.error.flatten(),
+    );
+
+    throw new Error(
+      "Format overview Jurnal Pengasuhan dari database tidak valid.",
+    );
+  }
+
+  return validation.data;
+}
+
+============================================================
+FILE: src\features\kepala-mahad\care-journals\data\get-kepala-mahad-care-journal-detail.ts
+============================================================
+import { z } from "zod";
+
+import {
+  createClient,
+} from "@/lib/supabase/server";
+
+import {
+  kepalaMahadCareJournalDetailSchema,
+  type KepalaMahadCareJournalDetailData,
+} from "../schemas/kepala-mahad-care-journal-detail-schema";
+
+const journalIdSchema =
+  z.string().uuid();
+
+export async function getKepalaMahadCareJournalDetail(
+  journalId: string,
+): Promise<KepalaMahadCareJournalDetailData> {
+  const validation =
+    journalIdSchema.safeParse(
+      journalId,
+    );
+
+  if (!validation.success) {
+    throw new Error(
+      "Journal ID tidak valid.",
+    );
+  }
+
+  const supabase =
+    await createClient();
+
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "get_kepala_mahad_care_journal_detail",
+    {
+      p_journal_id:
+        validation.data,
+    },
+  );
+
+  if (error) {
+    throw new Error(
+      `Gagal mengambil detail Jurnal Pengasuhan: ${error.message}`,
+    );
+  }
+
+  const responseValidation =
+    kepalaMahadCareJournalDetailSchema.safeParse(
+      data,
+    );
+
+  if (!responseValidation.success) {
+    console.error(
+      "Format detail jurnal Kepala Ma'had tidak valid:",
+      responseValidation.error.flatten(),
+    );
+
+    throw new Error(
+      "Format detail Jurnal Pengasuhan dari database tidak valid.",
+    );
+  }
+
+  return responseValidation.data;
+}
+
+============================================================
+FILE: src\features\kepala-mahad\care-journals\schemas\kepala-mahad-care-journal-overview-schema.ts
+============================================================
+import { z } from "zod";
+
+export const kepalaMahadCareJournalSessionSchema =
+  z.enum([
+    "morning",
+    "evening",
+  ]);
+
+export const kepalaMahadCareJournalStatusSchema =
+  z.enum([
+    "draft",
+    "submitted",
+    "revision_requested",
+    "reviewed",
+  ]);
+
+export const kepalaMahadCareJournalReviewActionSchema =
+  z.enum([
+    "reviewed",
+    "revision_requested",
+  ]);
+
+const staffSchema =
+  z.object({
+    staff_id:
+      z.string().uuid(),
+
+    legacy_staff_id:
+      z.string()
+        .nullable(),
+
+    full_name:
+      z.string(),
+
+    position:
+      z.string()
+        .nullable(),
+  });
+
+const latestReviewSchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    submission_version:
+      z.number()
+        .int()
+        .positive(),
+
+    action:
+      kepalaMahadCareJournalReviewActionSchema,
+
+    note:
+      z.string()
+        .nullable(),
+
+    created_at:
+      z.string(),
+
+    reviewer_name:
+      z.string(),
+  });
+
+const journalItemSchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    journal_date:
+      z.string(),
+
+    session:
+      kepalaMahadCareJournalSessionSchema,
+
+    status:
+      kepalaMahadCareJournalStatusSchema,
+
+    submission_version:
+      z.number()
+        .int()
+        .nonnegative(),
+
+    submitted_at:
+      z.string()
+        .nullable(),
+
+    last_reviewed_at:
+      z.string()
+        .nullable(),
+
+    created_at:
+      z.string(),
+
+    updated_at:
+      z.string(),
+
+    care_group:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        code:
+          z.string(),
+
+        name:
+          z.string(),
+
+        gender:
+          z.enum([
+            "male",
+            "female",
+          ]),
+      }),
+
+    created_by:
+      staffSchema,
+
+    submitted_by:
+      staffSchema
+        .nullable(),
+
+    entry_count:
+      z.number()
+        .int()
+        .nonnegative(),
+
+    complete_entry_count:
+      z.number()
+        .int()
+        .nonnegative(),
+
+    latest_review:
+      latestReviewSchema
+        .nullable(),
+  });
+
+export const kepalaMahadCareJournalOverviewSchema =
+  z.object({
+    generated_at:
+      z.string(),
+
+    profile:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        login_id:
+          z.string()
+            .nullable(),
+      }),
+
+    staff:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        legacy_staff_id:
+          z.string()
+            .nullable(),
+
+        full_name:
+          z.string(),
+
+        position:
+          z.string()
+            .nullable(),
+      }),
+
+    academic_year:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        name:
+          z.string(),
+
+        start_date:
+          z.string(),
+
+        end_date:
+          z.string(),
+      }),
+
+    filters:
+      z.object({
+        status:
+          kepalaMahadCareJournalStatusSchema
+            .nullable(),
+
+        date:
+          z.string()
+            .nullable(),
+      }),
+
+    summary:
+      z.object({
+        total_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        draft_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        submitted_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        revision_requested_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        reviewed_count:
+          z.number()
+            .int()
+            .nonnegative(),
+      }),
+
+    items:
+      z.array(
+        journalItemSchema,
+      ),
+  });
+
+export type KepalaMahadCareJournalStatus =
+  z.infer<
+    typeof kepalaMahadCareJournalStatusSchema
+  >;
+
+export type KepalaMahadCareJournalOverviewData =
+  z.infer<
+    typeof kepalaMahadCareJournalOverviewSchema
+  >;
+
+export type KepalaMahadCareJournalOverviewItem =
+  KepalaMahadCareJournalOverviewData["items"][number];
+
+============================================================
+FILE: src\features\kepala-mahad\care-journals\schemas\kepala-mahad-care-journal-detail-schema.ts
+============================================================
+import { z } from "zod";
+
+import {
+  kepalaMahadCareJournalReviewActionSchema,
+  kepalaMahadCareJournalSessionSchema,
+  kepalaMahadCareJournalStatusSchema,
+} from "./kepala-mahad-care-journal-overview-schema";
+
+const staffSchema =
+  z.object({
+    staff_id:
+      z.string().uuid(),
+
+    legacy_staff_id:
+      z.string()
+        .nullable(),
+
+    full_name:
+      z.string(),
+
+    position:
+      z.string()
+        .nullable(),
+  });
+
+const entrySchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    student_id:
+      z.string().uuid(),
+
+    legacy_student_id:
+      z.string()
+        .nullable(),
+
+    nis:
+      z.string()
+        .nullable(),
+
+    full_name:
+      z.string(),
+
+    gender:
+      z.enum([
+        "male",
+        "female",
+      ]),
+
+    health_condition:
+      z.enum([
+        "healthy",
+        "unwell",
+      ])
+        .nullable(),
+
+    sleep_compliance:
+      z.enum([
+        "on_time",
+        "needs_reminder",
+      ])
+        .nullable(),
+
+    psychological_condition:
+      z.enum([
+        "cheerful",
+        "gloomy",
+        "quiet",
+        "homesick",
+        "emotional",
+      ])
+        .nullable(),
+
+    parent_visit:
+      z.boolean()
+        .nullable(),
+
+    case_notes:
+      z.string()
+        .nullable(),
+
+    handling_notes:
+      z.string()
+        .nullable(),
+
+    updated_at:
+      z.string(),
+
+    class:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        name:
+          z.string(),
+
+        grade_level:
+          z.number()
+            .int(),
+      })
+        .nullable(),
+  });
+
+const reviewSchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    submission_version:
+      z.number()
+        .int()
+        .positive(),
+
+    action:
+      kepalaMahadCareJournalReviewActionSchema,
+
+    note:
+      z.string()
+        .nullable(),
+
+    created_at:
+      z.string(),
+
+    reviewer:
+      staffSchema,
+  });
+
+export const kepalaMahadCareJournalDetailSchema =
+  z.object({
+    generated_at:
+      z.string(),
+
+    journal:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        journal_date:
+          z.string(),
+
+        session:
+          kepalaMahadCareJournalSessionSchema,
+
+        status:
+          kepalaMahadCareJournalStatusSchema,
+
+        submission_version:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        submitted_at:
+          z.string()
+            .nullable(),
+
+        last_reviewed_at:
+          z.string()
+            .nullable(),
+
+        created_at:
+          z.string(),
+
+        updated_at:
+          z.string(),
+
+        care_group:
+          z.object({
+            id:
+              z.string().uuid(),
+
+            code:
+              z.string(),
+
+            name:
+              z.string(),
+
+            gender:
+              z.enum([
+                "male",
+                "female",
+              ]),
+          }),
+
+        created_by:
+          staffSchema,
+
+        submitted_by:
+          staffSchema
+            .nullable(),
+      }),
+
+    summary:
+      z.object({
+        entry_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        complete_entry_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        review_count:
+          z.number()
+            .int()
+            .nonnegative(),
+      }),
+
+    entries:
+      z.array(
+        entrySchema,
+      ),
+
+    reviews:
+      z.array(
+        reviewSchema,
+      ),
+  });
+
+export type KepalaMahadCareJournalDetailData =
+  z.infer<
+    typeof kepalaMahadCareJournalDetailSchema
+  >;
+
+export type KepalaMahadCareJournalEntry =
+  KepalaMahadCareJournalDetailData["entries"][number];
+
+============================================================
+FILE: src\features\kepala-mahad\care-journals\lib\parse-kepala-mahad-care-journal-query.ts
+============================================================
+import type {
+  KepalaMahadCareJournalStatus,
+} from "../schemas/kepala-mahad-care-journal-overview-schema";
+
+export type KepalaMahadCareJournalSearchParams =
+  Record<
+    string,
+    string | string[] | undefined
+  >;
+
+export type KepalaMahadCareJournalQuery = {
+  status:
+    KepalaMahadCareJournalStatus | null;
+
+  date:
+    string | null;
+};
+
+function firstValue(
+  value:
+    | string
+    | string[]
+    | undefined,
+): string | undefined {
+  return Array.isArray(value)
+    ? value[0]
+    : value;
+}
+
+function isValidDate(
+  value: string,
+): boolean {
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(
+      value,
+    )
+  ) {
+    return false;
+  }
+
+  const [
+    year,
+    month,
+    day,
+  ] = value
+    .split("-")
+    .map(Number);
+
+  const date =
+    new Date(
+      Date.UTC(
+        year,
+        month - 1,
+        day,
+      ),
+    );
+
+  return (
+    date.getUTCFullYear() ===
+      year &&
+    date.getUTCMonth() ===
+      month - 1 &&
+    date.getUTCDate() ===
+      day
+  );
+}
+
+export function parseKepalaMahadCareJournalQuery(
+  searchParams:
+    KepalaMahadCareJournalSearchParams,
+): KepalaMahadCareJournalQuery {
+  const rawStatus =
+    firstValue(
+      searchParams.status,
+    )
+      ?.trim()
+      .toLowerCase();
+
+  const allowedStatuses =
+    new Set([
+      "draft",
+      "submitted",
+      "revision_requested",
+      "reviewed",
+    ]);
+
+  const status =
+    rawStatus === "all"
+      ? null
+      : rawStatus &&
+          allowedStatuses.has(
+            rawStatus,
+          )
+        ? rawStatus as KepalaMahadCareJournalStatus
+        : "submitted";
+
+  const rawDate =
+    firstValue(
+      searchParams.date,
+    )?.trim();
+
+  const date =
+    rawDate &&
+    isValidDate(
+      rawDate,
+    )
+      ? rawDate
+      : null;
+
+  return {
+    status,
+    date,
+  };
+}
+
+============================================================
+FILE: src\app\(protected)\penanggung-jawab\monitoring\page.tsx
+============================================================
+import type {
+  Metadata,
+} from "next";
+
+import {
+  PenanggungJawabDormitoryMonitoring,
+} from "@/features/penanggung-jawab/monitoring/components/penanggung-jawab-dormitory-monitoring";
+
+import {
+  getPenanggungJawabDormitoryMonitoring,
+} from "@/features/penanggung-jawab/monitoring/data/get-penanggung-jawab-dormitory-monitoring";
+
+import {
+  requireRole,
+} from "@/lib/auth/guards";
+
+export const metadata: Metadata = {
+  title:
+    "Monitoring Asrama",
+
+  description:
+    "Monitoring operasional asrama untuk Penanggung Jawab E-Ma'had.",
+};
+
+export default async function PenanggungJawabMonitoringPage() {
+  await requireRole(
+    "penanggung_jawab",
+  );
+
+  const data =
+    await getPenanggungJawabDormitoryMonitoring();
+
+  return (
+    <PenanggungJawabDormitoryMonitoring
+      data={
+        data
+      }
+    />
+  );
+}
+
+============================================================
+FILE: src\features\penanggung-jawab\monitoring\components\penanggung-jawab-dormitory-monitoring.tsx
+============================================================
+import Link from "next/link";
+
+import type {
+  PenanggungJawabCareRecentItem,
+  PenanggungJawabDormitoryMonitoringData,
+  PenanggungJawabTahfizGroupSummary,
+} from "../schemas/penanggung-jawab-dormitory-monitoring-schema";
+
+type Props = {
+  data:
+    PenanggungJawabDormitoryMonitoringData;
+};
+
+function formatDate(
+  value:
+    string | null,
+): string {
+  if (!value) {
+    return "-";
+  }
+
+  return new Intl.DateTimeFormat(
+    "id-ID",
+    {
+      day:
+        "2-digit",
+
+      month:
+        "long",
+
+      year:
+        "numeric",
+
+      timeZone:
+        "Asia/Makassar",
+    },
+  ).format(
+    new Date(
+      `${value}T00:00:00+08:00`,
+    ),
+  );
+}
+
+function formatDateTime(
+  value:
+    string | null,
+): string {
+  if (!value) {
+    return "-";
+  }
+
+  const date =
+    new Date(
+      value,
+    );
+
+  if (
+    Number.isNaN(
+      date.getTime(),
+    )
+  ) {
+    return "-";
+  }
+
+  return new Intl.DateTimeFormat(
+    "id-ID",
+    {
+      dateStyle:
+        "medium",
+
+      timeStyle:
+        "short",
+
+      timeZone:
+        "Asia/Makassar",
+    },
+  ).format(
+    date,
+  );
+}
+
+function genderLabel(
+  value:
+    "male" | "female",
+): string {
+  return value ===
+    "male"
+    ? "Putra"
+    : "Putri";
+}
+
+function sessionLabel(
+  value:
+    string,
+): string {
+  switch (
+    value
+  ) {
+    case "morning":
+      return "Pagi";
+
+    case "evening":
+      return "Malam";
+
+    default:
+      return value;
+  }
+}
+
+function careStatusLabel(
+  value:
+    PenanggungJawabCareRecentItem["status"],
+): string {
+  switch (
+    value
+  ) {
+    case "draft":
+      return "Draft";
+
+    case "submitted":
+      return "Menunggu Review";
+
+    case "revision_requested":
+      return "Perlu Revisi";
+
+    case "reviewed":
+      return "Sudah Direview";
+  }
+}
+
+function careStatusClassName(
+  value:
+    PenanggungJawabCareRecentItem["status"],
+): string {
+  switch (
+    value
+  ) {
+    case "draft":
+      return "bg-slate-100 text-slate-600";
+
+    case "submitted":
+      return "bg-blue-50 text-blue-700";
+
+    case "revision_requested":
+      return "bg-amber-50 text-amber-700";
+
+    case "reviewed":
+      return "bg-emerald-50 text-emerald-700";
+  }
+}
+
+function SummaryCard({
+  label,
+  value,
+  helper,
+}: {
+  label:
+    string;
+
+  value:
+    string | number;
+
+  helper?:
+    string;
+}) {
+  return (
+    <article className="rounded-2xl border border-line bg-white p-5 shadow-soft">
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+        {label}
+      </p>
+
+      <p className="mt-3 text-3xl font-bold tracking-tight text-ink">
+        {value}
+      </p>
+
+      {helper && (
+        <p className="mt-2 text-xs leading-5 text-muted">
+          {helper}
+        </p>
+      )}
+    </article>
+  );
+}
+
+function ProgressBar({
+  value,
+}: {
+  value:
+    number;
+}) {
+  const normalizedValue =
+    Math.min(
+      Math.max(
+        value,
+        0,
+      ),
+      100,
+    );
+
+  return (
+    <div
+      className="h-2 overflow-hidden rounded-full bg-slate-100"
+      aria-label={`Progres ${normalizedValue}%`}
+    >
+      <div
+        className="h-full rounded-full bg-brand-600 transition-all"
+        style={{
+          width:
+            `${normalizedValue}%`,
+        }}
+      />
+    </div>
+  );
+}
+
+function CareJournalItem({
+  item,
+}: {
+  item:
+    PenanggungJawabCareRecentItem;
+}) {
+  return (
+    <article className="rounded-2xl border border-line bg-white p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="font-bold text-ink">
+              {
+                item.care_group
+                  .name
+              }
+            </p>
+
+            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+              {genderLabel(
+                item.care_group
+                  .gender,
+              )}
+            </span>
+          </div>
+
+          <p className="mt-2 text-sm text-muted">
+            {formatDate(
+              item.journal_date,
+            )}
+            {" Â· "}
+            {sessionLabel(
+              item.session,
+            )}
+          </p>
+        </div>
+
+        <span
+          className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${careStatusClassName(
+            item.status,
+          )}`}
+        >
+          {careStatusLabel(
+            item.status,
+          )}
+        </span>
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <div className="rounded-xl bg-slate-50 p-3">
+          <p className="text-xs text-muted">
+            Santri tercatat
+          </p>
+
+          <p className="mt-1 text-lg font-bold text-ink">
+            {
+              item.entry_count
+            }
+          </p>
+        </div>
+
+        <div
+          className={
+            item.attention_student_count >
+            0
+              ? "rounded-xl bg-amber-50 p-3"
+              : "rounded-xl bg-emerald-50 p-3"
+          }
+        >
+          <p
+            className={
+              item.attention_student_count >
+              0
+                ? "text-xs text-amber-700"
+                : "text-xs text-emerald-700"
+            }
+          >
+            Perlu perhatian
+          </p>
+
+          <p
+            className={
+              item.attention_student_count >
+              0
+                ? "mt-1 text-lg font-bold text-amber-900"
+                : "mt-1 text-lg font-bold text-emerald-900"
+            }
+          >
+            {
+              item.attention_student_count
+            }
+          </p>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function TahfizGroupItem({
+  group,
+}: {
+  group:
+    PenanggungJawabTahfizGroupSummary;
+}) {
+  const percentage =
+    group.student_count >
+    0
+      ? Math.round(
+          (
+            group.published_count /
+            group.student_count
+          ) *
+            100,
+        )
+      : 0;
+
+  return (
+    <article className="rounded-2xl border border-line bg-white p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="font-bold text-ink">
+            {
+              group.name
+            }
+          </p>
+
+          <p className="mt-1 text-xs text-muted">
+            {genderLabel(
+              group.gender,
+            )}
+
+            {group.grade_level !==
+              null &&
+              ` Â· Kelas ${group.grade_level}`}
+          </p>
+        </div>
+
+        <span
+          className={
+            group.missing_count >
+            0
+              ? "rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700"
+              : "rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700"
+          }
+        >
+          {percentage}%
+        </span>
+      </div>
+
+      <div className="mt-4">
+        <ProgressBar
+          value={
+            percentage
+          }
+        />
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
+        <span>
+          Published{" "}
+          <strong className="text-ink">
+            {
+              group.published_count
+            }
+          </strong>
+          /
+          {
+            group.student_count
+          }
+        </span>
+
+        <span>
+          Belum{" "}
+          <strong
+            className={
+              group.missing_count >
+              0
+                ? "text-amber-700"
+                : "text-emerald-700"
+            }
+          >
+            {
+              group.missing_count
+            }
+          </strong>
+        </span>
+      </div>
+    </article>
+  );
+}
+
+export function PenanggungJawabDormitoryMonitoring({
+  data,
+}: Props) {
+  const careSummary =
+    data.care.summary;
+
+  const headSummary =
+    data.mahad_head_journal
+      .summary;
+
+  const tahfizSummary =
+    data.tahfiz.summary;
+
+  const latestHeadJournal =
+    data.mahad_head_journal
+      .latest_item;
+
+  return (
+    <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      {/* ===================================================
+          HEADER
+      =================================================== */}
+
+      <section className="overflow-hidden rounded-3xl border border-brand-100 bg-white shadow-soft">
+        <div className="grid gap-6 p-6 sm:p-8 xl:grid-cols-[minmax(0,1fr)_320px]">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+              Penanggung Jawab
+            </p>
+
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+              Monitoring Asrama
+            </h1>
+
+            <p className="mt-4 max-w-3xl leading-7 text-muted">
+              Ringkasan kondisi
+              operasional Ma&apos;had
+              berdasarkan Jurnal
+              Pengasuhan, Jurnal Kepala
+              Ma&apos;had, dan laporan
+              Tahfiz yang telah
+              dipublikasikan.
+            </p>
+
+            <div className="mt-5 flex flex-wrap gap-2 text-xs font-semibold">
+              <span className="rounded-full bg-brand-50 px-3 py-1.5 text-brand-700">
+                Tahun Ajaran{" "}
+                {
+                  data.academic_year
+                    .name
+                }
+              </span>
+
+              <span className="rounded-full bg-slate-100 px-3 py-1.5 text-slate-600">
+                {formatDate(
+                  data.week.start,
+                )}
+                {" â€“ "}
+                {formatDate(
+                  data.week.end,
+                )}
+              </span>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5">
+            <p className="text-sm font-bold text-blue-900">
+              Monitoring read-only
+            </p>
+
+            <p className="mt-2 text-sm leading-6 text-blue-700">
+              Halaman ini tidak
+              menyediakan fungsi input,
+              edit, review, publish,
+              maupun transaksi
+              keuangan.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ===================================================
+          EXECUTIVE SNAPSHOT
+      =================================================== */}
+
+      <section className="mt-6">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+            Ringkasan pekan berjalan
+          </p>
+
+          <h2 className="mt-2 text-2xl font-bold text-ink">
+            Kondisi Operasional
+          </h2>
+        </div>
+
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <SummaryCard
+            label="Jurnal Pengasuhan"
+            value={
+              careSummary.journal_count
+            }
+            helper={`${careSummary.group_count} kelompok pengasuhan aktif`}
+          />
+
+          <SummaryCard
+            label="Perlu Tindak Lanjut"
+            value={
+              careSummary.follow_up_count
+            }
+            helper={`${careSummary.attention_student_count} santri terindikasi perlu perhatian`}
+          />
+
+          <SummaryCard
+            label="Jurnal Kepala Ma'had"
+            value={
+              headSummary.submitted_count
+            }
+            helper="Jurnal submitted pekan berjalan"
+          />
+
+          <SummaryCard
+            label="Laporan Tahfiz"
+            value={`${tahfizSummary.completion_percentage}%`}
+            helper={`${tahfizSummary.published_count} dari ${tahfizSummary.student_count} santri sudah published`}
+          />
+        </div>
+      </section>
+
+      {/* ===================================================
+          CARE
+      =================================================== */}
+
+      <section className="mt-7 rounded-3xl border border-line bg-white p-5 shadow-soft sm:p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+              Pengasuhan
+            </p>
+
+            <h2 className="mt-2 text-2xl font-bold text-ink">
+              Monitoring Jurnal
+              Pengasuhan
+            </h2>
+
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
+              Penanggung Jawab melihat
+              status dan ringkasan
+              operasional tanpa membuka
+              catatan individual santri.
+            </p>
+          </div>
+
+          <p className="text-sm text-muted">
+            Jurnal terakhir:{" "}
+            <strong className="text-ink">
+              {formatDate(
+                careSummary.latest_journal_date,
+              )}
+            </strong>
+          </p>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+          <div className="rounded-2xl bg-slate-50 p-4">
+            <p className="text-xs text-muted">
+              Draft
+            </p>
+
+            <p className="mt-1 text-2xl font-bold text-ink">
+              {
+                careSummary.draft_count
+              }
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-blue-50 p-4">
+            <p className="text-xs text-blue-700">
+              Menunggu Review
+            </p>
+
+            <p className="mt-1 text-2xl font-bold text-blue-900">
+              {
+                careSummary.pending_review_count
+              }
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-amber-50 p-4">
+            <p className="text-xs text-amber-700">
+              Perlu Revisi
+            </p>
+
+            <p className="mt-1 text-2xl font-bold text-amber-900">
+              {
+                careSummary.revision_requested_count
+              }
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-emerald-50 p-4">
+            <p className="text-xs text-emerald-700">
+              Sudah Direview
+            </p>
+
+            <p className="mt-1 text-2xl font-bold text-emerald-900">
+              {
+                careSummary.reviewed_count
+              }
+            </p>
+          </div>
+
+          <div
+            className={
+              careSummary.attention_student_count >
+              0
+                ? "rounded-2xl bg-red-50 p-4"
+                : "rounded-2xl bg-emerald-50 p-4"
+            }
+          >
+            <p
+              className={
+                careSummary.attention_student_count >
+                0
+                  ? "text-xs text-red-700"
+                  : "text-xs text-emerald-700"
+              }
+            >
+              Santri Perlu Perhatian
+            </p>
+
+            <p
+              className={
+                careSummary.attention_student_count >
+                0
+                  ? "mt-1 text-2xl font-bold text-red-900"
+                  : "mt-1 text-2xl font-bold text-emerald-900"
+              }
+            >
+              {
+                careSummary.attention_student_count
+              }
+            </p>
+          </div>
+        </div>
+
+        {data.care
+          .recent_items.length >
+        0 ? (
+          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+            {data.care.recent_items.map(
+              (
+                item,
+              ) => (
+                <CareJournalItem
+                  key={
+                    item.id
+                  }
+                  item={
+                    item
+                  }
+                />
+              ),
+            )}
+          </div>
+        ) : (
+          <div className="mt-5 rounded-2xl border border-dashed border-line bg-slate-50 p-6 text-center">
+            <p className="font-semibold text-ink">
+              Belum ada jurnal
+              pengasuhan pekan ini
+            </p>
+
+            <p className="mt-2 text-sm text-muted">
+              Ringkasan akan muncul
+              setelah Pengasuh mulai
+              membuat jurnal.
+            </p>
+          </div>
+        )}
+      </section>
+
+      {/* ===================================================
+          HEAD JOURNAL
+      =================================================== */}
+
+      <section className="mt-7 rounded-3xl border border-line bg-white p-5 shadow-soft sm:p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+              Kepala Ma&apos;had
+            </p>
+
+            <h2 className="mt-2 text-2xl font-bold text-ink">
+              Jurnal Kepala
+              Ma&apos;had
+            </h2>
+
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
+              Hanya jurnal yang sudah
+              dikirim oleh Kepala
+              Ma&apos;had yang
+              ditampilkan kepada
+              Penanggung Jawab.
+            </p>
+          </div>
+
+          <Link
+            href="/penanggung-jawab/jurnal"
+            className="inline-flex min-h-10 w-fit items-center justify-center rounded-xl border border-brand-200 bg-brand-50 px-4 text-sm font-semibold text-brand-700 transition hover:bg-brand-100"
+          >
+            Buka Semua Jurnal
+          </Link>
+        </div>
+
+        {latestHeadJournal ? (
+          <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <article className="rounded-2xl bg-slate-50 p-5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+                    Jurnal terbaru
+                  </p>
+
+                  <p className="mt-2 text-xl font-bold text-ink">
+                    {formatDate(
+                      latestHeadJournal.journal_date,
+                    )}
+                  </p>
+
+                  <p className="mt-2 text-sm text-muted">
+                    {
+                      latestHeadJournal
+                        .staff
+                        .full_name
+                    }
+                  </p>
+
+                  {latestHeadJournal
+                    .staff
+                    .position && (
+                    <p className="mt-1 text-xs text-muted">
+                      {
+                        latestHeadJournal
+                          .staff
+                          .position
+                      }
+                    </p>
+                  )}
+                </div>
+
+                <span className="w-fit rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                  Sudah Dikirim
+                </span>
+              </div>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl bg-white p-4">
+                  <p className="text-xs text-muted">
+                    Dikirim
+                  </p>
+
+                  <p className="mt-1 text-sm font-bold text-ink">
+                    {formatDateTime(
+                      latestHeadJournal.submitted_at,
+                    )}
+                  </p>
+                </div>
+
+                <div className="rounded-xl bg-white p-4">
+                  <p className="text-xs text-muted">
+                    Bukti Kinerja
+                  </p>
+
+                  <p className="mt-1 text-sm font-bold text-ink">
+                    {latestHeadJournal.has_evidence
+                      ? "Tersedia"
+                      : "Tidak ada"}
+                  </p>
+                </div>
+              </div>
+
+              <Link
+                href={`/penanggung-jawab/jurnal/${latestHeadJournal.id}`}
+                className="mt-5 inline-flex min-h-10 items-center justify-center rounded-xl bg-brand-700 px-4 text-sm font-semibold text-white transition hover:bg-brand-800"
+              >
+                Lihat Detail Jurnal
+              </Link>
+            </article>
+
+            <article className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-600">
+                Penyelesaian Checklist
+              </p>
+
+              <div className="mt-4 flex items-end justify-between gap-4">
+                <p className="text-4xl font-bold text-brand-950">
+                  {
+                    headSummary.latest_completion_percentage
+                  }
+                  %
+                </p>
+
+                <p className="text-sm font-semibold text-brand-700">
+                  {
+                    headSummary.latest_checked_count
+                  }
+                  /
+                  {
+                    headSummary.total_checklist_count
+                  }
+                </p>
+              </div>
+
+              <div className="mt-4">
+                <ProgressBar
+                  value={
+                    headSummary.latest_completion_percentage
+                  }
+                />
+              </div>
+
+              <p className="mt-4 text-xs leading-5 text-brand-700">
+                Progres dihitung dari
+                checklist aktif yang
+                ditandai pada jurnal
+                terbaru.
+              </p>
+            </article>
+          </div>
+        ) : (
+          <div className="mt-5 rounded-2xl border border-dashed border-line bg-slate-50 p-6 text-center">
+            <p className="font-semibold text-ink">
+              Belum ada jurnal yang
+              dikirim pekan ini
+            </p>
+
+            <p className="mt-2 text-sm text-muted">
+              Draft Kepala
+              Ma&apos;had tidak
+              ditampilkan kepada
+              Penanggung Jawab.
+            </p>
+          </div>
+        )}
+      </section>
+
+      {/* ===================================================
+          TAHFIZ
+      =================================================== */}
+
+      <section className="mt-7 rounded-3xl border border-line bg-white p-5 shadow-soft sm:p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+              Tahfiz
+            </p>
+
+            <h2 className="mt-2 text-2xl font-bold text-ink">
+              Pelaporan Mingguan
+            </h2>
+
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
+              Monitoring kelengkapan
+              laporan Tahfiz seluruh
+              santri pada pekan
+              berjalan.
+            </p>
+          </div>
+
+          <Link
+            href="/penanggung-jawab/tahfiz"
+            className="inline-flex min-h-10 w-fit items-center justify-center rounded-xl border border-brand-200 bg-brand-50 px-4 text-sm font-semibold text-brand-700 transition hover:bg-brand-100"
+          >
+            Buka Monitoring Tahfiz
+          </Link>
+        </div>
+
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <SummaryCard
+            label="Santri Tahfiz"
+            value={
+              tahfizSummary.student_count
+            }
+            helper={`${tahfizSummary.group_count} kelompok aktif`}
+          />
+
+          <SummaryCard
+            label="Sudah Published"
+            value={
+              tahfizSummary.published_count
+            }
+          />
+
+          <SummaryCard
+            label="Belum Published"
+            value={
+              tahfizSummary.missing_count
+            }
+          />
+
+          <SummaryCard
+            label="Perlu Bimbingan"
+            value={
+              tahfizSummary.attention_count
+            }
+          />
+        </div>
+
+        <div className="mt-5 rounded-2xl border border-brand-100 bg-brand-50 p-5">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold text-brand-800">
+                Kelengkapan laporan
+                pekan ini
+              </p>
+
+              <p className="mt-1 text-xs text-brand-700">
+                {
+                  tahfizSummary.published_count
+                }{" "}
+                dari{" "}
+                {
+                  tahfizSummary.student_count
+                }{" "}
+                santri
+              </p>
+            </div>
+
+            <p className="text-3xl font-bold text-brand-950">
+              {
+                tahfizSummary.completion_percentage
+              }
+              %
+            </p>
+          </div>
+
+          <div className="mt-4">
+            <ProgressBar
+              value={
+                tahfizSummary.completion_percentage
+              }
+            />
+          </div>
+        </div>
+
+        {data.tahfiz
+          .groups.length >
+        0 && (
+          <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {data.tahfiz.groups.map(
+              (
+                group,
+              ) => (
+                <TahfizGroupItem
+                  key={
+                    group.id
+                  }
+                  group={
+                    group
+                  }
+                />
+              ),
+            )}
+          </div>
+        )}
+      </section>
+
+      {/* ===================================================
+          SECURITY
+      =================================================== */}
+
+      <section className="mt-7 rounded-2xl border border-blue-100 bg-blue-50 p-5">
+        <p className="font-semibold text-blue-900">
+          Batas akses Penanggung Jawab
+        </p>
+
+        <p className="mt-2 max-w-4xl text-sm leading-6 text-blue-700">
+          Monitoring Asrama hanya
+          memberikan ringkasan
+          Pengasuhan, jurnal Kepala
+          Ma&apos;had yang sudah
+          dikirim, dan laporan Tahfiz
+          yang sudah dipublikasikan.
+          Tidak ada informasi keuangan
+          pada halaman ini.
+        </p>
+      </section>
+    </div>
+  );
+}
+
+============================================================
+FILE: src\features\penanggung-jawab\monitoring\data\get-penanggung-jawab-dormitory-monitoring.ts
+============================================================
+import "server-only";
+
+import {
+  createClient,
+} from "@/lib/supabase/server";
+
+import {
+  penanggungJawabDormitoryMonitoringSchema,
+  type PenanggungJawabDormitoryMonitoringData,
+} from "../schemas/penanggung-jawab-dormitory-monitoring-schema";
+
+export async function getPenanggungJawabDormitoryMonitoring(): Promise<PenanggungJawabDormitoryMonitoringData> {
+  const supabase =
+    await createClient();
+
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "get_penanggung_jawab_dormitory_monitoring",
+    );
+
+  if (error) {
+    throw new Error(
+      `Gagal memuat Monitoring Asrama Penanggung Jawab: ${error.message}`,
+    );
+  }
+
+  const validation =
+    penanggungJawabDormitoryMonitoringSchema.safeParse(
+      data,
+    );
+
+  if (
+    !validation.success
+  ) {
+    console.error(
+      "Payload Monitoring Asrama Penanggung Jawab tidak valid:",
+      validation.error.flatten(),
+    );
+
+    throw new Error(
+      "Format data Monitoring Asrama Penanggung Jawab tidak valid.",
+    );
+  }
+
+  return validation.data;
+}
+
+============================================================
+FILE: src\features\penanggung-jawab\monitoring\schemas\penanggung-jawab-dormitory-monitoring-schema.ts
+============================================================
+import {
+  z,
+} from "zod";
+
+const genderSchema =
+  z.enum([
+    "male",
+    "female",
+  ]);
+
+const careJournalStatusSchema =
+  z.enum([
+    "draft",
+    "submitted",
+    "revision_requested",
+    "reviewed",
+  ]);
+
+const careRecentItemSchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    journal_date:
+      z.string(),
+
+    session:
+      z.string(),
+
+    status:
+      careJournalStatusSchema,
+
+    submission_version:
+      z.number()
+        .int()
+        .nonnegative(),
+
+    submitted_at:
+      z.string().nullable(),
+
+    last_reviewed_at:
+      z.string().nullable(),
+
+    care_group:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        code:
+          z.string(),
+
+        name:
+          z.string(),
+
+        gender:
+          genderSchema,
+      }),
+
+    entry_count:
+      z.number()
+        .int()
+        .nonnegative(),
+
+    attention_student_count:
+      z.number()
+        .int()
+        .nonnegative(),
+  });
+
+const tahfizGroupSummarySchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    code:
+      z.string(),
+
+    name:
+      z.string(),
+
+    gender:
+      genderSchema,
+
+    grade_level:
+      z.number()
+        .int()
+        .nullable(),
+
+    student_count:
+      z.number()
+        .int()
+        .nonnegative(),
+
+    published_count:
+      z.number()
+        .int()
+        .nonnegative(),
+
+    missing_count:
+      z.number()
+        .int()
+        .nonnegative(),
+  });
+
+const latestMahadHeadJournalSchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    journal_date:
+      z.string(),
+
+    status:
+      z.literal(
+        "submitted",
+      ),
+
+    submitted_at:
+      z.string().nullable(),
+
+    has_evidence:
+      z.boolean(),
+
+    checked_count:
+      z.number()
+        .int()
+        .nonnegative(),
+
+    total_checklist_count:
+      z.number()
+        .int()
+        .nonnegative(),
+
+    staff:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        full_name:
+          z.string(),
+
+        position:
+          z.string().nullable(),
+      }),
+  });
+
+export const penanggungJawabDormitoryMonitoringSchema =
+  z.object({
+    generated_at:
+      z.string(),
+
+    access_mode:
+      z.literal(
+        "penanggung_jawab_read_only_monitoring",
+      ),
+
+    profile:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        login_id:
+          z.string().nullable(),
+      }),
+
+    staff:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        full_name:
+          z.string(),
+
+        position:
+          z.string().nullable(),
+      }),
+
+    academic_year:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        name:
+          z.string(),
+
+        start_date:
+          z.string(),
+
+        end_date:
+          z.string(),
+      }),
+
+    week:
+      z.object({
+        start:
+          z.string(),
+
+        end:
+          z.string(),
+      }),
+
+    care:
+      z.object({
+        summary:
+          z.object({
+            group_count:
+              z.number()
+                .int()
+                .nonnegative(),
+
+            journal_count:
+              z.number()
+                .int()
+                .nonnegative(),
+
+            draft_count:
+              z.number()
+                .int()
+                .nonnegative(),
+
+            submitted_count:
+              z.number()
+                .int()
+                .nonnegative(),
+
+            revision_requested_count:
+              z.number()
+                .int()
+                .nonnegative(),
+
+            reviewed_count:
+              z.number()
+                .int()
+                .nonnegative(),
+
+            pending_review_count:
+              z.number()
+                .int()
+                .nonnegative(),
+
+            follow_up_count:
+              z.number()
+                .int()
+                .nonnegative(),
+
+            attention_student_count:
+              z.number()
+                .int()
+                .nonnegative(),
+
+            latest_journal_date:
+              z.string().nullable(),
+          }),
+
+        recent_items:
+          z.array(
+            careRecentItemSchema,
+          ),
+      }),
+
+    mahad_head_journal:
+      z.object({
+        summary:
+          z.object({
+            submitted_count:
+              z.number()
+                .int()
+                .nonnegative(),
+
+            latest_journal_date:
+              z.string().nullable(),
+
+            latest_submitted_at:
+              z.string().nullable(),
+
+            latest_checked_count:
+              z.number()
+                .int()
+                .nonnegative(),
+
+            total_checklist_count:
+              z.number()
+                .int()
+                .nonnegative(),
+
+            latest_completion_percentage:
+              z.number()
+                .int()
+                .min(0)
+                .max(100),
+          }),
+
+        latest_item:
+          latestMahadHeadJournalSchema.nullable(),
+      }),
+
+    tahfiz:
+      z.object({
+        summary:
+          z.object({
+            group_count:
+              z.number()
+                .int()
+                .nonnegative(),
+
+            student_count:
+              z.number()
+                .int()
+                .nonnegative(),
+
+            published_count:
+              z.number()
+                .int()
+                .nonnegative(),
+
+            missing_count:
+              z.number()
+                .int()
+                .nonnegative(),
+
+            attention_count:
+              z.number()
+                .int()
+                .nonnegative(),
+
+            completion_percentage:
+              z.number()
+                .int()
+                .min(0)
+                .max(100),
+          }),
+
+        groups:
+          z.array(
+            tahfizGroupSummarySchema,
+          ),
+      }),
+  });
+
+export type PenanggungJawabDormitoryMonitoringData =
+  z.infer<
+    typeof penanggungJawabDormitoryMonitoringSchema
+  >;
+
+export type PenanggungJawabCareRecentItem =
+  z.infer<
+    typeof careRecentItemSchema
+  >;
+
+export type PenanggungJawabTahfizGroupSummary =
+  z.infer<
+    typeof tahfizGroupSummarySchema
+  >;
+
+============================================================
+FILE: database\sql\185b-create-penanggung-jawab-dormitory-monitoring.sql
+============================================================
+-- ============================================================
+-- E-MA'HAD
+-- STAGE 185B
+--
+-- PENANGGUNG JAWAB
+-- MONITORING ASRAMA
+--
+-- READ ONLY EXECUTIVE MONITORING
+--
+-- SUMBER:
+-- 1. Jurnal Pengasuhan
+-- 2. Jurnal Kepala Ma'had
+-- 3. Tahfiz
+--
+-- TIDAK MEMUAT DATA KEUANGAN
+-- ============================================================
+
+
+create or replace function public.get_penanggung_jawab_dormitory_monitoring()
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path to ''
+as $function$
+
+declare
+
+    -- ========================================================
+    -- AUTH
+    -- ========================================================
+
+    v_profile_id uuid;
+
+    v_login_id text;
+
+    v_staff_id uuid;
+    v_staff_name text;
+    v_staff_position text;
+
+
+    -- ========================================================
+    -- ACADEMIC YEAR
+    -- ========================================================
+
+    v_academic_year_id uuid;
+    v_academic_year_name text;
+    v_academic_year_start date;
+    v_academic_year_end date;
+
+
+    -- ========================================================
+    -- CURRENT WEEK
+    -- ========================================================
+
+    v_week_start date;
+    v_week_end date;
+
+
+    -- ========================================================
+    -- CARE / PENGASUHAN
+    -- ========================================================
+
+    v_care_group_count integer := 0;
+
+    v_care_journal_count integer := 0;
+
+    v_care_draft_count integer := 0;
+
+    v_care_submitted_count integer := 0;
+
+    v_care_revision_requested_count integer := 0;
+
+    v_care_reviewed_count integer := 0;
+
+    v_care_attention_student_count integer := 0;
+
+    v_care_latest_journal_date date;
+
+    v_care_recent_items jsonb :=
+        '[]'::jsonb;
+
+
+    -- ========================================================
+    -- MAHAD HEAD JOURNAL
+    -- ========================================================
+
+    v_head_journal_submitted_count integer := 0;
+
+    v_head_latest_journal_date date;
+
+    v_head_latest_submitted_at timestamptz;
+
+    v_head_latest_checked_count integer := 0;
+
+    v_head_total_checklist_count integer := 0;
+
+    v_head_latest_completion_percentage integer := 0;
+
+    v_head_latest_item jsonb;
+
+
+    -- ========================================================
+    -- TAHFIZ
+    -- ========================================================
+
+    v_tahfiz_group_count integer := 0;
+
+    v_tahfiz_student_count integer := 0;
+
+    v_tahfiz_published_count integer := 0;
+
+    v_tahfiz_missing_count integer := 0;
+
+    v_tahfiz_attention_count integer := 0;
+
+    v_tahfiz_completion_percentage integer := 0;
+
+    v_tahfiz_groups jsonb :=
+        '[]'::jsonb;
+
+begin
+
+    -- ========================================================
+    -- 1. AUTHENTICATION
+    -- ========================================================
+
+    v_profile_id :=
+        auth.uid();
+
+
+    if v_profile_id is null then
+        raise exception using
+            errcode = '42501',
+            message = 'Pengguna belum terautentikasi.';
+    end if;
+
+
+    -- ========================================================
+    -- 2. ROLE
+    -- ========================================================
+
+    if not public.has_role(
+        'penanggung_jawab'
+    ) then
+        raise exception using
+            errcode = '42501',
+            message = 'Akses Monitoring Asrama Penanggung Jawab ditolak.';
+    end if;
+
+
+    -- ========================================================
+    -- 3. ACTIVE PROFILE
+    -- ========================================================
+
+    select
+        profile.login_id
+
+    into
+        v_login_id
+
+    from public.profiles
+        as profile
+
+    where profile.id =
+          v_profile_id
+
+      and profile.is_active =
+          true;
+
+
+    if not found then
+        raise exception using
+            errcode = '42501',
+            message = 'Profile Penanggung Jawab tidak aktif.';
+    end if;
+
+
+    -- ========================================================
+    -- 4. ACTIVE STAFF
+    -- ========================================================
+
+    select
+        staff.id,
+        staff.full_name,
+        staff.position
+
+    into
+        v_staff_id,
+        v_staff_name,
+        v_staff_position
+
+    from public.staff
+        as staff
+
+    where staff.profile_id =
+          v_profile_id
+
+      and staff.is_active =
+          true
+
+    limit 1;
+
+
+    if v_staff_id is null then
+        raise exception using
+            errcode = '42501',
+            message = 'Data staf Penanggung Jawab aktif tidak ditemukan.';
+    end if;
+
+
+    -- ========================================================
+    -- 5. CURRENT ACADEMIC YEAR
+    -- ========================================================
+
+    select
+        academic_year.id,
+        academic_year.name,
+        academic_year.start_date,
+        academic_year.end_date
+
+    into
+        v_academic_year_id,
+        v_academic_year_name,
+        v_academic_year_start,
+        v_academic_year_end
+
+    from public.academic_years
+        as academic_year
+
+    where academic_year.is_current =
+          true
+
+    order by
+        academic_year.start_date desc
+
+    limit 1;
+
+
+    if v_academic_year_id is null then
+        raise exception
+            'Tahun ajaran aktif belum tersedia.';
+    end if;
+
+
+    -- ========================================================
+    -- 6. CURRENT WEEK
+    --
+    -- Senin - Minggu.
+    -- Sama dengan konsep pekan laporan Tahfiz.
+    -- ========================================================
+
+    v_week_start :=
+        date_trunc(
+            'week',
+            current_date
+        )::date;
+
+
+    v_week_end :=
+        v_week_start + 6;
+
+
+    -- ========================================================
+    -- 7. ACTIVE CARE GROUPS
+    -- ========================================================
+
+    select
+        count(*)::integer
+
+    into
+        v_care_group_count
+
+    from public.care_groups
+        as care_group
+
+    where care_group.academic_year_id =
+          v_academic_year_id
+
+      and care_group.is_active =
+          true;
+
+
+    -- ========================================================
+    -- 8. CARE JOURNAL SUMMARY
+    --
+    -- PJ hanya memperoleh metadata monitoring.
+    -- Tidak ada isi jurnal individual pada response ini.
+    -- ========================================================
+
+    select
+        count(*)::integer,
+
+        count(*) filter (
+            where journal.status =
+                  'draft'
+        )::integer,
+
+        count(*) filter (
+            where journal.status =
+                  'submitted'
+        )::integer,
+
+        count(*) filter (
+            where journal.status =
+                  'revision_requested'
+        )::integer,
+
+        count(*) filter (
+            where journal.status =
+                  'reviewed'
+        )::integer,
+
+        max(
+            journal.journal_date
+        )
+
+    into
+        v_care_journal_count,
+        v_care_draft_count,
+        v_care_submitted_count,
+        v_care_revision_requested_count,
+        v_care_reviewed_count,
+        v_care_latest_journal_date
+
+    from public.care_journals
+        as journal
+
+    inner join public.care_groups
+        as care_group
+
+        on care_group.id =
+           journal.care_group_id
+
+    where care_group.academic_year_id =
+          v_academic_year_id
+
+      and care_group.is_active =
+          true
+
+      and journal.journal_date
+          between
+          v_week_start
+          and
+          v_week_end;
+
+
+    -- ========================================================
+    -- 9. CARE STUDENTS NEEDING ATTENTION
+    --
+    -- Unique santri pada jurnal pekan berjalan.
+    --
+    -- Indikasi:
+    -- - kurang sehat
+    -- - perlu teguran tidur
+    -- - kondisi psikologis selain cheerful
+    -- - ada catatan kasus
+    -- ========================================================
+
+    select
+        count(
+            distinct entry.student_id
+        )::integer
+
+    into
+        v_care_attention_student_count
+
+    from public.care_journal_entries
+        as entry
+
+    inner join public.care_journals
+        as journal
+
+        on journal.id =
+           entry.journal_id
+
+    inner join public.care_groups
+        as care_group
+
+        on care_group.id =
+           journal.care_group_id
+
+    inner join public.students
+        as student
+
+        on student.id =
+           entry.student_id
+
+    where care_group.academic_year_id =
+          v_academic_year_id
+
+      and care_group.is_active =
+          true
+
+      and student.status =
+          'active'
+
+      and student.deleted_at
+          is null
+
+      and journal.journal_date
+          between
+          v_week_start
+          and
+          v_week_end
+
+      and (
+          entry.health_condition =
+              'unwell'
+
+          or entry.sleep_compliance =
+              'needs_reminder'
+
+          or entry.psychological_condition in (
+              'gloomy',
+              'quiet',
+              'homesick',
+              'emotional'
+          )
+
+          or nullif(
+              btrim(
+                  coalesce(
+                      entry.case_notes,
+                      ''
+                  )
+              ),
+              ''
+          ) is not null
+      );
+
+
+    -- ========================================================
+    -- 10. RECENT CARE JOURNALS
+    --
+    -- Metadata saja.
+    -- Maksimal 5.
+    -- ========================================================
+
+    select
+        coalesce(
+            jsonb_agg(
+                care_data.payload
+
+                order by
+                    care_data.journal_date desc,
+
+                    case
+                        when care_data.session =
+                             'morning'
+                        then 1
+
+                        when care_data.session =
+                             'evening'
+                        then 2
+
+                        else 3
+                    end,
+
+                    care_data.group_name
+            ),
+            '[]'::jsonb
+        )
+
+    into
+        v_care_recent_items
+
+    from (
+        select
+            journal.id
+                as journal_id,
+
+            journal.journal_date,
+
+            journal.session,
+
+            care_group.name
+                as group_name,
+
+            jsonb_build_object(
+                'id',
+                journal.id,
+
+                'journal_date',
+                journal.journal_date,
+
+                'session',
+                journal.session,
+
+                'status',
+                journal.status,
+
+                'submission_version',
+                journal.submission_version,
+
+                'submitted_at',
+                journal.submitted_at,
+
+                'last_reviewed_at',
+                journal.last_reviewed_at,
+
+                'care_group',
+                jsonb_build_object(
+                    'id',
+                    care_group.id,
+
+                    'code',
+                    care_group.code,
+
+                    'name',
+                    care_group.name,
+
+                    'gender',
+                    care_group.gender::text
+                ),
+
+                'entry_count',
+                (
+                    select
+                        count(*)::integer
+
+                    from public.care_journal_entries
+                        as entry_count
+
+                    where entry_count.journal_id =
+                          journal.id
+                ),
+
+                'attention_student_count',
+                (
+                    select
+                        count(
+                            distinct attention_entry.student_id
+                        )::integer
+
+                    from public.care_journal_entries
+                        as attention_entry
+
+                    where attention_entry.journal_id =
+                          journal.id
+
+                      and (
+                          attention_entry.health_condition =
+                              'unwell'
+
+                          or attention_entry.sleep_compliance =
+                              'needs_reminder'
+
+                          or attention_entry.psychological_condition in (
+                              'gloomy',
+                              'quiet',
+                              'homesick',
+                              'emotional'
+                          )
+
+                          or nullif(
+                              btrim(
+                                  coalesce(
+                                      attention_entry.case_notes,
+                                      ''
+                                  )
+                              ),
+                              ''
+                          ) is not null
+                      )
+                )
+            )
+                as payload
+
+        from public.care_journals
+            as journal
+
+        inner join public.care_groups
+            as care_group
+
+            on care_group.id =
+               journal.care_group_id
+
+        where care_group.academic_year_id =
+              v_academic_year_id
+
+          and care_group.is_active =
+              true
+
+          and journal.journal_date
+              between
+              v_week_start
+              and
+              v_week_end
+
+        order by
+            journal.journal_date desc,
+
+            case
+                when journal.session =
+                     'morning'
+                then 1
+
+                when journal.session =
+                     'evening'
+                then 2
+
+                else 3
+            end,
+
+            care_group.name
+
+        limit 5
+    )
+        as care_data;
+
+
+    -- ========================================================
+    -- 11. HEAD JOURNAL ACTIVE CHECKLIST COUNT
+    -- ========================================================
+
+    select
+        count(*)::integer
+
+    into
+        v_head_total_checklist_count
+
+    from public.mahad_head_journal_checklist_items
+        as checklist_item
+
+    where checklist_item.is_active =
+          true;
+
+
+    -- ========================================================
+    -- 12. HEAD JOURNAL SUMMARY
+    --
+    -- PJ hanya boleh melihat jurnal submitted.
+    -- ========================================================
+
+    select
+        count(*)::integer,
+
+        max(
+            journal.journal_date
+        )
+
+    into
+        v_head_journal_submitted_count,
+        v_head_latest_journal_date
+
+    from public.mahad_head_journals
+        as journal
+
+    where journal.academic_year_id =
+          v_academic_year_id
+
+      and journal.status =
+          'submitted'
+
+      and journal.journal_date
+          between
+          v_week_start
+          and
+          v_week_end;
+
+
+    -- ========================================================
+    -- 13. LATEST SUBMITTED HEAD JOURNAL
+    -- ========================================================
+
+    select
+        journal.submitted_at,
+
+        (
+            select
+                count(*)::integer
+
+            from public.mahad_head_journal_checks
+                as journal_check
+
+            where journal_check.journal_id =
+                  journal.id
+        ),
+
+        jsonb_build_object(
+            'id',
+            journal.id,
+
+            'journal_date',
+            journal.journal_date,
+
+            'status',
+            journal.status,
+
+            'submitted_at',
+            journal.submitted_at,
+
+            'has_evidence',
+            journal.evidence_path
+                is not null,
+
+            'checked_count',
+            (
+                select
+                    count(*)::integer
+
+                from public.mahad_head_journal_checks
+                    as journal_check
+
+                where journal_check.journal_id =
+                      journal.id
+            ),
+
+            'total_checklist_count',
+            v_head_total_checklist_count,
+
+            'staff',
+            jsonb_build_object(
+                'id',
+                creator.id,
+
+                'full_name',
+                creator.full_name,
+
+                'position',
+                creator.position
+            )
+        )
+
+    into
+        v_head_latest_submitted_at,
+        v_head_latest_checked_count,
+        v_head_latest_item
+
+    from public.mahad_head_journals
+        as journal
+
+    inner join public.staff
+        as creator
+
+        on creator.id =
+           journal.created_by_staff_id
+
+    where journal.academic_year_id =
+          v_academic_year_id
+
+      and journal.status =
+          'submitted'
+
+      and journal.journal_date
+          between
+          v_week_start
+          and
+          v_week_end
+
+    order by
+        journal.journal_date desc,
+        journal.submitted_at desc nulls last,
+        journal.id desc
+
+    limit 1;
+
+
+    if
+        v_head_latest_checked_count is not null
+
+        and v_head_total_checklist_count > 0
+    then
+
+        v_head_latest_completion_percentage :=
+            least(
+                100,
+                round(
+                    (
+                        v_head_latest_checked_count::numeric
+                        /
+                        v_head_total_checklist_count::numeric
+                    )
+                    * 100
+                )::integer
+            );
+
+    else
+
+        v_head_latest_checked_count :=
+            0;
+
+        v_head_latest_completion_percentage :=
+            0;
+
+    end if;
+
+
+    -- ========================================================
+    -- 14. ACTIVE TAHFIZ GROUPS
+    -- ========================================================
+
+    select
+        count(*)::integer
+
+    into
+        v_tahfiz_group_count
+
+    from public.tahfiz_groups
+        as tahfiz_group
+
+    where tahfiz_group.academic_year_id =
+          v_academic_year_id
+
+      and tahfiz_group.is_active =
+          true;
+
+
+    -- ========================================================
+    -- 15. ACTIVE TAHFIZ STUDENTS ON CURRENT WEEK
+    -- ========================================================
+
+    select
+        count(
+            distinct membership.student_id
+        )::integer
+
+    into
+        v_tahfiz_student_count
+
+    from public.tahfiz_group_members
+        as membership
+
+    inner join public.tahfiz_groups
+        as tahfiz_group
+
+        on tahfiz_group.id =
+           membership.tahfiz_group_id
+
+    inner join public.students
+        as student
+
+        on student.id =
+           membership.student_id
+
+    where tahfiz_group.academic_year_id =
+          v_academic_year_id
+
+      and tahfiz_group.is_active =
+          true
+
+      and student.status =
+          'active'
+
+      and student.deleted_at
+          is null
+
+      and membership.joined_at <=
+          v_week_end
+
+      and (
+          membership.left_at
+              is null
+
+          or membership.left_at >=
+             v_week_start
+      );
+
+
+    -- ========================================================
+    -- 16. PUBLISHED TAHFIZ STUDENTS
+    -- ========================================================
+
+    select
+        count(
+            distinct report.student_id
+        )::integer
+
+    into
+        v_tahfiz_published_count
+
+    from public.tahfiz_weekly_reports
+        as report
+
+    inner join public.students
+        as student
+
+        on student.id =
+           report.student_id
+
+    where report.academic_year_id =
+          v_academic_year_id
+
+      and report.week_start =
+          v_week_start
+
+      and report.status =
+          'published'
+
+      and report.published_at
+          is not null
+
+      and student.status =
+          'active'
+
+      and student.deleted_at
+          is null;
+
+
+    v_tahfiz_missing_count :=
+        greatest(
+            v_tahfiz_student_count -
+            v_tahfiz_published_count,
+            0
+        );
+
+
+    -- ========================================================
+    -- 17. TAHFIZ NEEDS ATTENTION
+    -- ========================================================
+
+    select
+        count(
+            distinct report.student_id
+        )::integer
+
+    into
+        v_tahfiz_attention_count
+
+    from public.tahfiz_weekly_reports
+        as report
+
+    inner join public.students
+        as student
+
+        on student.id =
+           report.student_id
+
+    where report.academic_year_id =
+          v_academic_year_id
+
+      and report.week_start =
+          v_week_start
+
+      and report.status =
+          'published'
+
+      and report.published_at
+          is not null
+
+      and student.status =
+          'active'
+
+      and student.deleted_at
+          is null
+
+      and (
+          report.fluency_rating =
+              'needs_guidance'
+
+          or report.tajwid_rating =
+              'needs_guidance'
+
+          or report.consistency_rating =
+              'needs_guidance'
+      );
+
+
+    if v_tahfiz_student_count > 0 then
+
+        v_tahfiz_completion_percentage :=
+            least(
+                100,
+                round(
+                    (
+                        v_tahfiz_published_count::numeric
+                        /
+                        v_tahfiz_student_count::numeric
+                    )
+                    * 100
+                )::integer
+            );
+
+    else
+
+        v_tahfiz_completion_percentage :=
+            0;
+
+    end if;
+
+
+    -- ========================================================
+    -- 18. TAHFIZ GROUP SUMMARY
+    -- ========================================================
+
+    select
+        coalesce(
+            jsonb_agg(
+                group_data.payload
+
+                order by
+                    group_data.grade_level nulls last,
+                    group_data.gender,
+                    group_data.group_name
+            ),
+            '[]'::jsonb
+        )
+
+    into
+        v_tahfiz_groups
+
+    from (
+        select
+            tahfiz_group.grade_level,
+
+            tahfiz_group.gender,
+
+            tahfiz_group.name
+                as group_name,
+
+            jsonb_build_object(
+                'id',
+                tahfiz_group.id,
+
+                'code',
+                tahfiz_group.code,
+
+                'name',
+                tahfiz_group.name,
+
+                'gender',
+                tahfiz_group.gender::text,
+
+                'grade_level',
+                tahfiz_group.grade_level,
+
+                'student_count',
+                (
+                    select
+                        count(
+                            distinct membership.student_id
+                        )::integer
+
+                    from public.tahfiz_group_members
+                        as membership
+
+                    inner join public.students
+                        as student
+
+                        on student.id =
+                           membership.student_id
+
+                    where membership.tahfiz_group_id =
+                          tahfiz_group.id
+
+                      and student.status =
+                          'active'
+
+                      and student.deleted_at
+                          is null
+
+                      and membership.joined_at <=
+                          v_week_end
+
+                      and (
+                          membership.left_at
+                              is null
+
+                          or membership.left_at >=
+                             v_week_start
+                      )
+                ),
+
+                'published_count',
+                (
+                    select
+                        count(
+                            distinct report.student_id
+                        )::integer
+
+                    from public.tahfiz_weekly_reports
+                        as report
+
+                    inner join public.students
+                        as student
+
+                        on student.id =
+                           report.student_id
+
+                    where report.tahfiz_group_id =
+                          tahfiz_group.id
+
+                      and report.academic_year_id =
+                          v_academic_year_id
+
+                      and report.week_start =
+                          v_week_start
+
+                      and report.status =
+                          'published'
+
+                      and report.published_at
+                          is not null
+
+                      and student.status =
+                          'active'
+
+                      and student.deleted_at
+                          is null
+                ),
+
+                'missing_count',
+                greatest(
+                    (
+                        select
+                            count(
+                                distinct membership.student_id
+                            )::integer
+
+                        from public.tahfiz_group_members
+                            as membership
+
+                        inner join public.students
+                            as student
+
+                            on student.id =
+                               membership.student_id
+
+                        where membership.tahfiz_group_id =
+                              tahfiz_group.id
+
+                          and student.status =
+                              'active'
+
+                          and student.deleted_at
+                              is null
+
+                          and membership.joined_at <=
+                              v_week_end
+
+                          and (
+                              membership.left_at
+                                  is null
+
+                              or membership.left_at >=
+                                 v_week_start
+                          )
+                    )
+                    -
+                    (
+                        select
+                            count(
+                                distinct report.student_id
+                            )::integer
+
+                        from public.tahfiz_weekly_reports
+                            as report
+
+                        inner join public.students
+                            as student
+
+                            on student.id =
+                               report.student_id
+
+                        where report.tahfiz_group_id =
+                              tahfiz_group.id
+
+                          and report.academic_year_id =
+                              v_academic_year_id
+
+                          and report.week_start =
+                              v_week_start
+
+                          and report.status =
+                              'published'
+
+                          and report.published_at
+                              is not null
+
+                          and student.status =
+                              'active'
+
+                          and student.deleted_at
+                              is null
+                    ),
+                    0
+                )
+            )
+                as payload
+
+        from public.tahfiz_groups
+            as tahfiz_group
+
+        where tahfiz_group.academic_year_id =
+              v_academic_year_id
+
+          and tahfiz_group.is_active =
+              true
+    )
+        as group_data;
+
+
+    -- ========================================================
+    -- 19. RESPONSE
+    -- ========================================================
+
+    return jsonb_build_object(
+
+        'generated_at',
+        now(),
+
+        'access_mode',
+        'penanggung_jawab_read_only_monitoring',
+
+        'profile',
+        jsonb_build_object(
+            'id',
+            v_profile_id,
+
+            'login_id',
+            v_login_id
+        ),
+
+        'staff',
+        jsonb_build_object(
+            'id',
+            v_staff_id,
+
+            'full_name',
+            v_staff_name,
+
+            'position',
+            v_staff_position
+        ),
+
+        'academic_year',
+        jsonb_build_object(
+            'id',
+            v_academic_year_id,
+
+            'name',
+            v_academic_year_name,
+
+            'start_date',
+            v_academic_year_start,
+
+            'end_date',
+            v_academic_year_end
+        ),
+
+        'week',
+        jsonb_build_object(
+            'start',
+            v_week_start,
+
+            'end',
+            v_week_end
+        ),
+
+        'care',
+        jsonb_build_object(
+            'summary',
+            jsonb_build_object(
+                'group_count',
+                coalesce(
+                    v_care_group_count,
+                    0
+                ),
+
+                'journal_count',
+                coalesce(
+                    v_care_journal_count,
+                    0
+                ),
+
+                'draft_count',
+                coalesce(
+                    v_care_draft_count,
+                    0
+                ),
+
+                'submitted_count',
+                coalesce(
+                    v_care_submitted_count,
+                    0
+                ),
+
+                'revision_requested_count',
+                coalesce(
+                    v_care_revision_requested_count,
+                    0
+                ),
+
+                'reviewed_count',
+                coalesce(
+                    v_care_reviewed_count,
+                    0
+                ),
+
+                'pending_review_count',
+                coalesce(
+                    v_care_submitted_count,
+                    0
+                ),
+
+                'follow_up_count',
+                coalesce(
+                    v_care_revision_requested_count,
+                    0
+                ),
+
+                'attention_student_count',
+                coalesce(
+                    v_care_attention_student_count,
+                    0
+                ),
+
+                'latest_journal_date',
+                v_care_latest_journal_date
+            ),
+
+            'recent_items',
+            coalesce(
+                v_care_recent_items,
+                '[]'::jsonb
+            )
+        ),
+
+        'mahad_head_journal',
+        jsonb_build_object(
+            'summary',
+            jsonb_build_object(
+                'submitted_count',
+                coalesce(
+                    v_head_journal_submitted_count,
+                    0
+                ),
+
+                'latest_journal_date',
+                v_head_latest_journal_date,
+
+                'latest_submitted_at',
+                v_head_latest_submitted_at,
+
+                'latest_checked_count',
+                coalesce(
+                    v_head_latest_checked_count,
+                    0
+                ),
+
+                'total_checklist_count',
+                coalesce(
+                    v_head_total_checklist_count,
+                    0
+                ),
+
+                'latest_completion_percentage',
+                coalesce(
+                    v_head_latest_completion_percentage,
+                    0
+                )
+            ),
+
+            'latest_item',
+            v_head_latest_item
+        ),
+
+        'tahfiz',
+        jsonb_build_object(
+            'summary',
+            jsonb_build_object(
+                'group_count',
+                coalesce(
+                    v_tahfiz_group_count,
+                    0
+                ),
+
+                'student_count',
+                coalesce(
+                    v_tahfiz_student_count,
+                    0
+                ),
+
+                'published_count',
+                coalesce(
+                    v_tahfiz_published_count,
+                    0
+                ),
+
+                'missing_count',
+                coalesce(
+                    v_tahfiz_missing_count,
+                    0
+                ),
+
+                'attention_count',
+                coalesce(
+                    v_tahfiz_attention_count,
+                    0
+                ),
+
+                'completion_percentage',
+                coalesce(
+                    v_tahfiz_completion_percentage,
+                    0
+                )
+            ),
+
+            'groups',
+            coalesce(
+                v_tahfiz_groups,
+                '[]'::jsonb
+            )
+        )
+    );
+
+end;
+
+$function$;
+
+
+-- ============================================================
+-- SECURITY
+-- ============================================================
+
+revoke all
+on function public.get_penanggung_jawab_dormitory_monitoring()
+from public;
+
+
+revoke all
+on function public.get_penanggung_jawab_dormitory_monitoring()
+from anon;
+
+
+grant execute
+on function public.get_penanggung_jawab_dormitory_monitoring()
+to authenticated;
+
+
+grant execute
+on function public.get_penanggung_jawab_dormitory_monitoring()
+to service_role;
+
+
+comment on function public.get_penanggung_jawab_dormitory_monitoring()
+is
+'Monitoring Asrama read-only untuk Penanggung Jawab E-Ma''had. Menggabungkan metadata Pengasuhan, Jurnal Kepala Ma''had submitted, dan laporan Tahfiz published tanpa data keuangan.';
+

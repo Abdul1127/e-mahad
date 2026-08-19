@@ -1,0 +1,2544 @@
+﻿
+============================================================
+01_ENVIRONMENT
+============================================================
+Node:
+v24.17.0
+
+npm:
+11.13.0
+
+============================================================
+02_GIT_STATUS
+============================================================
+ M src/app/(protected)/[role]/tagihan/[billId]/pembayaran/[paymentId]/batalkan/page.tsx
+ M src/app/(protected)/[role]/tagihan/[billId]/pembayaran/[paymentId]/bukti/unggah/page.tsx
+ M src/app/(protected)/[role]/tagihan/[billId]/pembayaran/baru/page.tsx
+ M src/components/app-shell/sidebar-navigation.tsx
+ M src/components/layout/role-dashboard.tsx
+ M src/config/navigation.ts
+ M src/features/admin/guardians/components/admin-guardian-detail.tsx
+ M src/features/admin/guardians/components/guardian-desktop-table.tsx
+ M src/features/admin/guardians/components/guardian-mobile-list.tsx
+ M src/features/admin/staff/components/admin-staff-detail.tsx
+ M src/features/admin/staff/components/staff-desktop-table.tsx
+ M src/features/admin/staff/components/staff-mobile-list.tsx
+ M src/features/admin/students/components/admin-student-detail.tsx
+ M src/features/admin/students/components/student-desktop-table.tsx
+ M src/features/admin/students/components/student-mobile-list.tsx
+ M src/features/bendahara/bills/components/bendahara-bill-detail.tsx
+ M src/features/bendahara/bills/components/bendahara-bill-list.tsx
+ M src/features/bendahara/payments/actions/cancel-bendahara-payment.ts
+ M src/features/bendahara/payments/actions/record-bendahara-bill-payment.ts
+ M src/features/bendahara/payments/components/bendahara-cancel-payment-form.tsx
+ M src/features/bendahara/payments/components/bendahara-payment-history.tsx
+ M src/features/bendahara/payments/components/bendahara-record-payment-form.tsx
+ M src/features/bendahara/payments/components/bendahara-upload-payment-proof-form.tsx
+ M src/features/kepala-mahad/care-journals/components/kepala-mahad-care-journal-detail.tsx
+ M src/features/kepala-mahad/care-journals/components/kepala-mahad-care-journal-overview.tsx
+ M src/features/pembina-tahfiz/weekly-reports/components/pembina-tahfiz-weekly-report-detail.tsx
+ M src/features/pembina-tahfiz/weekly-reports/components/pembina-tahfiz-weekly-report-history.tsx
+ M src/features/pengasuh/journals/components/pengasuh-journal-detail-preview.tsx
+ M src/features/pengasuh/journals/components/pengasuh-journal-history.tsx
+?? database/sql/177-inspect-leadership-tahfiz-monitoring.sql
+?? database/sql/178-create-leadership-tahfiz-monitoring.sql
+?? database/sql/179-verify-leadership-tahfiz-monitoring.sql
+?? database/sql/183b-create-kepala-mahad-finance-summary.sql
+?? database/sql/183c-verify-kepala-mahad-finance-summary.sql
+?? database/sql/184a-create-bendahara-finance-report.sql
+?? database/sql/184b-verify-bendahara-finance-report.sql
+?? database/sql/185a-audit-pj-dormitory-monitoring.sql
+?? database/sql/185b-create-penanggung-jawab-dormitory-monitoring.sql
+?? database/sql/185c-verify-penanggung-jawab-dormitory-monitoring.sql
+?? navigation-state-audit.txt
+?? src/app/(protected)/bendahara/
+?? src/app/(protected)/kepala-mahad/keuangan/
+?? src/app/(protected)/kepala-mahad/tahfiz/
+?? src/app/(protected)/penanggung-jawab/monitoring/
+?? src/app/(protected)/penanggung-jawab/tahfiz/
+?? src/components/navigation/
+?? src/features/bendahara/reports/
+?? src/features/kepala-mahad/finance/
+?? src/features/leadership/
+?? src/features/penanggung-jawab/
+?? src/lib/navigation/
+?? stage-186a-qa.txt
+?? tahfiz-current-files.txt
+
+============================================================
+03_PACKAGE_SCRIPTS
+============================================================
+
+
+dev       : next dev
+build     : next build
+start     : next start
+lint      : eslint
+typecheck : next typegen && tsc --noEmit
+
+
+
+
+
+============================================================
+04_PAGE_ROUTES
+============================================================
+src\app\(auth)\login\page.tsx
+src\app\(protected)\[role]\dashboard\page.tsx
+src\app\(protected)\[role]\jurnal\[journalId]\page.tsx
+src\app\(protected)\[role]\jurnal\page.tsx
+src\app\(protected)\[role]\laporan\[studentId]\page.tsx
+src\app\(protected)\[role]\laporan\page.tsx
+src\app\(protected)\[role]\laporan\riwayat\page.tsx
+src\app\(protected)\[role]\pembayaran\page.tsx
+src\app\(protected)\[role]\pengasuhan\[journalId]\page.tsx
+src\app\(protected)\[role]\pengasuhan\page.tsx
+src\app\(protected)\[role]\riwayat\page.tsx
+src\app\(protected)\[role]\santri\page.tsx
+src\app\(protected)\[role]\tagihan\[billId]\page.tsx
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\batalkan\page.tsx
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\bukti\unggah\page.tsx
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\baru\page.tsx
+src\app\(protected)\[role]\tagihan\baru\page.tsx
+src\app\(protected)\[role]\tagihan\page.tsx
+src\app\(protected)\[role]\tahfiz\[studentId]\page.tsx
+src\app\(protected)\admin\kelompok\page.tsx
+src\app\(protected)\admin\kelompok\pengasuhan\[groupId]\page.tsx
+src\app\(protected)\admin\kelompok\tahfiz\[groupId]\page.tsx
+src\app\(protected)\admin\santri\[studentId]\edit\page.tsx
+src\app\(protected)\admin\santri\[studentId]\page.tsx
+src\app\(protected)\admin\santri\page.tsx
+src\app\(protected)\admin\santri\tambah\page.tsx
+src\app\(protected)\admin\staf\[staffId]\akun\buat\page.tsx
+src\app\(protected)\admin\staf\[staffId]\akun\reset-password\page.tsx
+src\app\(protected)\admin\staf\[staffId]\akun\role\page.tsx
+src\app\(protected)\admin\staf\[staffId]\page.tsx
+src\app\(protected)\admin\staf\page.tsx
+src\app\(protected)\admin\wali\[guardianId]\akun\buat\page.tsx
+src\app\(protected)\admin\wali\[guardianId]\akun\reset-password\page.tsx
+src\app\(protected)\admin\wali\[guardianId]\edit\page.tsx
+src\app\(protected)\admin\wali\[guardianId]\hubungan\[relationId]\edit\page.tsx
+src\app\(protected)\admin\wali\[guardianId]\hubungkan\page.tsx
+src\app\(protected)\admin\wali\[guardianId]\page.tsx
+src\app\(protected)\admin\wali\page.tsx
+src\app\(protected)\admin\wali\tambah\page.tsx
+src\app\(protected)\bendahara\laporan\page.tsx
+src\app\(protected)\dashboard\page.tsx
+src\app\(protected)\kepala-mahad\jurnal\[journalId]\page.tsx
+src\app\(protected)\kepala-mahad\jurnal\baru\page.tsx
+src\app\(protected)\kepala-mahad\jurnal\page.tsx
+src\app\(protected)\kepala-mahad\keuangan\page.tsx
+src\app\(protected)\kepala-mahad\tahfiz\[studentId]\page.tsx
+src\app\(protected)\kepala-mahad\tahfiz\page.tsx
+src\app\(protected)\penanggung-jawab\jurnal\[journalId]\page.tsx
+src\app\(protected)\penanggung-jawab\jurnal\page.tsx
+src\app\(protected)\penanggung-jawab\monitoring\page.tsx
+src\app\(protected)\penanggung-jawab\tahfiz\[studentId]\page.tsx
+src\app\(protected)\penanggung-jawab\tahfiz\page.tsx
+src\app\(protected)\pengasuh\jadwal\[scheduleId]\page.tsx
+src\app\(protected)\pengasuh\jadwal\baru\page.tsx
+src\app\(protected)\pengasuh\jadwal\page.tsx
+src\app\(protected)\select-role\page.tsx
+src\app\(protected)\wali\pembayaran\page.tsx
+src\app\(protected)\wali\tagihan\page.tsx
+src\app\access-denied\page.tsx
+src\app\page.tsx
+
+============================================================
+05_PROTECTED_PAGE_GUARD_CANDIDATES
+============================================================
+PAGE_GUARD_FOUND	src\app\(protected)\[role]\dashboard\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\[role]\jurnal\[journalId]\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\[role]\jurnal\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\[role]\laporan\[studentId]\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\[role]\laporan\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\[role]\laporan\riwayat\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\[role]\pembayaran\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\[role]\pengasuhan\[journalId]\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\[role]\pengasuhan\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\[role]\riwayat\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\[role]\santri\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\[role]\tagihan\[billId]\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\batalkan\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\bukti\unggah\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\[role]\tagihan\[billId]\pembayaran\baru\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\[role]\tagihan\baru\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\[role]\tagihan\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\[role]\tahfiz\[studentId]\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\kelompok\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\kelompok\pengasuhan\[groupId]\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\kelompok\tahfiz\[groupId]\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\santri\[studentId]\edit\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\santri\[studentId]\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\santri\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\santri\tambah\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\staf\[staffId]\akun\buat\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\staf\[staffId]\akun\reset-password\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\staf\[staffId]\akun\role\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\staf\[staffId]\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\staf\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\wali\[guardianId]\akun\buat\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\wali\[guardianId]\akun\reset-password\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\wali\[guardianId]\edit\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\wali\[guardianId]\hubungan\[relationId]\edit\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\wali\[guardianId]\hubungkan\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\wali\[guardianId]\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\wali\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\admin\wali\tambah\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\bendahara\laporan\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\dashboard\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\kepala-mahad\jurnal\[journalId]\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\kepala-mahad\jurnal\baru\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\kepala-mahad\jurnal\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\kepala-mahad\keuangan\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\kepala-mahad\tahfiz\[studentId]\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\kepala-mahad\tahfiz\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\penanggung-jawab\jurnal\[journalId]\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\penanggung-jawab\jurnal\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\penanggung-jawab\monitoring\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\penanggung-jawab\tahfiz\[studentId]\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\penanggung-jawab\tahfiz\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\pengasuh\jadwal\[scheduleId]\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\pengasuh\jadwal\baru\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\pengasuh\jadwal\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\select-role\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\wali\pembayaran\page.tsx
+PAGE_GUARD_FOUND	src\app\(protected)\wali\tagihan\page.tsx
+
+============================================================
+06_PROTECTED_LAYOUT_FILES
+============================================================
+
+============================================================
+07_AUTH_AND_ROUTING_CORE
+============================================================
+
+FILE: src\proxy.ts
+------------------------------------------------------------
+import type { NextRequest } from "next/server";
+
+import { updateSession } from "@/lib/supabase/proxy";
+
+export async function proxy(
+  request: NextRequest,
+) {
+  return updateSession(request);
+}
+
+export const config = {
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
+};
+
+FILE: src\lib\auth\guards.ts
+------------------------------------------------------------
+import { redirect } from "next/navigation";
+
+import type { RoleCode } from "@/config/roles";
+
+import {
+  getAccessContext,
+  hasAssignedRole,
+} from "./get-access-context";
+import { getActiveRole } from "./get-active-role";
+import type { AccessContext } from "./types";
+
+export async function requireAccessContext(): Promise<AccessContext> {
+  const context = await getAccessContext();
+
+  if (!context) {
+    redirect("/login");
+  }
+
+  if (!context.isActive) {
+    redirect("/access-denied");
+  }
+
+  if (context.roles.length === 0) {
+    redirect("/access-denied");
+  }
+
+  return context;
+}
+
+export async function requireRole(
+  requiredRole: RoleCode,
+): Promise<AccessContext> {
+  const context = await requireAccessContext();
+
+  if (!hasAssignedRole(context, requiredRole)) {
+    redirect("/access-denied");
+  }
+
+  if (context.roles.length > 1) {
+    const activeRole = await getActiveRole();
+
+    const activeRoleIsAssigned =
+      activeRole !== null &&
+      hasAssignedRole(context, activeRole);
+
+    if (!activeRoleIsAssigned) {
+      redirect("/select-role");
+    }
+
+    if (activeRole !== requiredRole) {
+      redirect("/dashboard");
+    }
+  }
+
+  return context;
+}
+
+FILE: src\config\roles.ts
+------------------------------------------------------------
+export const roleDefinitions = {
+  admin: {
+    slug: "admin",
+    label: "Admin",
+    dashboardPath:
+      "/admin/dashboard",
+    description:
+      "Mengelola akun, data master, role, assignment, dan konfigurasi sistem.",
+  },
+
+  penanggung_jawab: {
+    slug:
+      "penanggung-jawab",
+    label:
+      "Penanggung Jawab",
+    dashboardPath:
+      "/penanggung-jawab/dashboard",
+    description:
+      "Memantau seluruh kegiatan asrama dan kinerja pengelolaan Ma'had selain bagian keuangan.",
+  },
+
+  kepala_mahad: {
+    slug:
+      "kepala-mahad",
+    label:
+      "Kepala Ma'had",
+    dashboardPath:
+      "/kepala-mahad/dashboard",
+    description:
+      "Memantau operasional asrama, pengasuhan, tahfiz, dan ringkasan keuangan.",
+  },
+
+  pengasuh: {
+    slug:
+      "pengasuh",
+    label:
+      "Pengasuh",
+    dashboardPath:
+      "/pengasuh/dashboard",
+    description:
+      "Mengelola jurnal pengasuhan santri sesuai kelompok penugasan.",
+  },
+
+  pembina_tahfiz: {
+    slug:
+      "pembina-tahfiz",
+    label:
+      "Pembina Tahfiz",
+    dashboardPath:
+      "/pembina-tahfiz/dashboard",
+    description:
+      "Mengelola perkembangan dan laporan tahfiz mingguan sesuai kelompok yang diampu.",
+  },
+
+  bendahara: {
+    slug:
+      "bendahara",
+    label:
+      "Bendahara",
+    dashboardPath:
+      "/bendahara/dashboard",
+    description:
+      "Mengelola tagihan, pembayaran, dan informasi keuangan santri.",
+  },
+
+  guardian: {
+    slug:
+      "wali",
+    label:
+      "Orang Tua/Wali",
+    dashboardPath:
+      "/wali/dashboard",
+    description:
+      "Memantau tahfiz dan keuangan anak yang terhubung dengan akun.",
+  },
+} as const;
+
+export type RoleCode =
+  keyof typeof roleDefinitions;
+
+export const roleCodes =
+  Object.keys(
+    roleDefinitions,
+  ) as RoleCode[];
+
+export function isRoleCode(
+  value: unknown,
+): value is RoleCode {
+  return (
+    typeof value ===
+      "string" &&
+    Object.prototype.hasOwnProperty.call(
+      roleDefinitions,
+      value,
+    )
+  );
+}
+
+export function getRoleCodeBySlug(
+  slug: string,
+): RoleCode | null {
+  return (
+    roleCodes.find(
+      (roleCode) =>
+        roleDefinitions[
+          roleCode
+        ].slug === slug,
+    ) ?? null
+  );
+}
+
+FILE: src\config\navigation.ts
+------------------------------------------------------------
+import type {
+  AppIconName,
+} from "@/components/app-shell/app-icon";
+
+import {
+  roleDefinitions,
+  type RoleCode,
+} from "@/config/roles";
+
+export type RoleNavigationItem = {
+  label:
+    string;
+
+  href:
+    string;
+
+  icon:
+    AppIconName;
+
+  available:
+    boolean;
+};
+
+const roleNavigation = {
+  admin: [
+    {
+      label:
+        "Dashboard",
+
+      href:
+        roleDefinitions
+          .admin
+          .dashboardPath,
+
+      icon:
+        "dashboard",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Data Santri",
+
+      href:
+        "/admin/santri",
+
+      icon:
+        "students",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Orang Tua/Wali",
+
+      href:
+        "/admin/wali",
+
+      icon:
+        "students",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Staf Pesantren",
+
+      href:
+        "/admin/staf",
+
+      icon:
+        "staff",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Kelompok dan Assignment",
+
+      href:
+        "/admin/kelompok",
+
+      icon:
+        "groups",
+
+      available:
+        true,
+    },
+  ],
+
+  penanggung_jawab: [
+    {
+      label:
+        "Dashboard",
+
+      href:
+        roleDefinitions
+          .penanggung_jawab
+          .dashboardPath,
+
+      icon:
+        "dashboard",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Monitoring Asrama",
+
+      href:
+        "/penanggung-jawab/monitoring",
+
+      icon:
+        "shield",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Jurnal Kepala Ma'had",
+
+      href:
+        "/penanggung-jawab/jurnal",
+
+      icon:
+        "journal",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Perkembangan Tahfiz",
+
+      href:
+        "/penanggung-jawab/tahfiz",
+
+      icon:
+        "tahfiz",
+
+      available:
+        true,
+    },
+  ],
+
+  kepala_mahad: [
+    {
+      label:
+        "Dashboard",
+
+      href:
+        roleDefinitions
+          .kepala_mahad
+          .dashboardPath,
+
+      icon:
+        "dashboard",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Jurnal Pengasuhan",
+
+      href:
+        "/kepala-mahad/pengasuhan",
+
+      icon:
+        "journal",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Jurnal Kepala Ma'had",
+
+      href:
+        "/kepala-mahad/jurnal",
+
+      icon:
+        "journal",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Perkembangan Tahfiz",
+
+      href:
+        "/kepala-mahad/tahfiz",
+
+      icon:
+        "tahfiz",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Ringkasan Keuangan",
+
+      href:
+        "/kepala-mahad/keuangan",
+
+      icon:
+        "finance",
+
+      available:
+        true,
+    },
+  ],
+
+  pengasuh: [
+    {
+      label:
+        "Dashboard",
+
+      href:
+        roleDefinitions
+          .pengasuh
+          .dashboardPath,
+
+      icon:
+        "dashboard",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Santri Ampuan",
+
+      href:
+        "/pengasuh/santri",
+
+      icon:
+        "students",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Jurnal Pengasuhan",
+
+      href:
+        "/pengasuh/jurnal",
+
+      icon:
+        "journal",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Riwayat Pengasuhan",
+
+      href:
+        "/pengasuh/riwayat",
+
+      icon:
+        "shield",
+
+      available:
+        true,
+    },
+  ],
+
+  pembina_tahfiz: [
+    {
+      label:
+        "Dashboard",
+
+      href:
+        roleDefinitions
+          .pembina_tahfiz
+          .dashboardPath,
+
+      icon:
+        "dashboard",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Laporan Mingguan",
+
+      href:
+        "/pembina-tahfiz/laporan",
+
+      icon:
+        "tahfiz",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Riwayat Laporan",
+
+      href:
+        "/pembina-tahfiz/laporan/riwayat",
+
+      icon:
+        "journal",
+
+      available:
+        true,
+    },
+  ],
+
+  bendahara: [
+    {
+      label:
+        "Dashboard",
+
+      href:
+        roleDefinitions
+          .bendahara
+          .dashboardPath,
+
+      icon:
+        "dashboard",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Tagihan",
+
+      href:
+        "/bendahara/tagihan",
+
+      icon:
+        "finance",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Pembayaran",
+
+      href:
+        "/bendahara/pembayaran",
+
+      icon:
+        "journal",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Laporan Keuangan",
+
+      href:
+        "/bendahara/laporan",
+
+      icon:
+        "finance",
+
+      available:
+        true,
+    },
+  ],
+
+  guardian: [
+    {
+      label:
+        "Beranda",
+
+      href:
+        roleDefinitions
+          .guardian
+          .dashboardPath,
+
+      icon:
+        "home",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Tagihan",
+
+      href:
+        "/wali/tagihan",
+
+      icon:
+        "finance",
+
+      available:
+        true,
+    },
+    {
+      label:
+        "Riwayat Pembayaran",
+
+      href:
+        "/wali/pembayaran",
+
+      icon:
+        "journal",
+
+      available:
+        true,
+    },
+  ],
+} satisfies Record<
+  RoleCode,
+  RoleNavigationItem[]
+>;
+
+export function getRoleNavigation(
+  roleCode:
+    RoleCode,
+): RoleNavigationItem[] {
+  return roleNavigation[
+    roleCode
+  ];
+}
+
+export function getCurrentNavigationItem(
+  roleCode:
+    RoleCode,
+
+  pathname:
+    string,
+): RoleNavigationItem | null {
+  const availableItems =
+    getRoleNavigation(
+      roleCode,
+    )
+      .filter(
+        (
+          item,
+        ) =>
+          item.available,
+      )
+      .sort(
+        (
+          firstItem,
+          secondItem,
+        ) =>
+          secondItem.href.length -
+          firstItem.href.length,
+      );
+
+  return (
+    availableItems.find(
+      (
+        item,
+      ) =>
+        pathname ===
+          item.href ||
+        pathname.startsWith(
+          `${item.href}/`,
+        ),
+    ) ??
+    null
+  );
+}
+
+FILE: src\components\app-shell\sidebar-navigation.tsx
+------------------------------------------------------------
+"use client";
+
+import Link from "next/link";
+import {
+  usePathname,
+} from "next/navigation";
+
+import {
+  AppIcon,
+} from "@/components/app-shell/app-icon";
+
+import type {
+  RoleNavigationItem,
+} from "@/config/navigation";
+
+type SidebarNavigationProps = {
+  items:
+    RoleNavigationItem[];
+
+  onNavigate?:
+    () => void;
+};
+
+/**
+ * =========================================================
+ * GET MOST SPECIFIC ACTIVE ITEM
+ * =========================================================
+ *
+ * Contoh:
+ *
+ * /pembina-tahfiz/laporan
+ *
+ * cocok dengan:
+ * - /pembina-tahfiz/laporan
+ *
+ * sedangkan:
+ *
+ * /pembina-tahfiz/laporan/riwayat
+ *
+ * sebenarnya cocok dengan:
+ * - /pembina-tahfiz/laporan
+ * - /pembina-tahfiz/laporan/riwayat
+ *
+ * Karena itu kita pilih href yang paling panjang /
+ * paling spesifik.
+ */
+function getActiveNavigationHref(
+  items:
+    RoleNavigationItem[],
+
+  pathname:
+    string,
+): string | null {
+  const matchedItems =
+    items
+      .filter(
+        (item) =>
+          item.available &&
+          (
+            pathname ===
+              item.href ||
+            pathname.startsWith(
+              `${item.href}/`,
+            )
+          ),
+      )
+      .sort(
+        (
+          firstItem,
+          secondItem,
+        ) =>
+          secondItem.href.length -
+          firstItem.href.length,
+      );
+
+  return (
+    matchedItems[0]
+      ?.href ??
+    null
+  );
+}
+
+export function SidebarNavigation({
+  items,
+  onNavigate,
+}: SidebarNavigationProps) {
+  const pathname =
+    usePathname();
+
+  const activeHref =
+    getActiveNavigationHref(
+      items,
+      pathname,
+    );
+
+  return (
+    <nav
+      aria-label="Navigasi utama"
+      className="space-y-1.5"
+    >
+      {items.map(
+        (item) => {
+          const isActive =
+            item.available &&
+            item.href ===
+              activeHref;
+
+          if (
+            !item.available
+          ) {
+            return (
+              <div
+                key={
+                  item.href
+                }
+                aria-disabled="true"
+                className="flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-white/45"
+              >
+                <AppIcon
+                  name={
+                    item.icon
+                  }
+                  className="size-5 shrink-0"
+                />
+
+                <span className="min-w-0 flex-1 truncate">
+                  {
+                    item.label
+                  }
+                </span>
+              </div>
+            );
+          }
+
+          return (
+            <Link
+              key={
+                item.href
+              }
+              href={
+                item.href
+              }
+              onClick={
+                onNavigate
+              }
+              aria-current={
+                isActive
+                  ? "page"
+                  : undefined
+              }
+              className={
+                isActive
+                  ? "flex min-h-11 items-center gap-3 rounded-xl bg-white px-3.5 py-2.5 text-sm font-semibold text-brand-900 shadow-sm"
+                  : "flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-white/75 transition hover:bg-white/8 hover:text-white"
+              }
+            >
+              <AppIcon
+                name={
+                  item.icon
+                }
+                className="size-5 shrink-0"
+              />
+
+              <span className="min-w-0 flex-1 truncate">
+                {
+                  item.label
+                }
+              </span>
+
+              {isActive && (
+                <AppIcon
+                  name="chevron-right"
+                  className="size-4 shrink-0 text-brand-600"
+                />
+              )}
+            </Link>
+          );
+        },
+      )}
+    </nav>
+  );
+}
+
+FILE: src\components\layout\role-dashboard.tsx
+------------------------------------------------------------
+import Link from "next/link";
+
+import {
+  AppIcon,
+} from "@/components/app-shell/app-icon";
+
+import {
+  roleDefinitions,
+  type RoleCode,
+} from "@/config/roles";
+
+import type {
+  AccessContext,
+} from "@/lib/auth/types";
+
+type WorkspaceModule = {
+  label:
+    string;
+
+  description:
+    string;
+
+  href?:
+    string;
+
+  available:
+    boolean;
+};
+
+type WorkspaceDefinition = {
+  focusTitle:
+    string;
+
+  focusDescription:
+    string;
+
+  modules:
+    WorkspaceModule[];
+};
+
+const workspaceByRole: Record<
+  RoleCode,
+  WorkspaceDefinition
+> = {
+  admin: {
+    focusTitle:
+      "Kelola data dasar E-Ma'had",
+
+    focusDescription:
+      "Admin mengelola santri, wali, staf, akun, kelompok, dan assignment.",
+
+    modules: [
+      {
+        label:
+          "Data Santri",
+
+        description:
+          "Kelola data dan penempatan santri.",
+
+        href:
+          "/admin/santri",
+
+        available:
+          true,
+      },
+      {
+        label:
+          "Orang Tua/Wali",
+
+        description:
+          "Kelola wali dan hubungan dengan santri.",
+
+        href:
+          "/admin/wali",
+
+        available:
+          true,
+      },
+      {
+        label:
+          "Staf dan Akun",
+
+        description:
+          "Kelola staf, akun login, dan role.",
+
+        href:
+          "/admin/staf",
+
+        available:
+          true,
+      },
+      {
+        label:
+          "Kelompok dan Assignment",
+
+        description:
+          "Kelola kelompok serta penugasan staf.",
+
+        href:
+          "/admin/kelompok",
+
+        available:
+          true,
+      },
+    ],
+  },
+
+  penanggung_jawab: {
+    focusTitle:
+      "Pantau operasional Ma'had",
+
+    focusDescription:
+      "Penanggung Jawab memonitor kondisi operasional asrama, kinerja Kepala Ma'had, dan perkembangan Tahfiz tanpa mengakses keuangan.",
+
+    modules: [
+      {
+        label:
+          "Monitoring Asrama",
+
+        description:
+          "Lihat ringkasan Pengasuhan, Jurnal Kepala Ma'had, dan kelengkapan laporan Tahfiz pekan berjalan.",
+
+        href:
+          "/penanggung-jawab/monitoring",
+
+        available:
+          true,
+      },
+      {
+        label:
+          "Jurnal Kepala Ma'had",
+
+        description:
+          "Pantau jurnal kegiatan dan kinerja Kepala Ma'had.",
+
+        href:
+          "/penanggung-jawab/jurnal",
+
+        available:
+          true,
+      },
+      {
+        label:
+          "Perkembangan Tahfiz",
+
+        description:
+          "Pantau laporan Tahfiz published seluruh santri secara read-only.",
+
+        href:
+          "/penanggung-jawab/tahfiz",
+
+        available:
+          true,
+      },
+    ],
+  },
+
+  kepala_mahad: {
+    focusTitle:
+      "Kendalikan operasional harian Ma'had",
+
+    focusDescription:
+      "Kepala Ma'had mereview pengasuhan, mencatat jurnal operasional, serta memonitor perkembangan Tahfiz dan keuangan.",
+
+    modules: [
+      {
+        label:
+          "Jurnal Pengasuhan",
+
+        description:
+          "Review jurnal dan kondisi santri dari Pengasuh.",
+
+        href:
+          "/kepala-mahad/pengasuhan",
+
+        available:
+          true,
+      },
+      {
+        label:
+          "Jurnal Kepala Ma'had",
+
+        description:
+          "Catat kegiatan dan kinerja operasional Kepala Ma'had.",
+
+        href:
+          "/kepala-mahad/jurnal",
+
+        available:
+          true,
+      },
+      {
+        label:
+          "Perkembangan Tahfiz",
+
+        description:
+          "Pantau laporan Tahfiz published seluruh santri.",
+
+        href:
+          "/kepala-mahad/tahfiz",
+
+        available:
+          true,
+      },
+      {
+        label:
+          "Ringkasan Keuangan",
+
+        description:
+          "Pantau tagihan, penerimaan, sisa kewajiban, dan transaksi terbaru secara read-only.",
+
+        href:
+          "/kepala-mahad/keuangan",
+
+        available:
+          true,
+      },
+    ],
+  },
+
+  pengasuh: {
+    focusTitle:
+      "Pantau kondisi santri dalam pengasuhan",
+
+    focusDescription:
+      "Pengasuh mengelola Jurnal Pengasuhan sesuai kelompok dan assignment yang diberikan.",
+
+    modules: [
+      {
+        label:
+          "Santri Ampuan",
+
+        description:
+          "Lihat santri sesuai kelompok pengasuhan.",
+
+        href:
+          "/pengasuh/santri",
+
+        available:
+          true,
+      },
+      {
+        label:
+          "Jurnal Pengasuhan",
+
+        description:
+          "Isi kondisi santri dan kirim jurnal untuk direview.",
+
+        href:
+          "/pengasuh/jurnal",
+
+        available:
+          true,
+      },
+      {
+        label:
+          "Riwayat Pengasuhan",
+
+        description:
+          "Lihat jurnal terdahulu dan tindak lanjut review.",
+
+        href:
+          "/pengasuh/riwayat",
+
+        available:
+          true,
+      },
+    ],
+  },
+
+  pembina_tahfiz: {
+    focusTitle:
+      "Perbarui perkembangan Tahfiz mingguan",
+
+    focusDescription:
+      "Pembina membuat dan mempublikasikan laporan Tahfiz individu santri sesuai kelompok yang diampu.",
+
+    modules: [
+      {
+        label:
+          "Laporan Mingguan",
+
+        description:
+          "Isi dan publikasikan laporan Tahfiz per santri.",
+
+        href:
+          "/pembina-tahfiz/laporan",
+
+        available:
+          true,
+      },
+      {
+        label:
+          "Riwayat Laporan",
+
+        description:
+          "Lihat kembali laporan mingguan yang pernah dibuat.",
+
+        href:
+          "/pembina-tahfiz/laporan/riwayat",
+
+        available:
+          true,
+      },
+    ],
+  },
+
+  bendahara: {
+    focusTitle:
+      "Kelola tagihan dan pembayaran santri",
+
+    focusDescription:
+      "Bendahara membuat tagihan, mencatat pembayaran, menyimpan bukti, dan melakukan koreksi transaksi.",
+
+    modules: [
+      {
+        label:
+          "Tagihan",
+
+        description:
+          "Kelola tagihan dan status pembayaran santri.",
+
+        href:
+          "/bendahara/tagihan",
+
+        available:
+          true,
+      },
+      {
+        label:
+          "Pembayaran",
+
+        description:
+          "Pantau riwayat transaksi pembayaran.",
+
+        href:
+          "/bendahara/pembayaran",
+
+        available:
+          true,
+      },
+      {
+        label:
+          "Laporan Keuangan",
+
+        description:
+          "Lihat rekap tagihan dan pembayaran berdasarkan periode laporan.",
+
+        href:
+          "/bendahara/laporan",
+
+        available:
+          true,
+      },
+    ],
+  },
+
+  guardian: {
+    focusTitle:
+      "Pantau informasi anak",
+
+    focusDescription:
+      "Orang tua atau wali hanya dapat melihat data anak yang terhubung dengan akun.",
+
+    modules: [
+      {
+        label:
+          "Tagihan",
+
+        description:
+          "Lihat tagihan anak pada tahun ajaran aktif.",
+
+        href:
+          "/wali/tagihan",
+
+        available:
+          true,
+      },
+      {
+        label:
+          "Riwayat Pembayaran",
+
+        description:
+          "Lihat pembayaran dan bukti transaksi anak.",
+
+        href:
+          "/wali/pembayaran",
+
+        available:
+          true,
+      },
+    ],
+  },
+};
+
+type RoleDashboardProps = {
+  roleCode:
+    RoleCode;
+
+  context:
+    AccessContext;
+};
+
+export function RoleDashboard({
+  roleCode,
+  context,
+}: RoleDashboardProps) {
+  const roleDefinition =
+    roleDefinitions[
+      roleCode
+    ];
+
+  const workspace =
+    workspaceByRole[
+      roleCode
+    ];
+
+  return (
+    <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <section className="overflow-hidden rounded-3xl border border-brand-100 bg-white shadow-soft">
+        <div className="grid gap-8 p-6 sm:p-8 xl:grid-cols-[minmax(0,1fr)_340px] xl:p-10">
+          <div className="min-w-0">
+            <div className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-700">
+              <span className="size-2 rounded-full bg-brand-500" />
+
+              Dashboard{" "}
+              {
+                roleDefinition.label
+              }
+            </div>
+
+            <h2 className="mt-5 max-w-3xl text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+              Assalamu&apos;alaikum,{" "}
+              {
+                context.fullName
+              }
+            </h2>
+
+            <p className="mt-4 max-w-3xl text-base leading-7 text-muted">
+              {
+                roleDefinition.description
+              }
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-brand-100 bg-brand-50/70 p-5">
+            <div className="flex items-start gap-3">
+              <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-700 text-white">
+                <AppIcon
+                  name="shield"
+                  className="size-5"
+                />
+              </div>
+
+              <div>
+                <p className="font-semibold text-brand-950">
+                  Akses role aktif
+                </p>
+
+                <p className="mt-1 text-sm leading-6 text-brand-700">
+                  Menu dan data
+                  dibatasi sesuai
+                  kewenangan role
+                  pengguna.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+        <section className="rounded-3xl border border-line bg-white p-6 shadow-soft sm:p-7">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+            Fokus Utama
+          </p>
+
+          <h3 className="mt-3 text-2xl font-bold tracking-tight text-ink">
+            {
+              workspace.focusTitle
+            }
+          </h3>
+
+          <p className="mt-3 leading-7 text-muted">
+            {
+              workspace.focusDescription
+            }
+          </p>
+
+          <div className="mt-6 rounded-2xl border border-brand-100 bg-brand-50 p-5">
+            <p className="font-semibold text-brand-900">
+              E-Ma&apos;had
+            </p>
+
+            <p className="mt-2 text-sm leading-6 text-brand-700">
+              Gunakan ruang kerja
+              sesuai tugas dan
+              kewenangan untuk
+              menjaga data tetap
+              konsisten dan mudah
+              dipantau.
+            </p>
+          </div>
+        </section>
+
+        <section className="rounded-3xl border border-line bg-white p-6 shadow-soft sm:p-7">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+            Ruang Kerja
+          </p>
+
+          <h3 className="mt-3 text-xl font-bold text-ink">
+            Modul Tersedia
+          </h3>
+
+          <div className="mt-5 space-y-3">
+            {workspace.modules.map(
+              (
+                module,
+              ) => {
+                if (
+                  module.available &&
+                  module.href
+                ) {
+                  return (
+                    <Link
+                      key={
+                        module.label
+                      }
+                      href={
+                        module.href
+                      }
+                      className="group flex min-h-16 items-center gap-4 rounded-2xl border border-line bg-slate-50/70 px-4 py-3 transition hover:border-brand-200 hover:bg-brand-50"
+                    >
+                      <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-white text-brand-700 shadow-sm">
+                        <AppIcon
+                          name="chevron-right"
+                          className="size-4 transition group-hover:translate-x-0.5"
+                        />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-ink">
+                          {
+                            module.label
+                          }
+                        </p>
+
+                        <p className="mt-1 text-xs leading-5 text-muted">
+                          {
+                            module.description
+                          }
+                        </p>
+                      </div>
+
+                      <span className="hidden text-xs font-semibold text-brand-700 sm:block">
+                        Buka
+                      </span>
+                    </Link>
+                  );
+                }
+
+                return (
+                  <div
+                    key={
+                      module.label
+                    }
+                    className="flex min-h-16 items-center gap-4 rounded-2xl border border-line bg-slate-50/70 px-4 py-3"
+                  >
+                    <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-white text-slate-400 shadow-sm">
+                      <AppIcon
+                        name="chevron-right"
+                        className="size-4"
+                      />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-slate-600">
+                        {
+                          module.label
+                        }
+                      </p>
+
+                      <p className="mt-1 text-xs leading-5 text-muted">
+                        {
+                          module.description
+                        }
+                      </p>
+                    </div>
+
+                    <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                      Belum tersedia
+                    </span>
+                  </div>
+                );
+              },
+            )}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+============================================================
+08_STALE_OR_PLACEHOLDER_TEXT
+============================================================
+
+PATTERN: SEGERA
+NO_MATCH
+
+PATTERN: segera
+NO_MATCH
+
+PATTERN: Belum tersedia
+src\app\not-found.tsx:16: Halaman yang kamu buka belum tersedia atau alamatnya
+src\components\layout\role-dashboard.tsx:591: Belum tersedia
+src\features\admin\dashboard\components\admin-attention-panel.tsx:29: "Relasi orang tua atau wali belum tersedia untuk santri tersebut.",
+src\features\admin\dashboard\components\admin-attention-panel.tsx:160: "Posisi belum tersedia"}
+src\features\admin\groups\components\admin-group-assignment-detail.tsx:122: "Belum tersedia"}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:158: {guardian.phone ?? "Belum tersedia"}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:168: {guardian.email ?? "Belum tersedia"}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:216: "ID Pengguna belum tersedia"}
+src\features\admin\guardians\components\guardian-account-create-form.tsx:129: "Belum tersedia"}
+src\features\admin\guardians\components\guardian-desktop-table.tsx:117: "Telepon belum tersedia"}
+src\features\admin\guardians\components\guardian-desktop-table.tsx:122: "Email kontak belum tersedia"}
+src\features\admin\guardians\components\guardian-desktop-table.tsx:182: "Belum tersedia"}
+src\features\admin\guardians\components\guardian-mobile-list.tsx:101: "Belum tersedia"}
+src\features\admin\guardians\components\guardian-mobile-list.tsx:112: "Belum tersedia"}
+src\features\admin\guardians\components\guardian-mobile-list.tsx:156: "Belum tersedia"}
+src\features\admin\staff\components\admin-staff-detail.tsx:180: "Belum tersedia"}
+src\features\admin\staff\components\admin-staff-detail.tsx:191: "Belum tersedia"}
+src\features\admin\staff\components\admin-staff-detail.tsx:267: "ID Pengguna belum tersedia"}
+src\features\admin\staff\components\admin-staff-detail.tsx:320: Pengguna belum tersedia. Periksa
+src\features\admin\staff\components\staff-account-create-form.tsx:183: "Belum tersedia"}
+src\features\admin\staff\components\staff-account-create-form.tsx:194: "Belum tersedia"}
+src\features\admin\staff\components\staff-desktop-table.tsx:121: "Jabatan belum tersedia"}
+src\features\admin\staff\components\staff-desktop-table.tsx:126: "Telepon belum tersedia"}
+src\features\admin\staff\components\staff-desktop-table.tsx:184: "Belum tersedia"}
+src\features\admin\staff\components\staff-mobile-list.tsx:105: "Belum tersedia"}
+src\features\admin\staff\components\staff-mobile-list.tsx:116: "Belum tersedia"}
+src\features\admin\staff\components\staff-mobile-list.tsx:170: "Belum tersedia"}
+src\features\admin\students\components\student-current-placement.tsx:74: "Belum tersedia"}
+src\features\admin\students\components\student-current-placement.tsx:92: "Belum tersedia"}
+src\features\admin\students\components\student-current-placement.tsx:100: emptyLabel="Pengasuh belum tersedia."
+src\features\admin\students\components\student-current-placement.tsx:111: "Belum tersedia"}
+src\features\admin\students\components\student-current-placement.tsx:119: emptyLabel="Pembina Tahfiz belum tersedia."
+src\features\admin\students\components\student-desktop-table.tsx:109: Belum tersedia
+src\features\admin\students\components\student-desktop-table.tsx:117: Belum tersedia
+src\features\admin\students\components\student-desktop-table.tsx:125: Belum tersedia
+src\features\admin\students\components\student-guardian-panel.tsx:81: "Belum tersedia"}
+src\features\admin\students\components\student-guardian-panel.tsx:93: "Belum tersedia"}
+src\features\admin\students\components\student-mobile-list.tsx:69: "Belum tersedia"}
+src\features\admin\students\components\student-mobile-list.tsx:80: "Belum tersedia"}
+src\features\admin\students\components\student-mobile-list.tsx:91: "Belum tersedia"}
+src\features\admin\students\components\student-profile-card.tsx:117: {student.nis ?? "Belum tersedia"}
+src\features\guardian\dashboard\components\guardian-tahfiz-dashboard.tsx:219: Belum tersedia
+src\features\leadership\tahfiz\components\leadership-tahfiz-monitoring-overview.tsx:228: : "Belum tersedia"}
+src\features\leadership\tahfiz\components\leadership-tahfiz-monitoring-overview.tsx:780: : "Belum tersedia"}
+src\features\leadership\tahfiz\components\leadership-tahfiz-student-history.tsx:248: : "Belum tersedia"}
+src\features\pembina-tahfiz\students\components\pembina-tahfiz-student-list.tsx:110: "Belum tersedia"}
+src\features\pengasuh\dashboard\components\pengasuh-dashboard.tsx:95: "Belum tersedia"}
+src\features\pengasuh\students\components\pengasuh-student-list.tsx:79: "Belum tersedia"}
+src\lib\supabase\admin.ts:13: "NEXT_PUBLIC_SUPABASE_URL belum tersedia.",
+src\lib\supabase\admin.ts:19: "SUPABASE_SECRET_KEY atau SUPABASE_SERVICE_ROLE_KEY belum tersedia.",
+
+PATTERN: belum tersedia
+src\app\not-found.tsx:16: Halaman yang kamu buka belum tersedia atau alamatnya
+src\components\layout\role-dashboard.tsx:591: Belum tersedia
+src\features\admin\dashboard\components\admin-attention-panel.tsx:29: "Relasi orang tua atau wali belum tersedia untuk santri tersebut.",
+src\features\admin\dashboard\components\admin-attention-panel.tsx:160: "Posisi belum tersedia"}
+src\features\admin\groups\components\admin-group-assignment-detail.tsx:122: "Belum tersedia"}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:158: {guardian.phone ?? "Belum tersedia"}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:168: {guardian.email ?? "Belum tersedia"}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:216: "ID Pengguna belum tersedia"}
+src\features\admin\guardians\components\guardian-account-create-form.tsx:129: "Belum tersedia"}
+src\features\admin\guardians\components\guardian-desktop-table.tsx:117: "Telepon belum tersedia"}
+src\features\admin\guardians\components\guardian-desktop-table.tsx:122: "Email kontak belum tersedia"}
+src\features\admin\guardians\components\guardian-desktop-table.tsx:182: "Belum tersedia"}
+src\features\admin\guardians\components\guardian-mobile-list.tsx:101: "Belum tersedia"}
+src\features\admin\guardians\components\guardian-mobile-list.tsx:112: "Belum tersedia"}
+src\features\admin\guardians\components\guardian-mobile-list.tsx:156: "Belum tersedia"}
+src\features\admin\staff\components\admin-staff-detail.tsx:180: "Belum tersedia"}
+src\features\admin\staff\components\admin-staff-detail.tsx:191: "Belum tersedia"}
+src\features\admin\staff\components\admin-staff-detail.tsx:267: "ID Pengguna belum tersedia"}
+src\features\admin\staff\components\admin-staff-detail.tsx:320: Pengguna belum tersedia. Periksa
+src\features\admin\staff\components\staff-account-create-form.tsx:183: "Belum tersedia"}
+src\features\admin\staff\components\staff-account-create-form.tsx:194: "Belum tersedia"}
+src\features\admin\staff\components\staff-desktop-table.tsx:121: "Jabatan belum tersedia"}
+src\features\admin\staff\components\staff-desktop-table.tsx:126: "Telepon belum tersedia"}
+src\features\admin\staff\components\staff-desktop-table.tsx:184: "Belum tersedia"}
+src\features\admin\staff\components\staff-mobile-list.tsx:105: "Belum tersedia"}
+src\features\admin\staff\components\staff-mobile-list.tsx:116: "Belum tersedia"}
+src\features\admin\staff\components\staff-mobile-list.tsx:170: "Belum tersedia"}
+src\features\admin\students\components\student-current-placement.tsx:74: "Belum tersedia"}
+src\features\admin\students\components\student-current-placement.tsx:92: "Belum tersedia"}
+src\features\admin\students\components\student-current-placement.tsx:100: emptyLabel="Pengasuh belum tersedia."
+src\features\admin\students\components\student-current-placement.tsx:111: "Belum tersedia"}
+src\features\admin\students\components\student-current-placement.tsx:119: emptyLabel="Pembina Tahfiz belum tersedia."
+src\features\admin\students\components\student-desktop-table.tsx:109: Belum tersedia
+src\features\admin\students\components\student-desktop-table.tsx:117: Belum tersedia
+src\features\admin\students\components\student-desktop-table.tsx:125: Belum tersedia
+src\features\admin\students\components\student-guardian-panel.tsx:81: "Belum tersedia"}
+src\features\admin\students\components\student-guardian-panel.tsx:93: "Belum tersedia"}
+src\features\admin\students\components\student-mobile-list.tsx:69: "Belum tersedia"}
+src\features\admin\students\components\student-mobile-list.tsx:80: "Belum tersedia"}
+src\features\admin\students\components\student-mobile-list.tsx:91: "Belum tersedia"}
+src\features\admin\students\components\student-profile-card.tsx:117: {student.nis ?? "Belum tersedia"}
+src\features\guardian\dashboard\components\guardian-tahfiz-dashboard.tsx:219: Belum tersedia
+src\features\leadership\tahfiz\components\leadership-tahfiz-monitoring-overview.tsx:228: : "Belum tersedia"}
+src\features\leadership\tahfiz\components\leadership-tahfiz-monitoring-overview.tsx:780: : "Belum tersedia"}
+src\features\leadership\tahfiz\components\leadership-tahfiz-student-history.tsx:248: : "Belum tersedia"}
+src\features\pembina-tahfiz\students\components\pembina-tahfiz-student-list.tsx:110: "Belum tersedia"}
+src\features\pengasuh\dashboard\components\pengasuh-dashboard.tsx:95: "Belum tersedia"}
+src\features\pengasuh\students\components\pengasuh-student-list.tsx:79: "Belum tersedia"}
+src\lib\supabase\admin.ts:13: "NEXT_PUBLIC_SUPABASE_URL belum tersedia.",
+src\lib\supabase\admin.ts:19: "SUPABASE_SECRET_KEY atau SUPABASE_SERVICE_ROLE_KEY belum tersedia.",
+
+PATTERN: Coming Soon
+NO_MATCH
+
+PATTERN: coming soon
+NO_MATCH
+
+PATTERN: TODO
+NO_MATCH
+
+PATTERN: FIXME
+NO_MATCH
+
+PATTERN: Klinik Tahsin
+NO_MATCH
+
+PATTERN: klinik tahsin
+NO_MATCH
+
+============================================================
+09_DORMANT_SCHEDULE_ATTENDANCE_EXPOSURE
+============================================================
+
+FILE: src\config\navigation.ts
+NO_EXPOSURE_FOUND
+
+FILE: src\components\layout\role-dashboard.tsx
+NO_EXPOSURE_FOUND
+
+FILE: src\components\app-shell\sidebar-navigation.tsx
+NO_EXPOSURE_FOUND
+
+============================================================
+10_ROLE_ROUTE_REFERENCES
+============================================================
+
+PREFIX: /admin/
+src\app\(protected)\admin\kelompok\page.tsx:3: import { AdminGroupAssignmentOverview } from "@/features/admin/groups/components/admin-group-assignment-overview";
+src\app\(protected)\admin\kelompok\page.tsx:4: import { getAdminGroupAssignmentOverview } from "@/features/admin/groups/data/get-admin-group-assignment-overview";
+src\app\(protected)\admin\kelompok\pengasuhan\[groupId]\page.tsx:4: import { AdminGroupAssignmentDetail } from "@/features/admin/groups/components/admin-group-assignment-detail";
+src\app\(protected)\admin\kelompok\pengasuhan\[groupId]\page.tsx:5: import { getAdminGroupAssignmentDetail } from "@/features/admin/groups/data/get-admin-group-assignment-detail";
+src\app\(protected)\admin\kelompok\tahfiz\[groupId]\page.tsx:4: import { AdminGroupAssignmentDetail } from "@/features/admin/groups/components/admin-group-assignment-detail";
+src\app\(protected)\admin\kelompok\tahfiz\[groupId]\page.tsx:5: import { getAdminGroupAssignmentDetail } from "@/features/admin/groups/data/get-admin-group-assignment-detail";
+src\app\(protected)\admin\santri\[studentId]\edit\page.tsx:4: import { StudentForm } from "@/features/admin/students/components/student-form";
+src\app\(protected)\admin\santri\[studentId]\edit\page.tsx:5: import { getAdminStudentDetail } from "@/features/admin/students/data/get-admin-student-detail";
+src\app\(protected)\admin\santri\[studentId]\edit\page.tsx:6: import { getAdminStudentFormOptions } from "@/features/admin/students/data/get-admin-student-form-options";
+src\app\(protected)\admin\santri\[studentId]\not-found.tsx:21: href="/admin/santri"
+src\app\(protected)\admin\santri\[studentId]\page.tsx:4: import { AdminStudentDetail } from "@/features/admin/students/components/admin-student-detail";
+src\app\(protected)\admin\santri\[studentId]\page.tsx:5: import { getAdminStudentDetail } from "@/features/admin/students/data/get-admin-student-detail";
+src\app\(protected)\admin\santri\page.tsx:3: import { AdminStudentList } from "@/features/admin/students/components/admin-student-list";
+src\app\(protected)\admin\santri\page.tsx:4: import { getAdminStudentList } from "@/features/admin/students/data/get-admin-student-list";
+src\app\(protected)\admin\santri\page.tsx:8: } from "@/features/admin/students/lib/parse-student-list-query";
+src\app\(protected)\admin\santri\tambah\page.tsx:3: import { StudentForm } from "@/features/admin/students/components/student-form";
+src\app\(protected)\admin\santri\tambah\page.tsx:4: import { getAdminStudentFormOptions } from "@/features/admin/students/data/get-admin-student-form-options";
+src\app\(protected)\admin\staf\[staffId]\akun\buat\page.tsx:10: import { getAdminStaffDetail } from "@/features/admin/staff/data/get-admin-staff-detail";
+src\app\(protected)\admin\staf\[staffId]\akun\buat\page.tsx:11: import { getAdminStaffLoginIdentity } from "@/features/admin/staff/data/get-admin-staff-login-identity";
+src\app\(protected)\admin\staf\[staffId]\akun\buat\page.tsx:12: import { getAdminStaffRoleOptions } from "@/features/admin/staff/data/get-admin-staff-role-options";
+src\app\(protected)\admin\staf\[staffId]\akun\buat\page.tsx:13: import { initialStaffAccountActionState } from "@/features/admin/staff/types/staff-account-action-state";
+src\app\(protected)\admin\staf\[staffId]\akun\buat\page.tsx:46: `/admin/staf/${staffId}`;
+src\app\(protected)\admin\staf\[staffId]\akun\buat\page.tsx:8: import { createAdminStaffAccount } from "@/features/admin/staff/actions/create-admin-staff-account";
+src\app\(protected)\admin\staf\[staffId]\akun\buat\page.tsx:9: import { StaffAccountCreateForm } from "@/features/admin/staff/components/staff-account-create-form";
+src\app\(protected)\admin\staf\[staffId]\akun\reset-password\page.tsx:10: import { getAdminStaffDetail } from "@/features/admin/staff/data/get-admin-staff-detail";
+src\app\(protected)\admin\staf\[staffId]\akun\reset-password\page.tsx:11: import { initialStaffAccountResetPasswordActionState } from "@/features/admin/staff/types/staff-account-action-state";
+src\app\(protected)\admin\staf\[staffId]\akun\reset-password\page.tsx:47: `/admin/staf/${staffId}`,
+src\app\(protected)\admin\staf\[staffId]\akun\reset-password\page.tsx:52: `/admin/staf/${staffId}`;
+src\app\(protected)\admin\staf\[staffId]\akun\reset-password\page.tsx:8: import { resetAdminStaffAccountPassword } from "@/features/admin/staff/actions/reset-admin-staff-account-password";
+src\app\(protected)\admin\staf\[staffId]\akun\reset-password\page.tsx:9: import { StaffAccountResetPasswordForm } from "@/features/admin/staff/components/staff-account-reset-password-form";
+src\app\(protected)\admin\staf\[staffId]\akun\role\page.tsx:10: import { getAdminStaffDetail } from "@/features/admin/staff/data/get-admin-staff-detail";
+src\app\(protected)\admin\staf\[staffId]\akun\role\page.tsx:11: import { getAdminStaffRoleOptions } from "@/features/admin/staff/data/get-admin-staff-role-options";
+src\app\(protected)\admin\staf\[staffId]\akun\role\page.tsx:12: import { initialStaffRoleActionState } from "@/features/admin/staff/types/staff-account-action-state";
+src\app\(protected)\admin\staf\[staffId]\akun\role\page.tsx:53: `/admin/staf/${staffId}`,
+src\app\(protected)\admin\staf\[staffId]\akun\role\page.tsx:58: `/admin/staf/${staffId}`;
+src\app\(protected)\admin\staf\[staffId]\akun\role\page.tsx:8: import { setAdminStaffRoles } from "@/features/admin/staff/actions/set-admin-staff-roles";
+src\app\(protected)\admin\staf\[staffId]\akun\role\page.tsx:9: import { StaffRoleManagementForm } from "@/features/admin/staff/components/staff-role-management-form";
+src\app\(protected)\admin\staf\[staffId]\page.tsx:4: import { AdminStaffDetail } from "@/features/admin/staff/components/admin-staff-detail";
+src\app\(protected)\admin\staf\[staffId]\page.tsx:5: import { getAdminStaffDetail } from "@/features/admin/staff/data/get-admin-staff-detail";
+src\app\(protected)\admin\staf\page.tsx:3: import { AdminStaffList } from "@/features/admin/staff/components/admin-staff-list";
+src\app\(protected)\admin\staf\page.tsx:4: import { getAdminStaffList } from "@/features/admin/staff/data/get-admin-staff-list";
+src\app\(protected)\admin\staf\page.tsx:5: import { getAdminStaffRoleOptions } from "@/features/admin/staff/data/get-admin-staff-role-options";
+src\app\(protected)\admin\staf\page.tsx:9: } from "@/features/admin/staff/lib/parse-staff-list-query";
+src\app\(protected)\admin\wali\[guardianId]\akun\buat\page.tsx:10: import { getAdminGuardianDetail } from "@/features/admin/guardians/data/get-admin-guardian-detail";
+src\app\(protected)\admin\wali\[guardianId]\akun\buat\page.tsx:108: href={`/admin/wali/${guardianId}/hubungkan`}
+src\app\(protected)\admin\wali\[guardianId]\akun\buat\page.tsx:11: import { getAdminGuardianLoginIdentity } from "@/features/admin/guardians/data/get-admin-guardian-login-identity";
+src\app\(protected)\admin\wali\[guardianId]\akun\buat\page.tsx:12: import { initialGuardianAccountActionState } from "@/features/admin/guardians/types/guardian-account-action-state";
+src\app\(protected)\admin\wali\[guardianId]\akun\buat\page.tsx:47: `/admin/wali/${guardianId}`,
+src\app\(protected)\admin\wali\[guardianId]\akun\buat\page.tsx:52: `/admin/wali/${guardianId}`;
+src\app\(protected)\admin\wali\[guardianId]\akun\buat\page.tsx:75: href={`/admin/wali/${guardianId}/edit`}
+src\app\(protected)\admin\wali\[guardianId]\akun\buat\page.tsx:8: import { createAdminGuardianAccount } from "@/features/admin/guardians/actions/create-admin-guardian-account";
+src\app\(protected)\admin\wali\[guardianId]\akun\buat\page.tsx:9: import { GuardianAccountCreateForm } from "@/features/admin/guardians/components/guardian-account-create-form";
+src\app\(protected)\admin\wali\[guardianId]\akun\reset-password\page.tsx:10: import { getAdminGuardianDetail } from "@/features/admin/guardians/data/get-admin-guardian-detail";
+src\app\(protected)\admin\wali\[guardianId]\akun\reset-password\page.tsx:11: import { initialGuardianAccountResetPasswordActionState } from "@/features/admin/guardians/types/guardian-account-action-state";
+src\app\(protected)\admin\wali\[guardianId]\akun\reset-password\page.tsx:50: `/admin/wali/${guardianId}`,
+src\app\(protected)\admin\wali\[guardianId]\akun\reset-password\page.tsx:61: `/admin/wali/${guardianId}`;
+src\app\(protected)\admin\wali\[guardianId]\akun\reset-password\page.tsx:8: import { resetAdminGuardianAccountPassword } from "@/features/admin/guardians/actions/reset-admin-guardian-account-password";
+src\app\(protected)\admin\wali\[guardianId]\akun\reset-password\page.tsx:9: import { GuardianAccountResetPasswordForm } from "@/features/admin/guardians/components/guardian-account-reset-password-form";
+src\app\(protected)\admin\wali\[guardianId]\edit\page.tsx:4: import { updateAdminGuardian } from "@/features/admin/guardians/actions/update-admin-guardian";
+src\app\(protected)\admin\wali\[guardianId]\edit\page.tsx:5: import { GuardianForm } from "@/features/admin/guardians/components/guardian-form";
+src\app\(protected)\admin\wali\[guardianId]\edit\page.tsx:6: import { getAdminGuardianDetail } from "@/features/admin/guardians/data/get-admin-guardian-detail";
+src\app\(protected)\admin\wali\[guardianId]\edit\page.tsx:7: import type { GuardianFormActionState } from "@/features/admin/guardians/types/guardian-form-action-state";
+src\app\(protected)\admin\wali\[guardianId]\edit\page.tsx:90: cancelHref={`/admin/wali/${guardianId}`}
+src\app\(protected)\admin\wali\[guardianId]\hubungan\[relationId]\edit\page.tsx:116: cancelHref={`/admin/wali/${guardianId}`}
+src\app\(protected)\admin\wali\[guardianId]\hubungan\[relationId]\edit\page.tsx:5: import { updateAdminGuardianStudentRelation } from "@/features/admin/guardians/actions/update-admin-guardian-student-relation";
+src\app\(protected)\admin\wali\[guardianId]\hubungan\[relationId]\edit\page.tsx:6: import { GuardianStudentRelationEditForm } from "@/features/admin/guardians/components/guardian-student-relation-edit-form";
+src\app\(protected)\admin\wali\[guardianId]\hubungan\[relationId]\edit\page.tsx:7: import { getAdminGuardianDetail } from "@/features/admin/guardians/data/get-admin-guardian-detail";
+src\app\(protected)\admin\wali\[guardianId]\hubungan\[relationId]\edit\page.tsx:79: href={`/admin/wali/${guardianId}`}
+src\app\(protected)\admin\wali\[guardianId]\hubungan\[relationId]\edit\page.tsx:8: import type { GuardianStudentRelationEditActionState } from "@/features/admin/guardians/types/guardian-student-relation-mutation-state";
+src\app\(protected)\admin\wali\[guardianId]\hubungkan\page.tsx:130: href={`/admin/wali/${guardianId}/edit`}
+src\app\(protected)\admin\wali\[guardianId]\hubungkan\page.tsx:140: action={`/admin/wali/${guardianId}/hubungkan`}
+src\app\(protected)\admin\wali\[guardianId]\hubungkan\page.tsx:168: href={`/admin/wali/${guardianId}/hubungkan`}
+src\app\(protected)\admin\wali\[guardianId]\hubungkan\page.tsx:5: import { createAdminGuardianStudentRelation } from "@/features/admin/guardians/actions/create-admin-guardian-student-relation";
+src\app\(protected)\admin\wali\[guardianId]\hubungkan\page.tsx:6: import { GuardianStudentRelationForm } from "@/features/admin/guardians/components/guardian-student-relation-form";
+src\app\(protected)\admin\wali\[guardianId]\hubungkan\page.tsx:7: import { getAdminGuardianDetail } from "@/features/admin/guardians/data/get-admin-guardian-detail";
+src\app\(protected)\admin\wali\[guardianId]\hubungkan\page.tsx:8: import { getAdminGuardianStudentOptions } from "@/features/admin/guardians/data/get-admin-guardian-student-options";
+src\app\(protected)\admin\wali\[guardianId]\hubungkan\page.tsx:86: href={`/admin/wali/${guardianId}`}
+src\app\(protected)\admin\wali\[guardianId]\hubungkan\page.tsx:9: import { initialGuardianStudentRelationActionState } from "@/features/admin/guardians/types/guardian-student-relation-action-state";
+src\app\(protected)\admin\wali\[guardianId]\page.tsx:4: import { AdminGuardianDetail } from "@/features/admin/guardians/components/admin-guardian-detail";
+src\app\(protected)\admin\wali\[guardianId]\page.tsx:5: import { getAdminGuardianDetail } from "@/features/admin/guardians/data/get-admin-guardian-detail";
+src\app\(protected)\admin\wali\page.tsx:3: import { AdminGuardianList } from "@/features/admin/guardians/components/admin-guardian-list";
+src\app\(protected)\admin\wali\page.tsx:4: import { getAdminGuardianList } from "@/features/admin/guardians/data/get-admin-guardian-list";
+src\app\(protected)\admin\wali\page.tsx:8: } from "@/features/admin/guardians/lib/parse-guardian-list-query";
+src\app\(protected)\admin\wali\tambah\page.tsx:3: import { createAdminGuardian } from "@/features/admin/guardians/actions/create-admin-guardian";
+src\app\(protected)\admin\wali\tambah\page.tsx:4: import { GuardianForm } from "@/features/admin/guardians/components/guardian-form";
+src\app\(protected)\admin\wali\tambah\page.tsx:41: cancelHref="/admin/wali"
+src\app\(protected)\admin\wali\tambah\page.tsx:5: import { initialGuardianFormActionState } from "@/features/admin/guardians/types/guardian-form-action-state";
+src\components\layout\role-dashboard.tsx:100: "/admin/kelompok",
+src\components\layout\role-dashboard.tsx:61: "/admin/santri",
+src\components\layout\role-dashboard.tsx:74: "/admin/wali",
+src\components\layout\role-dashboard.tsx:87: "/admin/staf",
+src\config\navigation.ts:46: "/admin/santri",
+src\config\navigation.ts:59: "/admin/wali",
+src\config\navigation.ts:72: "/admin/staf",
+src\config\navigation.ts:85: "/admin/kelompok",
+src\config\roles.ts:6: "/admin/dashboard",
+src\features\admin\groups\actions\admin-group-assignment-actions.ts:143: "/admin/kelompok",
+src\features\admin\groups\actions\admin-group-assignment-actions.ts:151: "/admin/staf",
+src\features\admin\groups\actions\admin-group-assignment-actions.ts:155: `/admin/staf/${staffId}`,
+src\features\admin\groups\actions\admin-group-assignment-actions.ts:234: "/admin/kelompok",
+src\features\admin\groups\actions\admin-group-assignment-actions.ts:242: "/admin/staf",
+src\features\admin\groups\actions\admin-group-assignment-actions.ts:308: `/admin/kelompok/tahfiz/${groupId}`;
+src\features\admin\groups\actions\admin-group-assignment-actions.ts:311: "/admin/kelompok",
+src\features\admin\groups\actions\admin-group-assignment-actions.ts:319: "/admin/staf",
+src\features\admin\groups\actions\admin-group-assignment-actions.ts:65: ? `/admin/kelompok/pengasuhan/${groupId}`
+src\features\admin\groups\actions\admin-group-assignment-actions.ts:66: : `/admin/kelompok/tahfiz/${groupId}`;
+src\features\admin\groups\components\admin-group-assignment-detail.tsx:150: href={`/admin/santri/${member.student_id}`}
+src\features\admin\groups\components\admin-group-assignment-detail.tsx:222: href={`/admin/santri/${member.student_id}`}
+src\features\admin\groups\components\admin-group-assignment-detail.tsx:334: href="/admin/kelompok"
+src\features\admin\groups\components\admin-group-assignment-manager.tsx:462: href={`/admin/staf/${assignment.staff_id}`}
+src\features\admin\groups\components\admin-group-assignment-overview.tsx:173: href={`/admin/kelompok/pengasuhan/${group.id}`}
+src\features\admin\groups\components\admin-group-assignment-overview.tsx:317: href={`/admin/kelompok/tahfiz/${group.id}`}
+src\features\admin\guardians\actions\create-admin-guardian.ts:108: revalidatePath("/admin/wali");
+src\features\admin\guardians\actions\create-admin-guardian.ts:111: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\create-admin-guardian-account.ts:360: revalidatePath("/admin/wali");
+src\features\admin\guardians\actions\create-admin-guardian-account.ts:363: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\create-admin-guardian-account.ts:369: `/admin/wali/${guardianId}?account=created-success`,
+src\features\admin\guardians\actions\create-admin-guardian-student-relation.ts:106: revalidatePath("/admin/wali");
+src\features\admin\guardians\actions\create-admin-guardian-student-relation.ts:109: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\create-admin-guardian-student-relation.ts:113: `/admin/santri/${validationResult.data.student_id}`,
+src\features\admin\guardians\actions\create-admin-guardian-student-relation.ts:117: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\delete-admin-guardian-student-relation.ts:103: `/admin/santri/${existingRelation.student_id}`,
+src\features\admin\guardians\actions\delete-admin-guardian-student-relation.ts:107: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\delete-admin-guardian-student-relation.ts:96: revalidatePath("/admin/wali");
+src\features\admin\guardians\actions\delete-admin-guardian-student-relation.ts:99: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\reset-admin-guardian-account-password.ts:158: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\reset-admin-guardian-account-password.ts:162: `/admin/wali/${guardianId}?account=password-reset-success`,
+src\features\admin\guardians\actions\set-admin-guardian-account-status.ts:102: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\set-admin-guardian-account-status.ts:106: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\set-admin-guardian-account-status.ts:219: revalidatePath("/admin/wali");
+src\features\admin\guardians\actions\set-admin-guardian-account-status.ts:222: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\set-admin-guardian-account-status.ts:228: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\update-admin-guardian.ts:92: revalidatePath("/admin/wali");
+src\features\admin\guardians\actions\update-admin-guardian.ts:94: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\update-admin-guardian.ts:98: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\update-admin-guardian-student-relation.ts:148: revalidatePath("/admin/wali");
+src\features\admin\guardians\actions\update-admin-guardian-student-relation.ts:151: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\update-admin-guardian-student-relation.ts:155: `/admin/santri/${existingRelation.student_id}`,
+src\features\admin\guardians\actions\update-admin-guardian-student-relation.ts:159: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\components\admin-guardian-detail.tsx:107: href={`/admin/wali/${guardian.id}/edit`}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:248: href={`/admin/wali/${guardian.id}/akun/reset-password`}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:257: href={`/admin/wali/${guardian.id}/edit`}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:278: href={`/admin/wali/${guardian.id}/akun/buat`}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:345: href={`/admin/wali/${guardian.id}/hubungkan`}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:367: href={`/admin/wali/${guardian.id}/hubungkan`}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:425: href={`/admin/santri/${child.student_id}`}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:432: href={`/admin/wali/${guardian.id}/hubungan/${child.relation_id}/edit`}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:66: fallbackHref="/admin/wali"
+src\features\admin\guardians\components\admin-guardian-detail.tsx:67: allowedPrefixes={["/admin/wali"]}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:99: href={`/admin/wali/${guardian.id}/hubungkan`}
+src\features\admin\guardians\components\admin-guardian-list.tsx:154: href="/admin/wali/tambah"
+src\features\admin\guardians\components\admin-guardian-list.tsx:45: href="/admin/wali/tambah"
+src\features\admin\guardians\components\guardian-desktop-table.tsx:194: href={`/admin/wali/${guardian.id}`}
+src\features\admin\guardians\components\guardian-filter-form.tsx:113: href="/admin/wali"
+src\features\admin\guardians\components\guardian-filter-form.tsx:22: action="/admin/wali"
+src\features\admin\guardians\components\guardian-mobile-list.tsx:179: href={`/admin/wali/${guardian.id}`}
+src\features\admin\guardians\components\guardian-pagination.tsx:46: return `/admin/wali?${parameters.toString()}`;
+src\features\admin\guardians\components\guardian-student-relation-form.tsx:309: href={`/admin/wali/${guardianId}`}
+src\features\admin\guardians\components\guardian-student-relation-form.tsx:81: href={`/admin/wali/${guardianId}/hubungkan`}
+src\features\admin\staff\actions\create-admin-staff-account.ts:375: "/admin/staf",
+src\features\admin\staff\actions\create-admin-staff-account.ts:379: `/admin/staf/${staffIdValidation.data}`,
+src\features\admin\staff\actions\create-admin-staff-account.ts:387: `/admin/staf/${staffIdValidation.data}`,
+src\features\admin\staff\actions\reset-admin-staff-account-password.ts:164: `/admin/staf/${staffId}`,
+src\features\admin\staff\actions\reset-admin-staff-account-password.ts:168: `/admin/staf/${staffId}`,
+src\features\admin\staff\actions\set-admin-staff-account-status.ts:110: `/admin/staf/${staffId}`,
+src\features\admin\staff\actions\set-admin-staff-account-status.ts:114: `/admin/staf/${staffId}`,
+src\features\admin\staff\actions\set-admin-staff-account-status.ts:230: "/admin/staf",
+src\features\admin\staff\actions\set-admin-staff-account-status.ts:234: `/admin/staf/${staffId}`,
+src\features\admin\staff\actions\set-admin-staff-account-status.ts:242: `/admin/staf/${staffId}`,
+src\features\admin\staff\actions\set-admin-staff-roles.ts:172: "/admin/staf",
+src\features\admin\staff\actions\set-admin-staff-roles.ts:176: `/admin/staf/${staffId}`,
+src\features\admin\staff\actions\set-admin-staff-roles.ts:184: `/admin/staf/${staffId}`,
+src\features\admin\staff\components\admin-staff-detail.tsx:103: fallbackHref="/admin/staf"
+src\features\admin\staff\components\admin-staff-detail.tsx:104: allowedPrefixes={["/admin/staf"]}
+src\features\admin\staff\components\admin-staff-detail.tsx:280: href={`/admin/staf/${staff.id}/akun/reset-password`}
+src\features\admin\staff\components\admin-staff-detail.tsx:287: href={`/admin/staf/${staff.id}/akun/role`}
+src\features\admin\staff\components\admin-staff-detail.tsx:346: href={`/admin/staf/${staff.id}/akun/buat`}
+src\features\admin\staff\components\admin-staff-detail.tsx:408: href={`/admin/staf/${staff.id}/akun/role`}
+src\features\admin\staff\components\staff-desktop-table.tsx:196: href={`/admin/staf/${staff.id}`}
+src\features\admin\staff\components\staff-filter-form.tsx:151: href="/admin/staf"
+src\features\admin\staff\components\staff-filter-form.tsx:27: action="/admin/staf"
+src\features\admin\staff\components\staff-mobile-list.tsx:182: href={`/admin/staf/${staff.id}`}
+src\features\admin\staff\components\staff-pagination.tsx:60: return `/admin/staf?${parameters.toString()}`;
+src\features\admin\students\actions\create-admin-student.ts:137: revalidatePath("/admin/dashboard");
+src\features\admin\students\actions\create-admin-student.ts:138: revalidatePath("/admin/santri");
+src\features\admin\students\actions\create-admin-student.ts:141: `/admin/santri/${result.data.student_id}`,
+src\features\admin\students\actions\update-admin-student.ts:151: revalidatePath("/admin/dashboard");
+src\features\admin\students\actions\update-admin-student.ts:152: revalidatePath("/admin/santri");
+src\features\admin\students\actions\update-admin-student.ts:154: `/admin/santri/${studentId}`,
+src\features\admin\students\actions\update-admin-student.ts:158: `/admin/santri/${studentId}`,
+src\features\admin\students\components\admin-student-detail.tsx:25: fallbackHref="/admin/santri"
+src\features\admin\students\components\admin-student-detail.tsx:26: allowedPrefixes={["/admin/santri"]}
+src\features\admin\students\components\admin-student-detail.tsx:56: href={`/admin/santri/${data.student.id}/edit`}
+src\features\admin\students\components\admin-student-list.tsx:117: href="/admin/santri"
+src\features\admin\students\components\admin-student-list.tsx:46: href="/admin/santri/tambah"
+src\features\admin\students\components\student-desktop-table.tsx:146: href={`/admin/santri/${student.id}`}
+src\features\admin\students\components\student-filter-form.tsx:184: href="/admin/santri"
+src\features\admin\students\components\student-filter-form.tsx:29: action="/admin/santri"
+src\features\admin\students\components\student-form.tsx:212: ? `/admin/santri/${studentId}`
+src\features\admin\students\components\student-form.tsx:213: : "/admin/santri";
+src\features\admin\students\components\student-mobile-list.tsx:115: href={`/admin/santri/${student.id}`}
+src\features\admin\students\components\student-pagination.tsx:55: return `/admin/santri?${parameters.toString()}`;
+
+PREFIX: /penanggung-jawab/
+src\app\(protected)\penanggung-jawab\jurnal\[journalId]\page.tsx:107: href="/penanggung-jawab/jurnal"
+src\app\(protected)\penanggung-jawab\monitoring\page.tsx:11: } from "@/features/penanggung-jawab/monitoring/data/get-penanggung-jawab-dormitory-monitoring";
+src\app\(protected)\penanggung-jawab\monitoring\page.tsx:7: } from "@/features/penanggung-jawab/monitoring/components/penanggung-jawab-dormitory-monitoring";
+src\components\layout\role-dashboard.tsx:124: "/penanggung-jawab/monitoring",
+src\components\layout\role-dashboard.tsx:137: "/penanggung-jawab/jurnal",
+src\components\layout\role-dashboard.tsx:150: "/penanggung-jawab/tahfiz",
+src\config\navigation.ts:116: "/penanggung-jawab/monitoring",
+src\config\navigation.ts:129: "/penanggung-jawab/jurnal",
+src\config\navigation.ts:142: "/penanggung-jawab/tahfiz",
+src\config\roles.ts:17: "/penanggung-jawab/dashboard",
+src\features\kepala-mahad\journal\actions\save-kepala-mahad-journal-action.ts:251: "/penanggung-jawab/jurnal",
+src\features\kepala-mahad\journal\components\mahad-head-journal-overview.tsx:60: : "/penanggung-jawab/jurnal";
+src\features\penanggung-jawab\monitoring\components\penanggung-jawab-dormitory-monitoring.tsx:714: href="/penanggung-jawab/jurnal"
+src\features\penanggung-jawab\monitoring\components\penanggung-jawab-dormitory-monitoring.tsx:789: href={`/penanggung-jawab/jurnal/${latestHeadJournal.id}`}
+src\features\penanggung-jawab\monitoring\components\penanggung-jawab-dormitory-monitoring.tsx:877: href="/penanggung-jawab/tahfiz"
+
+PREFIX: /kepala-mahad/
+src\app\(protected)\[role]\pengasuhan\[journalId]\page.tsx:15: } from "@/features/kepala-mahad/care-journals/components/kepala-mahad-care-journal-detail";
+src\app\(protected)\[role]\pengasuhan\[journalId]\page.tsx:19: } from "@/features/kepala-mahad/care-journals/data/get-kepala-mahad-care-journal-detail";
+src\app\(protected)\[role]\pengasuhan\page.tsx:15: } from "@/features/kepala-mahad/care-journals/components/kepala-mahad-care-journal-overview";
+src\app\(protected)\[role]\pengasuhan\page.tsx:19: } from "@/features/kepala-mahad/care-journals/data/get-kepala-mahad-care-journal-overview";
+src\app\(protected)\[role]\pengasuhan\page.tsx:24: } from "@/features/kepala-mahad/care-journals/lib/parse-kepala-mahad-care-journal-query";
+src\app\(protected)\kepala-mahad\jurnal\[journalId]\page.tsx:139: href="/kepala-mahad/jurnal"
+src\app\(protected)\kepala-mahad\jurnal\[journalId]\page.tsx:17: } from "@/features/kepala-mahad/journal/actions/save-kepala-mahad-journal-action";
+src\app\(protected)\kepala-mahad\jurnal\[journalId]\page.tsx:21: } from "@/features/kepala-mahad/journal/components/kepala-mahad-journal-form";
+src\app\(protected)\kepala-mahad\jurnal\[journalId]\page.tsx:25: } from "@/features/kepala-mahad/journal/components/mahad-head-journal-evidence-upload";
+src\app\(protected)\kepala-mahad\jurnal\[journalId]\page.tsx:29: } from "@/features/kepala-mahad/journal/components/mahad-head-journal-read-only";
+src\app\(protected)\kepala-mahad\jurnal\[journalId]\page.tsx:33: } from "@/features/kepala-mahad/journal/data/create-mahad-head-journal-evidence-signed-url";
+src\app\(protected)\kepala-mahad\jurnal\[journalId]\page.tsx:37: } from "@/features/kepala-mahad/journal/data/get-kepala-mahad-journal-detail";
+src\app\(protected)\kepala-mahad\jurnal\baru\page.tsx:73: href="/kepala-mahad/jurnal"
+src\app\(protected)\kepala-mahad\jurnal\baru\page.tsx:9: } from "@/features/kepala-mahad/journal/components/create-kepala-mahad-journal-form";
+src\app\(protected)\kepala-mahad\jurnal\page.tsx:11: } from "@/features/kepala-mahad/journal/data/get-kepala-mahad-journal-overview";
+src\app\(protected)\kepala-mahad\jurnal\page.tsx:7: } from "@/features/kepala-mahad/journal/components/mahad-head-journal-overview";
+src\app\(protected)\kepala-mahad\keuangan\page.tsx:11: } from "@/features/kepala-mahad/finance/data/get-kepala-mahad-finance-summary";
+src\app\(protected)\kepala-mahad\keuangan\page.tsx:7: } from "@/features/kepala-mahad/finance/components/kepala-mahad-finance-summary";
+src\app\(protected)\penanggung-jawab\jurnal\[journalId]\page.tsx:17: } from "@/features/kepala-mahad/journal/components/mahad-head-journal-read-only";
+src\app\(protected)\penanggung-jawab\jurnal\[journalId]\page.tsx:21: } from "@/features/kepala-mahad/journal/data/create-mahad-head-journal-evidence-signed-url";
+src\app\(protected)\penanggung-jawab\jurnal\[journalId]\page.tsx:25: } from "@/features/kepala-mahad/journal/data/get-penanggung-jawab-mahad-head-journal-detail";
+src\app\(protected)\penanggung-jawab\jurnal\page.tsx:11: } from "@/features/kepala-mahad/journal/data/get-penanggung-jawab-mahad-head-journal-overview";
+src\app\(protected)\penanggung-jawab\jurnal\page.tsx:7: } from "@/features/kepala-mahad/journal/components/mahad-head-journal-overview";
+src\components\layout\role-dashboard.tsx:174: "/kepala-mahad/pengasuhan",
+src\components\layout\role-dashboard.tsx:187: "/kepala-mahad/jurnal",
+src\components\layout\role-dashboard.tsx:200: "/kepala-mahad/tahfiz",
+src\components\layout\role-dashboard.tsx:213: "/kepala-mahad/keuangan",
+src\components\navigation\navigation-state-link.tsx:173: * /kepala-mahad/tahfiz
+src\components\navigation\navigation-state-link.tsx:174: * /kepala-mahad/tahfiz?page=4
+src\components\navigation\navigation-state-link.tsx:175: * /kepala-mahad/tahfiz?page=4&group=...
+src\components\navigation\navigation-state-link.tsx:201: * /kepala-mahad/tahfiz?page=4&group=ABC
+src\components\navigation\navigation-state-link.tsx:204: * /kepala-mahad/tahfiz/{studentId}
+src\components\navigation\navigation-state-link.tsx:207: * /kepala-mahad/tahfiz/{studentId}
+src\components\navigation\navigation-state-link.tsx:43: * /kepala-mahad/tahfiz?page=4
+src\config\navigation.ts:173: "/kepala-mahad/pengasuhan",
+src\config\navigation.ts:186: "/kepala-mahad/jurnal",
+src\config\navigation.ts:199: "/kepala-mahad/tahfiz",
+src\config\navigation.ts:212: "/kepala-mahad/keuangan",
+src\config\roles.ts:28: "/kepala-mahad/dashboard",
+src\features\kepala-mahad\care-journals\actions\review-kepala-mahad-care-journal.ts:217: "/kepala-mahad/pengasuhan",
+src\features\kepala-mahad\care-journals\actions\review-kepala-mahad-care-journal.ts:221: `/kepala-mahad/pengasuhan/${journalId}`,
+src\features\kepala-mahad\care-journals\actions\review-kepala-mahad-care-journal.ts:237: `/kepala-mahad/pengasuhan/${journalId}`,
+src\features\kepala-mahad\care-journals\components\kepala-mahad-care-journal-detail.tsx:129: fallbackHref="/kepala-mahad/pengasuhan"
+src\features\kepala-mahad\care-journals\components\kepala-mahad-care-journal-detail.tsx:131: "/kepala-mahad/pengasuhan",
+src\features\kepala-mahad\care-journals\components\kepala-mahad-care-journal-overview.tsx:154: href={`/kepala-mahad/pengasuhan/${journal.id}`}
+src\features\kepala-mahad\care-journals\components\kepala-mahad-care-journal-overview.tsx:252: action="/kepala-mahad/pengasuhan"
+src\features\kepala-mahad\journal\actions\create-kepala-mahad-journal-action.ts:113: `/kepala-mahad/jurnal/${result.data.journal_id}`,
+src\features\kepala-mahad\journal\actions\save-kepala-mahad-journal-action.ts:210: "/kepala-mahad/jurnal",
+src\features\kepala-mahad\journal\actions\save-kepala-mahad-journal-action.ts:214: `/kepala-mahad/jurnal/${journalValidation.data}`,
+src\features\kepala-mahad\journal\actions\save-kepala-mahad-journal-action.ts:243: "/kepala-mahad/jurnal",
+src\features\kepala-mahad\journal\actions\save-kepala-mahad-journal-action.ts:247: `/kepala-mahad/jurnal/${journalValidation.data}`,
+src\features\kepala-mahad\journal\actions\save-kepala-mahad-journal-action.ts:255: `/kepala-mahad/jurnal/${journalValidation.data}?submitted=1`,
+src\features\kepala-mahad\journal\components\mahad-head-journal-overview.tsx:59: ? "/kepala-mahad/jurnal"
+src\features\kepala-mahad\journal\components\mahad-head-journal-overview.tsx:97: href="/kepala-mahad/jurnal/baru"
+
+PREFIX: /pengasuh/
+src\app\(protected)\[role]\dashboard\page.tsx:15: import { PengasuhDashboard } from "@/features/pengasuh/dashboard/components/pengasuh-dashboard";
+src\app\(protected)\[role]\dashboard\page.tsx:16: import { getPengasuhDashboardData } from "@/features/pengasuh/dashboard/data/get-pengasuh-dashboard-data";
+src\app\(protected)\[role]\jurnal\[journalId]\page.tsx:15: } from "@/features/pengasuh/journals/components/pengasuh-journal-detail-preview";
+src\app\(protected)\[role]\jurnal\[journalId]\page.tsx:19: } from "@/features/pengasuh/journals/data/get-pengasuh-journal-detail";
+src\app\(protected)\[role]\jurnal\page.tsx:15: } from "@/features/pengasuh/journals/components/pengasuh-journal-overview";
+src\app\(protected)\[role]\jurnal\page.tsx:19: } from "@/features/pengasuh/journals/data/get-pengasuh-journal-overview";
+src\app\(protected)\[role]\jurnal\page.tsx:24: } from "@/features/pengasuh/journals/lib/parse-pengasuh-journal-query";
+src\app\(protected)\[role]\riwayat\page.tsx:15: } from "@/features/pengasuh/journals/components/pengasuh-journal-history";
+src\app\(protected)\[role]\riwayat\page.tsx:19: } from "@/features/pengasuh/journals/data/get-pengasuh-journal-history";
+src\app\(protected)\[role]\riwayat\page.tsx:24: } from "@/features/pengasuh/journals/lib/parse-pengasuh-journal-history-query";
+src\app\(protected)\[role]\santri\page.tsx:15: } from "@/features/pengasuh/students/components/pengasuh-student-list";
+src\app\(protected)\[role]\santri\page.tsx:19: } from "@/features/pengasuh/students/data/get-pengasuh-student-list";
+src\app\(protected)\[role]\santri\page.tsx:24: } from "@/features/pengasuh/students/lib/parse-pengasuh-student-list-query";
+src\app\(protected)\pengasuh\jadwal\[scheduleId]\page.tsx:11: } from "@/features/pengasuh/activities/components/pengasuh-activity-schedule-detail";
+src\app\(protected)\pengasuh\jadwal\[scheduleId]\page.tsx:15: } from "@/features/pengasuh/activities/data/get-pengasuh-activity-schedule-detail-data";
+src\app\(protected)\pengasuh\jadwal\baru\page.tsx:26: href="/pengasuh/jadwal"
+src\app\(protected)\pengasuh\jadwal\baru\page.tsx:5: } from "@/features/pengasuh/activities/components/pengasuh-create-activity-schedule-form";
+src\app\(protected)\pengasuh\jadwal\baru\page.tsx:9: } from "@/features/pengasuh/activities/data/get-pengasuh-activity-schedule-list-data";
+src\app\(protected)\pengasuh\jadwal\page.tsx:3: } from "@/features/pengasuh/activities/components/pengasuh-activity-schedule-list";
+src\app\(protected)\pengasuh\jadwal\page.tsx:7: } from "@/features/pengasuh/activities/data/get-pengasuh-activity-schedule-list-data";
+src\components\layout\role-dashboard.tsx:237: "/pengasuh/santri",
+src\components\layout\role-dashboard.tsx:250: "/pengasuh/jurnal",
+src\components\layout\role-dashboard.tsx:263: "/pengasuh/riwayat",
+src\config\navigation.ts:243: "/pengasuh/santri",
+src\config\navigation.ts:256: "/pengasuh/jurnal",
+src\config\navigation.ts:269: "/pengasuh/riwayat",
+src\config\roles.ts:39: "/pengasuh/dashboard",
+src\features\kepala-mahad\care-journals\actions\review-kepala-mahad-care-journal.ts:229: "/pengasuh/jurnal",
+src\features\kepala-mahad\care-journals\actions\review-kepala-mahad-care-journal.ts:233: `/pengasuh/jurnal/${journalId}`,
+src\features\pengasuh\activities\actions\create-pengasuh-activity-schedule.ts:264: "/pengasuh/jadwal",
+src\features\pengasuh\activities\actions\create-pengasuh-activity-schedule.ts:268: `/pengasuh/jadwal/${scheduleId}`,
+src\features\pengasuh\activities\actions\save-pengasuh-activity-attendance.ts:214: "/pengasuh/jadwal",
+src\features\pengasuh\activities\actions\save-pengasuh-activity-attendance.ts:218: `/pengasuh/jadwal/${scheduleValidation.data}`,
+src\features\pengasuh\activities\actions\save-pengasuh-activity-attendance.ts:222: `/pengasuh/jadwal/${scheduleValidation.data}?saved=1`,
+src\features\pengasuh\activities\components\pengasuh-activity-schedule-detail.tsx:91: href="/pengasuh/jadwal"
+src\features\pengasuh\activities\components\pengasuh-activity-schedule-list.tsx:124: href="/pengasuh/jadwal/baru"
+src\features\pengasuh\activities\components\pengasuh-activity-schedule-list.tsx:217: href="/pengasuh/jadwal/baru"
+src\features\pengasuh\activities\components\pengasuh-activity-schedule-list.tsx:348: href={`/pengasuh/jadwal/${schedule.id}`}
+src\features\pengasuh\activities\components\pengasuh-create-activity-schedule-form.tsx:266: href="/pengasuh/jadwal"
+src\features\pengasuh\dashboard\components\pengasuh-dashboard.tsx:461: href="/pengasuh/santri"
+src\features\pengasuh\dashboard\components\pengasuh-dashboard.tsx:480: href="/pengasuh/jurnal"
+src\features\pengasuh\dashboard\components\pengasuh-dashboard.tsx:500: href="/pengasuh/riwayat"
+src\features\pengasuh\journals\actions\create-or-open-pengasuh-journal.ts:166: `/pengasuh/jurnal/${responseValidation.data.journal_id}`,
+src\features\pengasuh\journals\actions\fill-normal-pengasuh-journal.ts:141: `/pengasuh/jurnal/${validation.data.journalId}`,
+src\features\pengasuh\journals\actions\fill-normal-pengasuh-journal.ts:145: "/pengasuh/jurnal",
+src\features\pengasuh\journals\actions\save-pengasuh-journal-entry.ts:249: `/pengasuh/jurnal/${validation.data.journalId}`,
+src\features\pengasuh\journals\actions\save-pengasuh-journal-entry.ts:253: "/pengasuh/jurnal",
+src\features\pengasuh\journals\actions\submit-pengasuh-journal.ts:139: "/pengasuh/jurnal",
+src\features\pengasuh\journals\actions\submit-pengasuh-journal.ts:143: `/pengasuh/jurnal/${validation.data.journalId}`,
+src\features\pengasuh\journals\actions\submit-pengasuh-journal.ts:147: `/pengasuh/jurnal/${validation.data.journalId}`,
+src\features\pengasuh\journals\components\pengasuh-journal-detail-preview.tsx:105: fallbackHref={`/pengasuh/jurnal?date=${journal.journal_date}`}
+src\features\pengasuh\journals\components\pengasuh-journal-detail-preview.tsx:107: "/pengasuh/jurnal",
+src\features\pengasuh\journals\components\pengasuh-journal-detail-preview.tsx:108: "/pengasuh/riwayat",
+src\features\pengasuh\journals\components\pengasuh-journal-history.tsx:142: return `/pengasuh/riwayat?${params.toString()}`;
+src\features\pengasuh\journals\components\pengasuh-journal-history.tsx:299: href={`/pengasuh/jurnal/${journal.id}`}
+src\features\pengasuh\journals\components\pengasuh-journal-history.tsx:417: action="/pengasuh/riwayat"
+src\features\pengasuh\journals\components\pengasuh-journal-history.tsx:552: href="/pengasuh/riwayat"
+src\features\pengasuh\journals\components\pengasuh-journal-overview.tsx:207: href={`/pengasuh/jurnal/${journal.id}`}
+src\features\pengasuh\journals\components\pengasuh-journal-overview.tsx:442: action="/pengasuh/jurnal"
+src\features\pengasuh\students\components\pengasuh-student-list.tsx:293: action="/pengasuh/santri"
+src\features\pengasuh\students\components\pengasuh-student-list.tsx:327: href="/pengasuh/santri"
+src\features\pengasuh\students\components\pengasuh-student-list.tsx:385: href="/pengasuh/santri"
+
+PREFIX: /pembina-tahfiz/
+src\app\(protected)\[role]\dashboard\page.tsx:12: import { PembinaTahfizDashboard } from "@/features/pembina-tahfiz/dashboard/components/pembina-tahfiz-dashboard";
+src\app\(protected)\[role]\dashboard\page.tsx:13: import { getPembinaTahfizDashboardData } from "@/features/pembina-tahfiz/dashboard/data/get-pembina-tahfiz-dashboard-data";
+src\app\(protected)\[role]\laporan\[studentId]\page.tsx:15: } from "@/features/pembina-tahfiz/weekly-reports/components/pembina-tahfiz-weekly-report-detail";
+src\app\(protected)\[role]\laporan\[studentId]\page.tsx:19: } from "@/features/pembina-tahfiz/weekly-reports/data/get-pembina-tahfiz-weekly-report-detail";
+src\app\(protected)\[role]\laporan\[studentId]\page.tsx:24: } from "@/features/pembina-tahfiz/weekly-reports/lib/parse-pembina-tahfiz-weekly-report-query";
+src\app\(protected)\[role]\laporan\page.tsx:15: } from "@/features/pembina-tahfiz/weekly-reports/components/pembina-tahfiz-weekly-report-overview";
+src\app\(protected)\[role]\laporan\page.tsx:19: } from "@/features/pembina-tahfiz/weekly-reports/data/get-pembina-tahfiz-weekly-report-overview";
+src\app\(protected)\[role]\laporan\page.tsx:24: } from "@/features/pembina-tahfiz/weekly-reports/lib/parse-pembina-tahfiz-weekly-report-query";
+src\app\(protected)\[role]\laporan\riwayat\page.tsx:15: } from "@/features/pembina-tahfiz/weekly-reports/components/pembina-tahfiz-weekly-report-history";
+src\app\(protected)\[role]\laporan\riwayat\page.tsx:19: } from "@/features/pembina-tahfiz/weekly-reports/data/get-pembina-tahfiz-weekly-report-history";
+src\app\(protected)\[role]\laporan\riwayat\page.tsx:24: } from "@/features/pembina-tahfiz/weekly-reports/lib/parse-pembina-tahfiz-weekly-report-history-query";
+src\app\(protected)\[role]\santri\page.tsx:28: } from "@/features/pembina-tahfiz/students/components/pembina-tahfiz-student-list";
+src\app\(protected)\[role]\santri\page.tsx:32: } from "@/features/pembina-tahfiz/students/data/get-pembina-tahfiz-student-list";
+src\app\(protected)\[role]\santri\page.tsx:37: } from "@/features/pembina-tahfiz/students/lib/parse-pembina-tahfiz-student-list-query";
+src\components\app-shell\sidebar-navigation.tsx:31: * /pembina-tahfiz/laporan
+src\components\app-shell\sidebar-navigation.tsx:34: * - /pembina-tahfiz/laporan
+src\components\app-shell\sidebar-navigation.tsx:38: * /pembina-tahfiz/laporan/riwayat
+src\components\app-shell\sidebar-navigation.tsx:41: * - /pembina-tahfiz/laporan
+src\components\app-shell\sidebar-navigation.tsx:42: * - /pembina-tahfiz/laporan/riwayat
+src\components\layout\role-dashboard.tsx:287: "/pembina-tahfiz/laporan",
+src\components\layout\role-dashboard.tsx:300: "/pembina-tahfiz/laporan/riwayat",
+src\config\navigation.ts:300: "/pembina-tahfiz/laporan",
+src\config\navigation.ts:313: "/pembina-tahfiz/laporan/riwayat",
+src\config\roles.ts:50: "/pembina-tahfiz/dashboard",
+src\features\pembina-tahfiz\students\components\pembina-tahfiz-student-list.tsx:212: action="/pembina-tahfiz/santri"
+src\features\pembina-tahfiz\students\components\pembina-tahfiz-student-list.tsx:260: href="/pembina-tahfiz/santri"
+src\features\pembina-tahfiz\students\components\pembina-tahfiz-student-list.tsx:310: href="/pembina-tahfiz/santri"
+src\features\pembina-tahfiz\weekly-reports\actions\save-pembina-tahfiz-weekly-report.ts:508: "/pembina-tahfiz/laporan",
+src\features\pembina-tahfiz\weekly-reports\actions\save-pembina-tahfiz-weekly-report.ts:512: `/pembina-tahfiz/laporan/${studentId}`,
+src\features\pembina-tahfiz\weekly-reports\actions\save-pembina-tahfiz-weekly-report.ts:522: `/pembina-tahfiz/laporan?week=${weekStart}`,
+src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-detail.tsx:50: fallbackHref={`/pembina-tahfiz/laporan?week=${data.week.start}`}
+src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-detail.tsx:52: "/pembina-tahfiz/laporan",
+src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-history.tsx:175: action="/pembina-tahfiz/laporan/riwayat"
+src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-history.tsx:245: href="/pembina-tahfiz/laporan/riwayat"
+src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-history.tsx:398: href={`/pembina-tahfiz/laporan/${item.student.id}?week=${item.report.week_start}`}
+src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-history.tsx:77: return `/pembina-tahfiz/laporan/riwayat?${params.toString()}`;
+src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-history.tsx:92: href="/pembina-tahfiz/laporan"
+src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-overview.tsx:197: href={`/pembina-tahfiz/laporan/${item.student.id}?week=${weekStart}`}
+src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-overview.tsx:270: href="/pembina-tahfiz/laporan/riwayat"
+src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-overview.tsx:350: action="/pembina-tahfiz/laporan"
+src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-overview.tsx:438: href={`/pembina-tahfiz/laporan?week=${data.week.start}`}
+src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-overview.tsx:493: href={`/pembina-tahfiz/laporan?week=${data.week.start}`}
+
+PREFIX: /bendahara/
+src\app\(protected)\[role]\dashboard\page.tsx:6: import { BendaharaDashboard } from "@/features/bendahara/dashboard/components/bendahara-dashboard";
+src\app\(protected)\[role]\dashboard\page.tsx:7: import { getBendaharaDashboardData } from "@/features/bendahara/dashboard/data/get-bendahara-dashboard-data";
+src\app\(protected)\[role]\pembayaran\page.tsx:11: } from "@/features/bendahara/payments/components/bendahara-payment-history";
+src\app\(protected)\[role]\pembayaran\page.tsx:15: } from "@/features/bendahara/payments/data/get-bendahara-payment-history-data";
+src\app\(protected)\[role]\pembayaran\page.tsx:19: } from "@/features/bendahara/payments/lib/parse-bendahara-payment-history-query";
+src\app\(protected)\[role]\tagihan\[billId]\page.tsx:15: } from "@/features/bendahara/bills/components/bendahara-bill-detail";
+src\app\(protected)\[role]\tagihan\[billId]\page.tsx:19: } from "@/features/bendahara/bills/data/get-bendahara-bill-detail-data";
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\batalkan\page.tsx:112: `/bendahara/tagihan/${data.bill.id}`;
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\batalkan\page.tsx:19: } from "@/features/bendahara/bills/data/get-bendahara-bill-detail-data";
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\batalkan\page.tsx:23: } from "@/features/bendahara/payments/components/bendahara-cancel-payment-form";
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\bukti\unggah\page.tsx:112: `/bendahara/tagihan/${data.bill.id}`;
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\bukti\unggah\page.tsx:19: } from "@/features/bendahara/bills/data/get-bendahara-bill-detail-data";
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\bukti\unggah\page.tsx:23: } from "@/features/bendahara/payments/components/bendahara-upload-payment-proof-form";
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\baru\page.tsx:111: `/bendahara/tagihan/${billIdValidation.data}`;
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\baru\page.tsx:19: } from "@/features/bendahara/bills/data/get-bendahara-bill-detail-data";
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\baru\page.tsx:23: } from "@/features/bendahara/payments/components/bendahara-record-payment-form";
+src\app\(protected)\[role]\tagihan\baru\page.tsx:13: } from "@/features/bendahara/bills/components/bendahara-create-bill-form";
+src\app\(protected)\[role]\tagihan\baru\page.tsx:138: href="/bendahara/tagihan"
+src\app\(protected)\[role]\tagihan\baru\page.tsx:17: } from "@/features/bendahara/bills/data/get-bendahara-bill-student-options";
+src\app\(protected)\[role]\tagihan\baru\page.tsx:189: action="/bendahara/tagihan/baru"
+src\app\(protected)\[role]\tagihan\baru\page.tsx:211: href="/bendahara/tagihan/baru"
+src\app\(protected)\[role]\tagihan\baru\page.tsx:312: href={`/bendahara/tagihan/baru?${params.toString()}`}
+src\app\(protected)\[role]\tagihan\page.tsx:11: } from "@/features/bendahara/bills/components/bendahara-bill-list";
+src\app\(protected)\[role]\tagihan\page.tsx:15: } from "@/features/bendahara/bills/data/get-bendahara-bill-list-data";
+src\app\(protected)\[role]\tagihan\page.tsx:19: } from "@/features/bendahara/bills/lib/parse-bendahara-bill-list-query";
+src\app\(protected)\bendahara\laporan\page.tsx:11: } from "@/features/bendahara/reports/data/get-bendahara-finance-report";
+src\app\(protected)\bendahara\laporan\page.tsx:7: } from "@/features/bendahara/reports/components/bendahara-finance-report";
+src\components\layout\role-dashboard.tsx:324: "/bendahara/tagihan",
+src\components\layout\role-dashboard.tsx:337: "/bendahara/pembayaran",
+src\components\layout\role-dashboard.tsx:350: "/bendahara/laporan",
+src\config\navigation.ts:344: "/bendahara/tagihan",
+src\config\navigation.ts:357: "/bendahara/pembayaran",
+src\config\navigation.ts:370: "/bendahara/laporan",
+src\config\roles.ts:61: "/bendahara/dashboard",
+src\features\bendahara\bills\actions\create-bendahara-student-bill.ts:219: "/bendahara/dashboard",
+src\features\bendahara\bills\actions\create-bendahara-student-bill.ts:223: "/bendahara/tagihan",
+src\features\bendahara\bills\actions\create-bendahara-student-bill.ts:227: "/bendahara/tagihan",
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:281: fallbackHref="/bendahara/tagihan"
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:283: "/bendahara/tagihan",
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:284: "/bendahara/pembayaran",
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:326: href={`/bendahara/tagihan/${bill.id}/pembayaran/baru`}
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:613: href={`/bendahara/tagihan/${bill.id}/pembayaran/baru`}
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:780: href={`/bendahara/tagihan/${bill.id}/pembayaran/${payment.id}/bukti/unggah`}
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:797: href={`/bendahara/tagihan/${bill.id}/pembayaran/${payment.id}/batalkan`}
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:8: } from "@/features/bendahara/payments/components/bendahara-payment-proof-button";
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:866: href={`/bendahara/tagihan/${bill.id}/pembayaran/baru`}
+src\features\bendahara\bills\components\bendahara-bill-list.tsx:147: ? `/bendahara/tagihan?${query}`
+src\features\bendahara\bills\components\bendahara-bill-list.tsx:148: : "/bendahara/tagihan";
+src\features\bendahara\bills\components\bendahara-bill-list.tsx:264: href="/bendahara/tagihan/baru"
+src\features\bendahara\bills\components\bendahara-bill-list.tsx:388: action="/bendahara/tagihan"
+src\features\bendahara\bills\components\bendahara-bill-list.tsx:419: href="/bendahara/tagihan"
+src\features\bendahara\bills\components\bendahara-bill-list.tsx:659: href={`/bendahara/tagihan/${bill.id}`}
+src\features\bendahara\bills\components\bendahara-create-bill-form.tsx:162: href="/bendahara/tagihan/baru"
+src\features\bendahara\bills\components\bendahara-create-bill-form.tsx:544: href="/bendahara/tagihan"
+src\features\bendahara\dashboard\components\bendahara-dashboard.tsx:188: href="/bendahara/tagihan"
+src\features\bendahara\dashboard\components\bendahara-dashboard.tsx:207: href="/bendahara/tagihan/baru"
+src\features\bendahara\dashboard\components\bendahara-dashboard.tsx:226: href="/bendahara/pembayaran"
+src\features\bendahara\payments\actions\cancel-bendahara-payment.ts:146: "/bendahara/dashboard",
+src\features\bendahara\payments\actions\cancel-bendahara-payment.ts:150: "/bendahara/tagihan",
+src\features\bendahara\payments\actions\cancel-bendahara-payment.ts:154: `/bendahara/tagihan/${input.billId}`,
+src\features\bendahara\payments\actions\cancel-bendahara-payment.ts:158: "/bendahara/pembayaran",
+src\features\bendahara\payments\actions\cancel-bendahara-payment.ts:168: `/bendahara/tagihan/${input.billId}`;
+src\features\bendahara\payments\actions\record-bendahara-bill-payment.ts:200: "/bendahara/dashboard",
+src\features\bendahara\payments\actions\record-bendahara-bill-payment.ts:204: "/bendahara/tagihan",
+src\features\bendahara\payments\actions\record-bendahara-bill-payment.ts:208: `/bendahara/tagihan/${input.billId}`,
+src\features\bendahara\payments\actions\record-bendahara-bill-payment.ts:212: "/bendahara/pembayaran",
+src\features\bendahara\payments\actions\record-bendahara-bill-payment.ts:222: * /bendahara/tagihan?page=3
+src\features\bendahara\payments\actions\record-bendahara-bill-payment.ts:224: * /bendahara/tagihan/BILL
+src\features\bendahara\payments\actions\record-bendahara-bill-payment.ts:225: *   ?returnTo=/bendahara/tagihan?page=3
+src\features\bendahara\payments\actions\record-bendahara-bill-payment.ts:227: * /bendahara/tagihan/BILL/pembayaran/baru
+src\features\bendahara\payments\actions\record-bendahara-bill-payment.ts:228: *   ?returnTo=/bendahara/tagihan/BILL?returnTo=...
+src\features\bendahara\payments\actions\record-bendahara-bill-payment.ts:236: `/bendahara/tagihan/${input.billId}`;
+src\features\bendahara\payments\components\bendahara-cancel-payment-form.tsx:140: `/bendahara/tagihan/${billId}`;
+src\features\bendahara\payments\components\bendahara-payment-history.tsx:218: ? `/bendahara/pembayaran?${query}`
+src\features\bendahara\payments\components\bendahara-payment-history.tsx:219: : "/bendahara/pembayaran";
+src\features\bendahara\payments\components\bendahara-payment-history.tsx:381: href="/bendahara/tagihan"
+src\features\bendahara\payments\components\bendahara-payment-history.tsx:552: action="/bendahara/pembayaran"
+src\features\bendahara\payments\components\bendahara-payment-history.tsx:596: href="/bendahara/pembayaran"
+src\features\bendahara\payments\components\bendahara-payment-history.tsx:845: href={`/bendahara/tagihan/${allocation.bill.id}`}
+src\features\bendahara\payments\components\bendahara-record-payment-form.tsx:110: `/bendahara/tagihan/${billId}`;
+src\features\bendahara\payments\components\bendahara-upload-payment-proof-form.tsx:271: `/bendahara/tagihan/${billId}`;
+src\features\bendahara\payments\components\bendahara-upload-payment-proof-form.tsx:545: * /bendahara/tagihan/{billId}
+src\features\bendahara\payments\components\bendahara-upload-payment-proof-form.tsx:549: * /bendahara/tagihan/{billId}
+src\features\bendahara\payments\components\bendahara-upload-payment-proof-form.tsx:550: * ?returnTo=/bendahara/tagihan?page=...
+src\features\bendahara\reports\components\bendahara-finance-report.tsx:358: action="/bendahara/laporan"
+src\features\bendahara\reports\components\bendahara-finance-report.tsx:426: href="/bendahara/laporan"
+
+PREFIX: /wali/
+src\app\(protected)\admin\wali\[guardianId]\akun\buat\page.tsx:108: href={`/admin/wali/${guardianId}/hubungkan`}
+src\app\(protected)\admin\wali\[guardianId]\akun\buat\page.tsx:47: `/admin/wali/${guardianId}`,
+src\app\(protected)\admin\wali\[guardianId]\akun\buat\page.tsx:52: `/admin/wali/${guardianId}`;
+src\app\(protected)\admin\wali\[guardianId]\akun\buat\page.tsx:75: href={`/admin/wali/${guardianId}/edit`}
+src\app\(protected)\admin\wali\[guardianId]\akun\reset-password\page.tsx:50: `/admin/wali/${guardianId}`,
+src\app\(protected)\admin\wali\[guardianId]\akun\reset-password\page.tsx:61: `/admin/wali/${guardianId}`;
+src\app\(protected)\admin\wali\[guardianId]\edit\page.tsx:90: cancelHref={`/admin/wali/${guardianId}`}
+src\app\(protected)\admin\wali\[guardianId]\hubungan\[relationId]\edit\page.tsx:116: cancelHref={`/admin/wali/${guardianId}`}
+src\app\(protected)\admin\wali\[guardianId]\hubungan\[relationId]\edit\page.tsx:79: href={`/admin/wali/${guardianId}`}
+src\app\(protected)\admin\wali\[guardianId]\hubungkan\page.tsx:130: href={`/admin/wali/${guardianId}/edit`}
+src\app\(protected)\admin\wali\[guardianId]\hubungkan\page.tsx:140: action={`/admin/wali/${guardianId}/hubungkan`}
+src\app\(protected)\admin\wali\[guardianId]\hubungkan\page.tsx:168: href={`/admin/wali/${guardianId}/hubungkan`}
+src\app\(protected)\admin\wali\[guardianId]\hubungkan\page.tsx:86: href={`/admin/wali/${guardianId}`}
+src\components\layout\role-dashboard.tsx:374: "/wali/tagihan",
+src\components\layout\role-dashboard.tsx:387: "/wali/pembayaran",
+src\config\navigation.ts:401: "/wali/tagihan",
+src\config\navigation.ts:414: "/wali/pembayaran",
+src\config\roles.ts:72: "/wali/dashboard",
+src\features\admin\guardians\actions\create-admin-guardian.ts:111: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\create-admin-guardian-account.ts:363: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\create-admin-guardian-account.ts:369: `/admin/wali/${guardianId}?account=created-success`,
+src\features\admin\guardians\actions\create-admin-guardian-student-relation.ts:109: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\create-admin-guardian-student-relation.ts:117: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\delete-admin-guardian-student-relation.ts:107: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\delete-admin-guardian-student-relation.ts:99: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\reset-admin-guardian-account-password.ts:158: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\reset-admin-guardian-account-password.ts:162: `/admin/wali/${guardianId}?account=password-reset-success`,
+src\features\admin\guardians\actions\set-admin-guardian-account-status.ts:102: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\set-admin-guardian-account-status.ts:106: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\set-admin-guardian-account-status.ts:222: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\set-admin-guardian-account-status.ts:228: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\update-admin-guardian.ts:94: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\update-admin-guardian.ts:98: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\update-admin-guardian-student-relation.ts:151: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\actions\update-admin-guardian-student-relation.ts:159: `/admin/wali/${guardianId}`,
+src\features\admin\guardians\components\admin-guardian-detail.tsx:107: href={`/admin/wali/${guardian.id}/edit`}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:248: href={`/admin/wali/${guardian.id}/akun/reset-password`}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:257: href={`/admin/wali/${guardian.id}/edit`}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:278: href={`/admin/wali/${guardian.id}/akun/buat`}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:345: href={`/admin/wali/${guardian.id}/hubungkan`}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:367: href={`/admin/wali/${guardian.id}/hubungkan`}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:432: href={`/admin/wali/${guardian.id}/hubungan/${child.relation_id}/edit`}
+src\features\admin\guardians\components\admin-guardian-detail.tsx:99: href={`/admin/wali/${guardian.id}/hubungkan`}
+src\features\admin\guardians\components\admin-guardian-list.tsx:154: href="/admin/wali/tambah"
+src\features\admin\guardians\components\admin-guardian-list.tsx:45: href="/admin/wali/tambah"
+src\features\admin\guardians\components\guardian-desktop-table.tsx:194: href={`/admin/wali/${guardian.id}`}
+src\features\admin\guardians\components\guardian-mobile-list.tsx:179: href={`/admin/wali/${guardian.id}`}
+src\features\admin\guardians\components\guardian-student-relation-form.tsx:309: href={`/admin/wali/${guardianId}`}
+src\features\admin\guardians\components\guardian-student-relation-form.tsx:81: href={`/admin/wali/${guardianId}/hubungkan`}
+src\features\guardian\dashboard\components\guardian-tahfiz-dashboard.tsx:227: href={`/wali/tahfiz/${child.student.id}`}
+src\features\guardian\finance\components\guardian-bill-list.tsx:137: href="/wali/tagihan"
+src\features\guardian\finance\components\guardian-bill-list.tsx:156: href={`/wali/tagihan?student=${child.id}`}
+src\features\guardian\finance\components\guardian-bill-list.tsx:407: href={`/wali/pembayaran?student=${bill.student.id}`}
+src\features\guardian\finance\components\guardian-payment-history.tsx:112: ? `/wali/pembayaran?${query}`
+src\features\guardian\finance\components\guardian-payment-history.tsx:113: : "/wali/pembayaran";
+src\features\guardian\finance\components\guardian-payment-history.tsx:154: href="/wali/pembayaran"
+src\features\guardian\finance\components\guardian-payment-history.tsx:173: href={`/wali/pembayaran?student=${child.id}`}
+src\features\guardian\tahfiz\components\guardian-tahfiz-report-history.tsx:114: return `/wali/tahfiz/${studentId}?page=${page}`;
+src\features\guardian\tahfiz\components\guardian-tahfiz-report-history.tsx:129: href="/wali/dashboard"
+
+============================================================
+11_RETURN_TO_NAVIGATION
+============================================================
+
+PATTERN: PreserveStateLink
+src\components\navigation\navigation-state-link.tsx:19: type PreserveStateLinkProps =
+src\components\navigation\navigation-state-link.tsx:210: export function PreserveStateLink({
+src\components\navigation\navigation-state-link.tsx:213: }: PreserveStateLinkProps) {
+src\features\admin\guardians\components\guardian-desktop-table.tsx:193: <PreserveStateLink
+src\features\admin\guardians\components\guardian-desktop-table.tsx:198: </PreserveStateLink>
+src\features\admin\guardians\components\guardian-desktop-table.tsx:2: PreserveStateLink,
+src\features\admin\guardians\components\guardian-mobile-list.tsx:178: <PreserveStateLink
+src\features\admin\guardians\components\guardian-mobile-list.tsx:183: </PreserveStateLink>
+src\features\admin\guardians\components\guardian-mobile-list.tsx:2: PreserveStateLink,
+src\features\admin\staff\components\staff-desktop-table.tsx:195: <PreserveStateLink
+src\features\admin\staff\components\staff-desktop-table.tsx:2: PreserveStateLink,
+src\features\admin\staff\components\staff-desktop-table.tsx:200: </PreserveStateLink>
+src\features\admin\staff\components\staff-mobile-list.tsx:181: <PreserveStateLink
+src\features\admin\staff\components\staff-mobile-list.tsx:186: </PreserveStateLink>
+src\features\admin\staff\components\staff-mobile-list.tsx:2: PreserveStateLink,
+src\features\admin\students\components\student-desktop-table.tsx:145: <PreserveStateLink
+src\features\admin\students\components\student-desktop-table.tsx:150: </PreserveStateLink>
+src\features\admin\students\components\student-desktop-table.tsx:2: PreserveStateLink,
+src\features\admin\students\components\student-mobile-list.tsx:114: <PreserveStateLink
+src\features\admin\students\components\student-mobile-list.tsx:119: </PreserveStateLink>
+src\features\admin\students\components\student-mobile-list.tsx:2: PreserveStateLink,
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:2: PreserveStateLink,
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:325: <PreserveStateLink
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:330: </PreserveStateLink>
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:612: <PreserveStateLink
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:617: </PreserveStateLink>
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:779: <PreserveStateLink
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:784: </PreserveStateLink>
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:796: <PreserveStateLink
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:801: </PreserveStateLink>
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:865: <PreserveStateLink
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:870: </PreserveStateLink>
+src\features\bendahara\bills\components\bendahara-bill-list.tsx:4: PreserveStateLink,
+src\features\bendahara\bills\components\bendahara-bill-list.tsx:658: <PreserveStateLink
+src\features\bendahara\bills\components\bendahara-bill-list.tsx:663: </PreserveStateLink>
+src\features\bendahara\payments\components\bendahara-payment-history.tsx:4: PreserveStateLink,
+src\features\bendahara\payments\components\bendahara-payment-history.tsx:844: <PreserveStateLink
+src\features\bendahara\payments\components\bendahara-payment-history.tsx:849: </PreserveStateLink>
+src\features\kepala-mahad\care-journals\components\kepala-mahad-care-journal-overview.tsx:153: <PreserveStateLink
+src\features\kepala-mahad\care-journals\components\kepala-mahad-care-journal-overview.tsx:161: </PreserveStateLink>
+src\features\kepala-mahad\care-journals\components\kepala-mahad-care-journal-overview.tsx:2: PreserveStateLink,
+src\features\leadership\tahfiz\components\leadership-tahfiz-monitoring-overview.tsx:319: <PreserveStateLink
+src\features\leadership\tahfiz\components\leadership-tahfiz-monitoring-overview.tsx:324: </PreserveStateLink>
+src\features\leadership\tahfiz\components\leadership-tahfiz-monitoring-overview.tsx:5: PreserveStateLink,
+src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-history.tsx:397: <PreserveStateLink
+src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-history.tsx:4: PreserveStateLink,
+src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-history.tsx:406: </PreserveStateLink>
+src\features\pengasuh\journals\components\pengasuh-journal-history.tsx:298: <PreserveStateLink
+src\features\pengasuh\journals\components\pengasuh-journal-history.tsx:303: </PreserveStateLink>
+src\features\pengasuh\journals\components\pengasuh-journal-history.tsx:4: PreserveStateLink,
+
+PATTERN: ReturnLink
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\batalkan\page.tsx:10: ReturnLink,
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\batalkan\page.tsx:120: <ReturnLink
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\batalkan\page.tsx:130: </ReturnLink>
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\batalkan\page.tsx:172: <ReturnLink
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\batalkan\page.tsx:182: </ReturnLink>
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\bukti\unggah\page.tsx:10: ReturnLink,
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\bukti\unggah\page.tsx:126: <ReturnLink
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\bukti\unggah\page.tsx:136: </ReturnLink>
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\bukti\unggah\page.tsx:176: <ReturnLink
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\bukti\unggah\page.tsx:186: </ReturnLink>
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\bukti\unggah\page.tsx:221: <ReturnLink
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\bukti\unggah\page.tsx:231: </ReturnLink>
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\bukti\unggah\page.tsx:247: <ReturnLink
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\[paymentId]\bukti\unggah\page.tsx:257: </ReturnLink>
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\baru\page.tsx:10: ReturnLink,
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\baru\page.tsx:119: <ReturnLink
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\baru\page.tsx:129: </ReturnLink>
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\baru\page.tsx:151: <ReturnLink
+src\app\(protected)\[role]\tagihan\[billId]\pembayaran\baru\page.tsx:161: </ReturnLink>
+src\components\navigation\navigation-state-link.tsx:24: type ReturnLinkProps =
+src\components\navigation\navigation-state-link.tsx:252: export function ReturnLink({
+src\components\navigation\navigation-state-link.tsx:256: }: ReturnLinkProps) {
+src\features\admin\guardians\components\admin-guardian-detail.tsx:4: ReturnLink,
+src\features\admin\guardians\components\admin-guardian-detail.tsx:65: <ReturnLink
+src\features\admin\guardians\components\admin-guardian-detail.tsx:78: </ReturnLink>
+src\features\admin\staff\components\admin-staff-detail.tsx:102: <ReturnLink
+src\features\admin\staff\components\admin-staff-detail.tsx:115: </ReturnLink>
+src\features\admin\staff\components\admin-staff-detail.tsx:4: ReturnLink,
+src\features\admin\students\components\admin-student-detail.tsx:24: <ReturnLink
+src\features\admin\students\components\admin-student-detail.tsx:37: </ReturnLink>
+src\features\admin\students\components\admin-student-detail.tsx:4: ReturnLink,
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:280: <ReturnLink
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:289: </ReturnLink>
+src\features\bendahara\bills\components\bendahara-bill-detail.tsx:3: ReturnLink,
+src\features\bendahara\payments\components\bendahara-cancel-payment-form.tsx:347: <ReturnLink
+src\features\bendahara\payments\components\bendahara-cancel-payment-form.tsx:357: </ReturnLink>
+src\features\bendahara\payments\components\bendahara-cancel-payment-form.tsx:8: ReturnLink,
+src\features\bendahara\payments\components\bendahara-record-payment-form.tsx:465: <ReturnLink
+src\features\bendahara\payments\components\bendahara-record-payment-form.tsx:475: </ReturnLink>
+src\features\bendahara\payments\components\bendahara-record-payment-form.tsx:8: ReturnLink,
+src\features\bendahara\payments\components\bendahara-upload-payment-proof-form.tsx:18: ReturnLink,
+src\features\bendahara\payments\components\bendahara-upload-payment-proof-form.tsx:770: <ReturnLink
+src\features\bendahara\payments\components\bendahara-upload-payment-proof-form.tsx:780: </ReturnLink>
+src\features\kepala-mahad\care-journals\components\kepala-mahad-care-journal-detail.tsx:128: <ReturnLink
+src\features\kepala-mahad\care-journals\components\kepala-mahad-care-journal-detail.tsx:136: </ReturnLink>
+src\features\kepala-mahad\care-journals\components\kepala-mahad-care-journal-detail.tsx:2: ReturnLink,
+src\features\leadership\tahfiz\components\leadership-tahfiz-student-history.tsx:124: <ReturnLink
+src\features\leadership\tahfiz\components\leadership-tahfiz-student-history.tsx:132: </ReturnLink>
+src\features\leadership\tahfiz\components\leadership-tahfiz-student-history.tsx:3: ReturnLink,
+src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-detail.tsx:2: ReturnLink,
+src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-detail.tsx:49: <ReturnLink
+src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-detail.tsx:57: </ReturnLink>
+src\features\pengasuh\journals\components\pengasuh-journal-detail-preview.tsx:104: <ReturnLink
+src\features\pengasuh\journals\components\pengasuh-journal-detail-preview.tsx:113: </ReturnLink>
+src\features\pengasuh\journals\components\pengasuh-journal-detail-preview.tsx:2: ReturnLink,
+
+PATTERN: CarryReturnToLink
+src\components\navigation\navigation-state-link.tsx:30: type CarryReturnToLinkProps =
+src\components\navigation\navigation-state-link.tsx:303: export function CarryReturnToLink({
+src\components\navigation\navigation-state-link.tsx:306: }: CarryReturnToLinkProps) {
+src\features\leadership\tahfiz\components\leadership-tahfiz-student-history.tsx:2: CarryReturnToLink,
+src\features\leadership\tahfiz\components\leadership-tahfiz-student-history.tsx:462: <CarryReturnToLink
+src\features\leadership\tahfiz\components\leadership-tahfiz-student-history.tsx:471: </CarryReturnToLink>
+src\features\leadership\tahfiz\components\leadership-tahfiz-student-history.tsx:483: <CarryReturnToLink
+src\features\leadership\tahfiz\components\leadership-tahfiz-student-history.tsx:488: </CarryReturnToLink>
+
+PATTERN: returnTo
+src\components\navigation\navigation-state-link.tsx:121: * ?returnTo=/halaman-asal?page=4...
+src\components\navigation\navigation-state-link.tsx:125: function appendReturnTo(
+src\components\navigation\navigation-state-link.tsx:127: returnTo: string,
+src\components\navigation\navigation-state-link.tsx:152: "returnTo",
+src\components\navigation\navigation-state-link.tsx:153: returnTo,
+src\components\navigation\navigation-state-link.tsx:208: * ?returnTo=%2Fkepala-mahad%2Ftahfiz%3Fpage%3D4...
+src\components\navigation\navigation-state-link.tsx:227: appendReturnTo(
+src\components\navigation\navigation-state-link.tsx:247: * Membaca returnTo dari URL.
+src\components\navigation\navigation-state-link.tsx:249: * Kalau returnTo hilang / tidak valid,
+src\components\navigation\navigation-state-link.tsx:263: "returnTo",
+src\components\navigation\navigation-state-link.tsx:292: * &returnTo=/tahfiz?page=4
+src\components\navigation\navigation-state-link.tsx:298: * &returnTo=/tahfiz?page=4
+src\components\navigation\navigation-state-link.tsx:30: type CarryReturnToLinkProps =
+src\components\navigation\navigation-state-link.tsx:303: export function CarryReturnToLink({
+src\components\navigation\navigation-state-link.tsx:306: }: CarryReturnToLinkProps) {
+src\components\navigation\navigation-state-link.tsx:310: const rawReturnTo =
+src\components\navigation\navigation-state-link.tsx:312: "returnTo",
+src\components\navigation\navigation-state-link.tsx:315: const safeReturnTo =
+src\components\navigation\navigation-state-link.tsx:317: rawReturnTo,
+src\components\navigation\navigation-state-link.tsx:322: safeReturnTo
+src\components\navigation\navigation-state-link.tsx:323: ? appendReturnTo(
+src\components\navigation\navigation-state-link.tsx:325: safeReturnTo,
+src\components\navigation\navigation-state-link.tsx:40: * Memastikan returnTo hanya menuju URL internal E-Ma'had.
+src\features\bendahara\payments\actions\cancel-bendahara-payment.ts:12: getServerActionReturnTo,
+src\features\bendahara\payments\actions\cancel-bendahara-payment.ts:171: await getServerActionReturnTo({
+src\features\bendahara\payments\actions\record-bendahara-bill-payment.ts:12: getServerActionReturnTo,
+src\features\bendahara\payments\actions\record-bendahara-bill-payment.ts:225: *   ?returnTo=/bendahara/tagihan?page=3
+src\features\bendahara\payments\actions\record-bendahara-bill-payment.ts:228: *   ?returnTo=/bendahara/tagihan/BILL?returnTo=...
+src\features\bendahara\payments\actions\record-bendahara-bill-payment.ts:232: * kembali ke detail BILL dengan returnTo daftar tetap utuh
+src\features\bendahara\payments\actions\record-bendahara-bill-payment.ts:239: await getServerActionReturnTo({
+src\features\bendahara\payments\components\bendahara-upload-payment-proof-form.tsx:197: * returnTo pada halaman upload harus menuju detail tagihan
+src\features\bendahara\payments\components\bendahara-upload-payment-proof-form.tsx:201: * query tersebut bisa berisi returnTo menuju daftar
+src\features\bendahara\payments\components\bendahara-upload-payment-proof-form.tsx:204: function getSafeDetailReturnTo({
+src\features\bendahara\payments\components\bendahara-upload-payment-proof-form.tsx:273: const detailReturnTo =
+src\features\bendahara\payments\components\bendahara-upload-payment-proof-form.tsx:274: getSafeDetailReturnTo({
+src\features\bendahara\payments\components\bendahara-upload-payment-proof-form.tsx:277: "returnTo",
+src\features\bendahara\payments\components\bendahara-upload-payment-proof-form.tsx:550: * ?returnTo=/bendahara/tagihan?page=...
+src\features\bendahara\payments\components\bendahara-upload-payment-proof-form.tsx:556: detailReturnTo,
+src\features\leadership\tahfiz\components\leadership-tahfiz-student-history.tsx:2: CarryReturnToLink,
+src\features\leadership\tahfiz\components\leadership-tahfiz-student-history.tsx:462: <CarryReturnToLink
+src\features\leadership\tahfiz\components\leadership-tahfiz-student-history.tsx:471: </CarryReturnToLink>
+src\features\leadership\tahfiz\components\leadership-tahfiz-student-history.tsx:483: <CarryReturnToLink
+src\features\leadership\tahfiz\components\leadership-tahfiz-student-history.tsx:488: </CarryReturnToLink>
+src\lib\navigation\get-server-action-return-to.ts:105: export async function getServerActionReturnTo({
+src\lib\navigation\get-server-action-return-to.ts:108: }: GetServerActionReturnToOptions): Promise<string> {
+src\lib\navigation\get-server-action-return-to.ts:127: const returnTo =
+src\lib\navigation\get-server-action-return-to.ts:129: "returnTo",
+src\lib\navigation\get-server-action-return-to.ts:132: return getSafeInternalReturnTo({
+src\lib\navigation\get-server-action-return-to.ts:134: returnTo,
+src\lib\navigation\get-server-action-return-to.ts:31: function getSafeInternalReturnTo({
+src\lib\navigation\get-server-action-return-to.ts:66: * Mencegah returnTo diarahkan ke domain eksternal.
+src\lib\navigation\get-server-action-return-to.ts:7: type GetServerActionReturnToOptions = {
+src\lib\navigation\get-server-action-return-to.ts:85: * terdapat returnTo menuju daftar sebelumnya.
+
+============================================================
+12_AVAILABLE_FALSE_CANDIDATES
+============================================================
+
+============================================================
+13_AUDIT_COMPLETED
+============================================================
+Audit generated at: 2026-08-13 21:30:13
+Report file: stage-186a-qa.txt

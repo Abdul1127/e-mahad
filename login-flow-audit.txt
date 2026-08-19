@@ -1,0 +1,1277 @@
+﻿
+============================================================
+FILE: src\app\(auth)\login\page.tsx
+============================================================
+import type { Metadata } from "next";
+
+import { LoginForm } from "@/features/auth/components/login-form";
+
+export const metadata: Metadata = {
+  title: "Login",
+
+  description:
+    "Masuk ke sistem informasi E-Ma'had menggunakan ID Pengguna.",
+};
+
+export default function LoginPage() {
+  return (
+    <main className="grid min-h-screen lg:grid-cols-2">
+      <section className="hidden bg-emerald-900 px-12 py-16 text-white lg:flex lg:flex-col lg:justify-between">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-[0.24em] text-emerald-200">
+            Sistem Informasi Pesantren
+          </p>
+
+          <h1 className="mt-6 text-6xl font-bold tracking-tight">
+            E-Ma&apos;had
+          </h1>
+
+          <p className="mt-6 max-w-xl text-lg leading-8 text-emerald-100">
+            Sistem terpusat untuk pengelolaan
+            dan pemantauan kegiatan asrama,
+            pengasuhan, tahfiz, dan keuangan
+            santri.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-emerald-700 bg-emerald-800/50 p-6">
+          <p className="text-sm leading-7 text-emerald-100">
+            Setiap pengguna memperoleh
+            dashboard dan cakupan data
+            berdasarkan role serta assignment
+            yang telah ditentukan.
+          </p>
+        </div>
+      </section>
+
+      <section className="flex items-center justify-center bg-slate-50 px-5 py-12 sm:px-8">
+        <div className="w-full max-w-md">
+          <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm sm:p-9">
+            <div className="mb-8">
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-700">
+                Selamat datang
+              </p>
+
+              <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
+                Masuk ke akun
+              </h2>
+
+              <p className="mt-3 leading-7 text-slate-600">
+                Gunakan ID Pengguna dan
+                password yang telah diberikan
+                oleh administrator.
+              </p>
+            </div>
+
+            <LoginForm />
+          </div>
+
+          <p className="mt-6 text-center text-sm text-slate-500">
+            Hubungi administrator apabila ID
+            Pengguna atau password tidak dapat
+            digunakan.
+          </p>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+============================================================
+FILE: src\app\(protected)\dashboard\page.tsx
+============================================================
+import { redirect } from "next/navigation";
+
+import { resolveDashboardPath } from "@/lib/auth/dashboard";
+import { getActiveRole } from "@/lib/auth/get-active-role";
+import { requireAccessContext } from "@/lib/auth/guards";
+
+export default async function DashboardResolverPage() {
+  const context = await requireAccessContext();
+  const activeRole = await getActiveRole();
+
+  redirect(
+    resolveDashboardPath(context, activeRole),
+  );
+}
+
+============================================================
+FILE: src\app\(protected)\select-role\page.tsx
+============================================================
+import { redirect } from "next/navigation";
+
+import { roleDefinitions } from "@/config/roles";
+import { RoleSelectionForm } from "@/features/auth/components/role-selection-form";
+import { requireAccessContext } from "@/lib/auth/guards";
+
+export default async function SelectRolePage() {
+  const context = await requireAccessContext();
+
+  if (context.roles.length === 1) {
+    redirect(
+      roleDefinitions[context.roles[0].code]
+        .dashboardPath,
+    );
+  }
+
+  return (
+    <main className="mx-auto max-w-5xl px-5 py-10 sm:px-8">
+      <section className="mb-8">
+        <p className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-700">
+          Pilih konteks kerja
+        </p>
+
+        <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
+          Gunakan E-Ma&apos;had sebagai
+        </h1>
+
+        <p className="mt-4 max-w-2xl leading-7 text-slate-600">
+          Akunmu mempunyai beberapa role. Pilih role
+          yang akan digunakan pada sesi kerja ini.
+        </p>
+      </section>
+
+      <RoleSelectionForm
+        roles={context.roles}
+      />
+    </main>
+  );
+}
+
+============================================================
+FILE: src\lib\auth\guards.ts
+============================================================
+import { redirect } from "next/navigation";
+
+import type { RoleCode } from "@/config/roles";
+
+import {
+  getAccessContext,
+  hasAssignedRole,
+} from "./get-access-context";
+import { getActiveRole } from "./get-active-role";
+import type { AccessContext } from "./types";
+
+export async function requireAccessContext(): Promise<AccessContext> {
+  const context = await getAccessContext();
+
+  if (!context) {
+    redirect("/login");
+  }
+
+  if (!context.isActive) {
+    redirect("/access-denied");
+  }
+
+  if (context.roles.length === 0) {
+    redirect("/access-denied");
+  }
+
+  return context;
+}
+
+export async function requireRole(
+  requiredRole: RoleCode,
+): Promise<AccessContext> {
+  const context = await requireAccessContext();
+
+  if (!hasAssignedRole(context, requiredRole)) {
+    redirect("/access-denied");
+  }
+
+  if (context.roles.length > 1) {
+    const activeRole = await getActiveRole();
+
+    const activeRoleIsAssigned =
+      activeRole !== null &&
+      hasAssignedRole(context, activeRole);
+
+    if (!activeRoleIsAssigned) {
+      redirect("/select-role");
+    }
+
+    if (activeRole !== requiredRole) {
+      redirect("/dashboard");
+    }
+  }
+
+  return context;
+}
+
+============================================================
+FILE: src\lib\auth\get-active-role.ts
+============================================================
+import { cookies } from "next/headers";
+
+import {
+  isRoleCode,
+  type RoleCode,
+} from "@/config/roles";
+
+import { ACTIVE_ROLE_COOKIE_NAME } from "./constants";
+
+export async function getActiveRole(): Promise<RoleCode | null> {
+  const cookieStore = await cookies();
+
+  const value = cookieStore.get(
+    ACTIVE_ROLE_COOKIE_NAME,
+  )?.value;
+
+  return isRoleCode(value) ? value : null;
+}
+
+============================================================
+FILE: src\lib\auth\get-access-context.ts
+============================================================
+import type { RoleCode } from "@/config/roles";
+import { isRoleCode } from "@/config/roles";
+import { createClient } from "@/lib/supabase/server";
+
+import type {
+  AccessContext,
+  UserRole,
+} from "./types";
+
+type ServerSupabaseClient = Awaited<
+  ReturnType<typeof createClient>
+>;
+
+function isRecord(
+  value: unknown,
+): value is Record<string, unknown> {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value)
+  );
+}
+
+function parseNullableString(
+  value: unknown,
+): string | null {
+  return typeof value === "string" ? value : null;
+}
+
+function parseRole(value: unknown): UserRole | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const code = value.code;
+  const name = value.name;
+
+  if (!isRoleCode(code) || typeof name !== "string") {
+    return null;
+  }
+
+  return {
+    code,
+    name,
+  };
+}
+
+function parseRoles(value: unknown): UserRole[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.reduce<UserRole[]>((roles, item) => {
+    const parsedRole = parseRole(item);
+
+    if (parsedRole) {
+      roles.push(parsedRole);
+    }
+
+    return roles;
+  }, []);
+}
+
+function parseAccessContext(
+  value: unknown,
+): AccessContext | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  if (
+    typeof value.user_id !== "string" ||
+    typeof value.full_name !== "string" ||
+    typeof value.is_active !== "boolean"
+  ) {
+    return null;
+  }
+
+  return {
+    userId: value.user_id,
+    email: parseNullableString(value.email),
+    fullName: value.full_name,
+    isActive: value.is_active,
+    staffId: parseNullableString(value.staff_id),
+    guardianId: parseNullableString(
+      value.guardian_id,
+    ),
+    roles: parseRoles(value.roles),
+  };
+}
+
+export async function getAccessContextWithClient(
+  supabase: ServerSupabaseClient,
+): Promise<AccessContext | null> {
+  const {
+    data: claimsData,
+    error: claimsError,
+  } = await supabase.auth.getClaims();
+
+  const subject = claimsData?.claims?.sub;
+
+  if (
+    claimsError ||
+    typeof subject !== "string" ||
+    !subject
+  ) {
+    return null;
+  }
+
+  const {
+    data: contextData,
+    error: contextError,
+  } = await supabase.rpc("get_my_access_context");
+
+  if (contextError) {
+    throw new Error(
+      `Gagal membaca konteks akses: ${contextError.message}`,
+    );
+  }
+
+  const context = parseAccessContext(contextData);
+
+  if (!context || context.userId !== subject) {
+    return null;
+  }
+
+  return context;
+}
+
+export async function getAccessContext(): Promise<AccessContext | null> {
+  const supabase = await createClient();
+
+  return getAccessContextWithClient(supabase);
+}
+
+export function hasAssignedRole(
+  context: AccessContext,
+  roleCode: RoleCode,
+): boolean {
+  return context.roles.some(
+    (role) => role.code === roleCode,
+  );
+}
+
+============================================================
+LOGIN RELATED FILES
+============================================================
+
+============================================================
+AUTH FEATURE FILES
+============================================================
+
+------------------------------------------------------------
+FILE: C:\Users\Nryuu\e-mahad\src\features\admin\guardians\data\get-admin-guardian-login-identity.ts
+------------------------------------------------------------
+import { createClient } from "@/lib/supabase/server";
+
+import {
+  guardianLoginIdentitySchema,
+  type GuardianLoginIdentityData,
+} from "../schemas/guardian-login-identity-schema";
+
+export async function getAdminGuardianLoginIdentity(
+  guardianId: string,
+): Promise<GuardianLoginIdentityData> {
+  const supabase = await createClient();
+
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "get_admin_guardian_login_identity",
+    {
+      p_guardian_id: guardianId,
+    },
+  );
+
+  if (error) {
+    throw new Error(
+      `Gagal membaca identitas login wali: ${error.message}`,
+    );
+  }
+
+  const validationResult =
+    guardianLoginIdentitySchema.safeParse(
+      data,
+    );
+
+  if (!validationResult.success) {
+    console.error(
+      "Response identitas login wali tidak valid:",
+      validationResult.error.flatten(),
+    );
+
+    throw new Error(
+      "Format identitas login wali tidak valid.",
+    );
+  }
+
+  return validationResult.data;
+}
+
+------------------------------------------------------------
+FILE: C:\Users\Nryuu\e-mahad\src\features\admin\guardians\schemas\guardian-login-identity-schema.ts
+------------------------------------------------------------
+import { z } from "zod";
+
+export const guardianLoginIdentitySchema =
+  z.object({
+    success: z.boolean(),
+
+    status: z.enum([
+      "candidate",
+      "existing",
+    ]),
+
+    guardian_id: z.string().uuid(),
+
+    profile_id: z
+      .string()
+      .uuid()
+      .nullable(),
+
+    full_name: z.string().min(1),
+
+    student_seed: z
+      .string()
+      .nullable()
+      .optional(),
+
+    login_id: z.string().min(1),
+
+    internal_auth_email: z
+      .string()
+      .email(),
+  });
+
+export type GuardianLoginIdentityData =
+  z.infer<
+    typeof guardianLoginIdentitySchema
+  >;
+
+------------------------------------------------------------
+FILE: C:\Users\Nryuu\e-mahad\src\features\admin\staff\data\get-admin-staff-login-identity.ts
+------------------------------------------------------------
+import { createClient } from "@/lib/supabase/server";
+
+import {
+  staffLoginIdentitySchema,
+  type StaffLoginIdentityData,
+} from "../schemas/staff-login-identity-schema";
+
+export async function getAdminStaffLoginIdentity(
+  staffId: string,
+): Promise<StaffLoginIdentityData> {
+  const supabase =
+    await createClient();
+
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "get_admin_staff_login_identity",
+    {
+      p_staff_id: staffId,
+    },
+  );
+
+  if (error) {
+    throw new Error(
+      `Gagal membaca identitas login staf: ${error.message}`,
+    );
+  }
+
+  const validationResult =
+    staffLoginIdentitySchema.safeParse(
+      data,
+    );
+
+  if (!validationResult.success) {
+    console.error(
+      "Response identitas login staf tidak valid:",
+      validationResult.error.flatten(),
+    );
+
+    throw new Error(
+      "Format identitas login staf tidak sesuai.",
+    );
+  }
+
+  return validationResult.data;
+}
+
+------------------------------------------------------------
+FILE: C:\Users\Nryuu\e-mahad\src\features\admin\staff\schemas\staff-login-identity-schema.ts
+------------------------------------------------------------
+import { z } from "zod";
+
+const staffLoginIdentityRoleSchema =
+  z.object({
+    code: z.string().min(1),
+    name: z.string().min(1),
+  });
+
+export const staffLoginIdentitySchema =
+  z.object({
+    success: z.boolean(),
+
+    status: z.enum([
+      "candidate",
+      "existing",
+    ]),
+
+    staff_id:
+      z.string().uuid(),
+
+    profile_id: z
+      .string()
+      .uuid()
+      .nullable(),
+
+    legacy_staff_id:
+      z.string().min(1),
+
+    full_name:
+      z.string().min(1),
+
+    position:
+      z.string().nullable(),
+
+    phone:
+      z.string().nullable(),
+
+    staff_is_active:
+      z.boolean(),
+
+    login_id:
+      z.string().min(1),
+
+    internal_auth_email:
+      z.string().email(),
+
+    roles: z.array(
+      staffLoginIdentityRoleSchema,
+    ),
+  });
+
+export type StaffLoginIdentityData =
+  z.infer<
+    typeof staffLoginIdentitySchema
+  >;
+
+------------------------------------------------------------
+FILE: C:\Users\Nryuu\e-mahad\src\features\auth\actions\login.ts
+------------------------------------------------------------
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
+import { roleDefinitions } from "@/config/roles";
+import { ACTIVE_ROLE_COOKIE_NAME } from "@/lib/auth/constants";
+import { getAccessContextWithClient } from "@/lib/auth/get-access-context";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
+
+import { loginSchema } from "../schemas/login-schema";
+import type { LoginActionState } from "../types/login-action-state";
+
+function invalidCredentialState(): LoginActionState {
+  return {
+    status: "error",
+    message:
+      "ID Pengguna atau password tidak sesuai.",
+    fieldErrors: {},
+  };
+}
+
+export async function loginAction(
+  _previousState: LoginActionState,
+  formData: FormData,
+): Promise<LoginActionState> {
+  const validationResult =
+    loginSchema.safeParse({
+      login_id:
+        formData.get("login_id"),
+
+      password:
+        formData.get("password"),
+    });
+
+  if (!validationResult.success) {
+    const fieldErrors =
+      validationResult.error.flatten()
+        .fieldErrors;
+
+    return {
+      status: "error",
+
+      message:
+        "Periksa kembali data login yang dimasukkan.",
+
+      fieldErrors: {
+        login_id:
+          fieldErrors.login_id,
+
+        password:
+          fieldErrors.password,
+      },
+    };
+  }
+
+  const loginId =
+    validationResult.data.login_id;
+
+  const password =
+    validationResult.data.password;
+
+  let authEmail: string;
+
+  try {
+    const adminSupabase =
+      createAdminClient();
+
+    /*
+     * Login ID disimpan di public.profiles.
+     * Admin Client diperlukan karena pengguna
+     * belum mempunyai session ketika proses
+     * login dimulai.
+     */
+    const {
+      data: profile,
+      error: profileLookupError,
+    } = await adminSupabase
+      .from("profiles")
+      .select("id")
+      .eq("login_id", loginId)
+      .maybeSingle();
+
+    if (profileLookupError) {
+      console.error(
+        "Gagal mencari profile berdasarkan login ID:",
+        {
+          loginId,
+          error:
+            profileLookupError.message,
+        },
+      );
+
+      return {
+        status: "error",
+
+        message:
+          "Layanan login sedang mengalami kendala. Silakan coba kembali.",
+
+        fieldErrors: {},
+      };
+    }
+
+    /*
+     * Jangan membedakan pesan antara ID tidak
+     * ditemukan dan password salah agar sistem
+     * tidak membocorkan daftar ID pengguna.
+     */
+    if (!profile) {
+      return invalidCredentialState();
+    }
+
+    const {
+      data: authUserData,
+      error: authUserLookupError,
+    } =
+      await adminSupabase.auth.admin.getUserById(
+        profile.id,
+      );
+
+    if (
+      authUserLookupError ||
+      !authUserData.user
+    ) {
+      console.error(
+        "Auth user untuk login ID tidak ditemukan:",
+        {
+          loginId,
+          profileId: profile.id,
+          error:
+            authUserLookupError?.message ??
+            "User tidak tersedia.",
+        },
+      );
+
+      return invalidCredentialState();
+    }
+
+    const resolvedEmail =
+      authUserData.user.email
+        ?.trim()
+        .toLowerCase();
+
+    if (!resolvedEmail) {
+      console.error(
+        "Auth user tidak mempunyai email:",
+        {
+          loginId,
+          profileId: profile.id,
+        },
+      );
+
+      return invalidCredentialState();
+    }
+
+    authEmail = resolvedEmail;
+  } catch (error) {
+    console.error(
+      "Supabase Admin Client gagal digunakan saat login:",
+      error,
+    );
+
+    return {
+      status: "error",
+
+      message:
+        "Layanan login belum dapat digunakan. Periksa konfigurasi server.",
+
+      fieldErrors: {},
+    };
+  }
+
+  /*
+   * Client biasa tetap digunakan agar session
+   * hasil login tersimpan ke cookie aplikasi.
+   */
+  const supabase =
+    await createClient();
+
+  const { error: loginError } =
+    await supabase.auth.signInWithPassword({
+      email: authEmail,
+      password,
+    });
+
+  if (loginError) {
+    return invalidCredentialState();
+  }
+
+  let accessContext;
+
+  try {
+    accessContext =
+      await getAccessContextWithClient(
+        supabase,
+      );
+  } catch (error) {
+    console.error(
+      "Gagal membaca akses setelah login:",
+      error,
+    );
+
+    await supabase.auth.signOut();
+
+    return {
+      status: "error",
+
+      message:
+        "Akun berhasil diverifikasi, tetapi data akses tidak dapat dibaca.",
+
+      fieldErrors: {},
+    };
+  }
+
+  if (!accessContext) {
+    await supabase.auth.signOut();
+
+    return {
+      status: "error",
+
+      message:
+        "Profile akun tidak ditemukan atau sesi tidak valid.",
+
+      fieldErrors: {},
+    };
+  }
+
+  if (!accessContext.isActive) {
+    await supabase.auth.signOut();
+
+    return {
+      status: "error",
+
+      message:
+        "Akun sedang tidak aktif. Hubungi administrator.",
+
+      fieldErrors: {},
+    };
+  }
+
+  if (
+    accessContext.roles.length === 0
+  ) {
+    await supabase.auth.signOut();
+
+    return {
+      status: "error",
+
+      message:
+        "Akun belum mempunyai role aplikasi.",
+
+      fieldErrors: {},
+    };
+  }
+
+  const cookieStore =
+    await cookies();
+
+  let destination =
+    "/select-role";
+
+  if (
+    accessContext.roles.length === 1
+  ) {
+    const assignedRole =
+      accessContext.roles[0].code;
+
+    cookieStore.set(
+      ACTIVE_ROLE_COOKIE_NAME,
+      assignedRole,
+      {
+        httpOnly: true,
+        sameSite: "lax",
+
+        secure:
+          process.env.NODE_ENV ===
+          "production",
+
+        path: "/",
+      },
+    );
+
+    destination =
+      roleDefinitions[assignedRole]
+        .dashboardPath;
+  } else {
+    cookieStore.delete(
+      ACTIVE_ROLE_COOKIE_NAME,
+    );
+  }
+
+  revalidatePath(
+    "/",
+    "layout",
+  );
+
+  redirect(destination);
+}
+
+------------------------------------------------------------
+FILE: C:\Users\Nryuu\e-mahad\src\features\auth\actions\logout.ts
+------------------------------------------------------------
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
+import { ACTIVE_ROLE_COOKIE_NAME } from "@/lib/auth/constants";
+import { createClient } from "@/lib/supabase/server";
+
+export async function logoutAction(): Promise<void> {
+  const supabase = await createClient();
+
+  await supabase.auth.signOut();
+
+  const cookieStore = await cookies();
+
+  cookieStore.delete(ACTIVE_ROLE_COOKIE_NAME);
+
+  revalidatePath("/", "layout");
+
+  redirect("/login");
+}
+
+------------------------------------------------------------
+FILE: C:\Users\Nryuu\e-mahad\src\features\auth\actions\select-active-role.ts
+------------------------------------------------------------
+"use server";
+
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
+import {
+  isRoleCode,
+  roleDefinitions,
+} from "@/config/roles";
+import { ACTIVE_ROLE_COOKIE_NAME } from "@/lib/auth/constants";
+import {
+  getAccessContext,
+  hasAssignedRole,
+} from "@/lib/auth/get-access-context";
+
+export async function selectActiveRoleAction(
+  formData: FormData,
+): Promise<void> {
+  const requestedRole = formData.get("role");
+
+  if (!isRoleCode(requestedRole)) {
+    redirect("/access-denied");
+  }
+
+  const context = await getAccessContext();
+
+  if (
+    !context ||
+    !context.isActive ||
+    !hasAssignedRole(context, requestedRole)
+  ) {
+    redirect("/access-denied");
+  }
+
+  const cookieStore = await cookies();
+
+  cookieStore.set(
+    ACTIVE_ROLE_COOKIE_NAME,
+    requestedRole,
+    {
+      httpOnly: true,
+      sameSite: "lax",
+      secure:
+        process.env.NODE_ENV === "production",
+      path: "/",
+    },
+  );
+
+  redirect(
+    roleDefinitions[requestedRole]
+      .dashboardPath,
+  );
+}
+
+------------------------------------------------------------
+FILE: C:\Users\Nryuu\e-mahad\src\features\auth\components\login-form.tsx
+------------------------------------------------------------
+"use client";
+
+import { useActionState } from "react";
+
+import { loginAction } from "@/features/auth/actions/login";
+import { initialLoginActionState } from "@/features/auth/types/login-action-state";
+
+export function LoginForm() {
+  const [
+    state,
+    formAction,
+    isPending,
+  ] = useActionState(
+    loginAction,
+    initialLoginActionState,
+  );
+
+  return (
+    <form
+      action={formAction}
+      className="space-y-5"
+    >
+      <div>
+        <label
+          htmlFor="login_id"
+          className="mb-2 block text-sm font-semibold text-slate-700"
+        >
+          ID Pengguna
+        </label>
+
+        <input
+          id="login_id"
+          name="login_id"
+          type="text"
+          autoComplete="username"
+          autoCapitalize="characters"
+          spellCheck={false}
+          required
+          maxLength={64}
+          disabled={isPending}
+          placeholder="Contoh: ADM-001"
+          aria-describedby="login-id-help login-id-error"
+          aria-invalid={Boolean(
+            state.fieldErrors.login_id,
+          )}
+          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 font-medium uppercase tracking-wide text-slate-900 outline-none transition placeholder:normal-case placeholder:tracking-normal placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+        />
+
+        <p
+          id="login-id-help"
+          className="mt-2 text-xs leading-5 text-slate-500"
+        >
+          Gunakan ID akun yang diberikan
+          oleh administrator.
+        </p>
+
+        <div
+          id="login-id-error"
+          className="mt-2 space-y-1"
+        >
+          {state.fieldErrors.login_id?.map(
+            (errorMessage) => (
+              <p
+                key={errorMessage}
+                className="text-sm text-red-600"
+              >
+                {errorMessage}
+              </p>
+            ),
+          )}
+        </div>
+      </div>
+
+      <div>
+        <label
+          htmlFor="password"
+          className="mb-2 block text-sm font-semibold text-slate-700"
+        >
+          Password
+        </label>
+
+        <input
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          required
+          disabled={isPending}
+          placeholder="Masukkan password"
+          aria-describedby="password-error"
+          aria-invalid={Boolean(
+            state.fieldErrors.password,
+          )}
+          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+        />
+
+        <div
+          id="password-error"
+          className="mt-2 space-y-1"
+        >
+          {state.fieldErrors.password?.map(
+            (errorMessage) => (
+              <p
+                key={errorMessage}
+                className="text-sm text-red-600"
+              >
+                {errorMessage}
+              </p>
+            ),
+          )}
+        </div>
+      </div>
+
+      {state.status === "error" && (
+        <div
+          role="alert"
+          aria-live="polite"
+          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700"
+        >
+          {state.message}
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={isPending}
+        className="flex w-full items-center justify-center rounded-xl bg-emerald-700 px-5 py-3 font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-emerald-400"
+      >
+        {isPending
+          ? "Memverifikasi akun..."
+          : "Masuk ke E-Ma'had"}
+      </button>
+    </form>
+  );
+}
+
+------------------------------------------------------------
+FILE: C:\Users\Nryuu\e-mahad\src\features\auth\components\logout-button.tsx
+------------------------------------------------------------
+"use client";
+
+import { AppIcon } from "@/components/app-shell/app-icon";
+
+import { logoutAction } from "../actions/logout";
+
+type LogoutButtonProps = {
+  variant?: "compact" | "menu";
+};
+
+export function LogoutButton({
+  variant = "compact",
+}: LogoutButtonProps) {
+  const buttonClassName =
+    variant === "menu"
+      ? "flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-left text-sm font-semibold text-red-700 transition hover:bg-red-50"
+      : "inline-flex min-h-10 items-center gap-2 rounded-xl border border-line bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50";
+
+  return (
+    <form action={logoutAction}>
+      <button
+        type="submit"
+        className={buttonClassName}
+      >
+        <AppIcon
+          name="logout"
+          className="size-4.5"
+        />
+
+        <span>Keluar</span>
+      </button>
+    </form>
+  );
+}
+
+------------------------------------------------------------
+FILE: C:\Users\Nryuu\e-mahad\src\features\auth\components\role-selection-form.tsx
+------------------------------------------------------------
+import { AppIcon } from "@/components/app-shell/app-icon";
+import { roleDefinitions } from "@/config/roles";
+import type { UserRole } from "@/lib/auth/types";
+
+import { selectActiveRoleAction } from "../actions/select-active-role";
+
+type RoleSelectionFormProps = {
+  roles: UserRole[];
+};
+
+export function RoleSelectionForm({
+  roles,
+}: RoleSelectionFormProps) {
+  return (
+    <div className="grid gap-4 md:grid-cols-2">
+      {roles.map((role) => {
+        const definition =
+          roleDefinitions[role.code];
+
+        return (
+          <form
+            key={role.code}
+            action={selectActiveRoleAction}
+          >
+            <input
+              type="hidden"
+              name="role"
+              value={role.code}
+            />
+
+            <button
+              type="submit"
+              className="group h-full w-full rounded-3xl border border-line bg-white p-6 text-left shadow-soft transition hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-panel"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="grid size-12 shrink-0 place-items-center rounded-2xl bg-brand-50 text-brand-700 transition group-hover:bg-brand-700 group-hover:text-white">
+                  <AppIcon
+                    name="switch"
+                    className="size-5"
+                  />
+                </div>
+
+                <AppIcon
+                  name="chevron-right"
+                  className="mt-1 size-5 text-slate-300 transition group-hover:translate-x-1 group-hover:text-brand-600"
+                />
+              </div>
+
+              <span className="mt-6 block text-xl font-bold text-ink">
+                {definition.label}
+              </span>
+
+              <span className="mt-2 block text-sm leading-6 text-muted">
+                {definition.description}
+              </span>
+
+              <span className="mt-6 block text-sm font-semibold text-brand-700">
+                Gunakan role ini
+              </span>
+            </button>
+          </form>
+        );
+      })}
+    </div>
+  );
+}
+
+------------------------------------------------------------
+FILE: C:\Users\Nryuu\e-mahad\src\features\auth\schemas\login-schema.ts
+------------------------------------------------------------
+import { z } from "zod";
+
+export const loginSchema = z.object({
+  login_id: z
+    .string()
+    .trim()
+    .min(
+      1,
+      "ID Pengguna wajib diisi.",
+    )
+    .max(
+      64,
+      "ID Pengguna maksimal 64 karakter.",
+    )
+    .transform((value) =>
+      value.toUpperCase(),
+    )
+    .refine(
+      (value) =>
+        /^[A-Z0-9]+(?:-[A-Z0-9]+)*$/.test(
+          value,
+        ),
+      {
+        message:
+          "Format ID Pengguna tidak valid.",
+      },
+    ),
+
+  password: z
+    .string()
+    .min(
+      1,
+      "Password wajib diisi.",
+    )
+    .max(
+      256,
+      "Password terlalu panjang.",
+    ),
+});
+
+export type LoginInput = z.infer<
+  typeof loginSchema
+>;
+
+------------------------------------------------------------
+FILE: C:\Users\Nryuu\e-mahad\src\features\auth\types\login-action-state.ts
+------------------------------------------------------------
+export type LoginActionState = {
+  status: "idle" | "error";
+  message: string;
+
+  fieldErrors: {
+    login_id?: string[];
+    password?: string[];
+  };
+};
+
+export const initialLoginActionState: LoginActionState =
+  {
+    status: "idle",
+    message: "",
+    fieldErrors: {},
+  };

@@ -7,6 +7,7 @@ import {
   type RoleCode,
 } from "@/config/roles";
 
+
 export type RoleNavigationItem = {
   label:
     string;
@@ -20,6 +21,23 @@ export type RoleNavigationItem = {
   available:
     boolean;
 };
+
+
+const accountNavigationItem =
+  {
+    label:
+      "Ubah Password",
+
+    href:
+      "/akun/password",
+
+    icon:
+      "shield",
+
+    available:
+      true,
+  } satisfies RoleNavigationItem;
+
 
 const roleNavigation = {
   admin: [
@@ -38,6 +56,9 @@ const roleNavigation = {
       available:
         true,
     },
+
+    accountNavigationItem,
+
     {
       label:
         "Data Santri",
@@ -92,6 +113,7 @@ const roleNavigation = {
     },
   ],
 
+
   penanggung_jawab: [
     {
       label:
@@ -108,6 +130,9 @@ const roleNavigation = {
       available:
         true,
     },
+
+    accountNavigationItem,
+
     {
       label:
         "Monitoring Asrama",
@@ -121,6 +146,21 @@ const roleNavigation = {
       available:
         true,
     },
+
+    {
+      label:
+        "Kondisi Pengasuhan",
+
+      href:
+        "/penanggung-jawab/pengasuhan",
+
+      icon:
+        "students",
+
+      available:
+        true,
+    },
+
     {
       label:
         "Jurnal Kepala Ma'had",
@@ -134,6 +174,7 @@ const roleNavigation = {
       available:
         true,
     },
+
     {
       label:
         "Perkembangan Tahfiz",
@@ -148,6 +189,7 @@ const roleNavigation = {
         true,
     },
   ],
+
 
   kepala_mahad: [
     {
@@ -165,6 +207,9 @@ const roleNavigation = {
       available:
         true,
     },
+
+    accountNavigationItem,
+
     {
       label:
         "Jurnal Pengasuhan",
@@ -178,6 +223,7 @@ const roleNavigation = {
       available:
         true,
     },
+
     {
       label:
         "Jurnal Kepala Ma'had",
@@ -191,6 +237,7 @@ const roleNavigation = {
       available:
         true,
     },
+
     {
       label:
         "Perkembangan Tahfiz",
@@ -204,6 +251,7 @@ const roleNavigation = {
       available:
         true,
     },
+
     {
       label:
         "Ringkasan Keuangan",
@@ -218,6 +266,7 @@ const roleNavigation = {
         true,
     },
   ],
+
 
   pengasuh: [
     {
@@ -235,6 +284,9 @@ const roleNavigation = {
       available:
         true,
     },
+
+    accountNavigationItem,
+
     {
       label:
         "Santri Ampuan",
@@ -248,6 +300,7 @@ const roleNavigation = {
       available:
         true,
     },
+
     {
       label:
         "Jurnal Pengasuhan",
@@ -261,6 +314,7 @@ const roleNavigation = {
       available:
         true,
     },
+
     {
       label:
         "Riwayat Pengasuhan",
@@ -275,6 +329,7 @@ const roleNavigation = {
         true,
     },
   ],
+
 
   pembina_tahfiz: [
     {
@@ -292,6 +347,9 @@ const roleNavigation = {
       available:
         true,
     },
+
+    accountNavigationItem,
+
     {
       label:
         "Laporan Mingguan",
@@ -305,6 +363,7 @@ const roleNavigation = {
       available:
         true,
     },
+
     {
       label:
         "Riwayat Laporan",
@@ -319,6 +378,7 @@ const roleNavigation = {
         true,
     },
   ],
+
 
   bendahara: [
     {
@@ -336,6 +396,9 @@ const roleNavigation = {
       available:
         true,
     },
+
+    accountNavigationItem,
+
     {
       label:
         "Tagihan",
@@ -349,6 +412,7 @@ const roleNavigation = {
       available:
         true,
     },
+
     {
       label:
         "Pembayaran",
@@ -362,6 +426,7 @@ const roleNavigation = {
       available:
         true,
     },
+
     {
       label:
         "Laporan Keuangan",
@@ -376,6 +441,7 @@ const roleNavigation = {
         true,
     },
   ],
+
 
   guardian: [
     {
@@ -393,6 +459,9 @@ const roleNavigation = {
       available:
         true,
     },
+
+    accountNavigationItem,
+
     {
       label:
         "Tagihan",
@@ -406,6 +475,7 @@ const roleNavigation = {
       available:
         true,
     },
+
     {
       label:
         "Riwayat Pembayaran",
@@ -425,6 +495,7 @@ const roleNavigation = {
   RoleNavigationItem[]
 >;
 
+
 export function getRoleNavigation(
   roleCode:
     RoleCode,
@@ -433,6 +504,7 @@ export function getRoleNavigation(
     roleCode
   ];
 }
+
 
 export function getCurrentNavigationItem(
   roleCode:
@@ -459,6 +531,7 @@ export function getCurrentNavigationItem(
           secondItem.href.length -
           firstItem.href.length,
       );
+
 
   return (
     availableItems.find(

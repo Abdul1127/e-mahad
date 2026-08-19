@@ -1,0 +1,6340 @@
+
+========================================
+C:\Users\Nryuu\e-mahad\src\app\(protected)\admin\kelompok\tahfiz\[groupId]\page.tsx
+========================================
+
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+
+import { AdminGroupAssignmentDetail } from "@/features/admin/groups/components/admin-group-assignment-detail";
+import { getAdminGroupAssignmentDetail } from "@/features/admin/groups/data/get-admin-group-assignment-detail";
+import { requireRole } from "@/lib/auth/guards";
+
+export const metadata: Metadata = {
+  title: "Detail Kelompok Tahfiz",
+};
+
+type PageProps = {
+  params: Promise<{
+    groupId: string;
+  }>;
+};
+
+export default async function AdminTahfizGroupDetailPage({
+  params,
+}: PageProps) {
+  await requireRole("admin");
+
+  const { groupId } =
+    await params;
+
+  const data =
+    await getAdminGroupAssignmentDetail(
+      "tahfiz",
+      groupId,
+    );
+
+  if (!data) {
+    notFound();
+  }
+
+  return (
+    <AdminGroupAssignmentDetail
+      data={data}
+    />
+  );
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\app\(protected)\[role]\tahfiz\[studentId]\page.tsx
+========================================
+
+import type {
+  Metadata,
+} from "next";
+
+import {
+  notFound,
+} from "next/navigation";
+
+import {
+  z,
+} from "zod";
+
+import {
+  getRoleCodeBySlug,
+} from "@/config/roles";
+
+import {
+  GuardianTahfizReportHistory,
+} from "@/features/guardian/tahfiz/components/guardian-tahfiz-report-history";
+
+import {
+  getGuardianTahfizReportHistory,
+} from "@/features/guardian/tahfiz/data/get-guardian-tahfiz-report-history";
+
+import {
+  parseGuardianTahfizReportHistoryQuery,
+  type GuardianTahfizReportHistorySearchParams,
+} from "@/features/guardian/tahfiz/lib/parse-guardian-tahfiz-report-history-query";
+
+import {
+  requireRole,
+} from "@/lib/auth/guards";
+
+export const metadata: Metadata = {
+  title:
+    "Riwayat Tahfiz",
+
+  description:
+    "Riwayat perkembangan Tahfiz santri E-Ma'had.",
+};
+
+const studentIdSchema =
+  z.string().uuid();
+
+type Props = {
+  params: Promise<{
+    role: string;
+    studentId: string;
+  }>;
+
+  searchParams:
+    Promise<GuardianTahfizReportHistorySearchParams>;
+};
+
+export default async function Page({
+  params,
+  searchParams,
+}: Props) {
+  const {
+    role,
+    studentId,
+  } = await params;
+
+  /*
+   * =====================================================
+   * ROLE
+   * =====================================================
+   */
+
+  if (
+    getRoleCodeBySlug(
+      role,
+    ) !==
+    "guardian"
+  ) {
+    notFound();
+  }
+
+  /*
+   * =====================================================
+   * STUDENT ID
+   * =====================================================
+   */
+
+  const studentValidation =
+    studentIdSchema.safeParse(
+      studentId,
+    );
+
+  if (
+    !studentValidation.success
+  ) {
+    notFound();
+  }
+
+  /*
+   * =====================================================
+   * AUTHORIZATION
+   * =====================================================
+   */
+
+  await requireRole(
+    "guardian",
+  );
+
+  /*
+   * =====================================================
+   * QUERY
+   * =====================================================
+   */
+
+  const query =
+    parseGuardianTahfizReportHistoryQuery(
+      await searchParams,
+    );
+
+  /*
+   * =====================================================
+   * DATA
+   * =====================================================
+   */
+
+  const data =
+    await getGuardianTahfizReportHistory(
+      studentValidation.data,
+      query,
+    );
+
+  return (
+    <GuardianTahfizReportHistory
+      data={data}
+      page={query.page}
+    />
+  );
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\guardian\dashboard\components\guardian-tahfiz-dashboard.tsx
+========================================
+
+import Link from "next/link";
+
+import type {
+  GuardianTahfizDashboardChild,
+  GuardianTahfizDashboardData,
+} from "../schemas/guardian-tahfiz-dashboard-schema";
+
+type Props = {
+  data:
+    GuardianTahfizDashboardData;
+};
+
+function formatDate(
+  value: string,
+): string {
+  return new Intl.DateTimeFormat(
+    "id-ID",
+    {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    },
+  ).format(
+    new Date(
+      `${value}T00:00:00Z`,
+    ),
+  );
+}
+
+function formatDateTime(
+  value: string,
+): string {
+  return new Intl.DateTimeFormat(
+    "id-ID",
+    {
+      dateStyle: "medium",
+      timeStyle: "short",
+    },
+  ).format(
+    new Date(
+      value,
+    ),
+  );
+}
+
+function getGenderLabel(
+  gender:
+    "male" | "female",
+): string {
+  return gender === "male"
+    ? "Putra"
+    : "Putri";
+}
+
+function getRatingLabel(
+  rating:
+    | "excellent"
+    | "good"
+    | "fair"
+    | "needs_guidance"
+    | null,
+): string {
+  switch (
+    rating
+  ) {
+    case "excellent":
+      return "Sangat Baik";
+
+    case "good":
+      return "Baik";
+
+    case "fair":
+      return "Cukup";
+
+    case "needs_guidance":
+      return "Perlu Bimbingan";
+
+    default:
+      return "-";
+  }
+}
+
+function getRelationshipLabel(
+  value:
+    string,
+): string {
+  switch (
+    value
+      .trim()
+      .toLowerCase()
+  ) {
+    case "father":
+      return "Ayah";
+
+    case "mother":
+      return "Ibu";
+
+    case "parent":
+      return "Orang Tua";
+
+    case "guardian":
+      return "Wali";
+
+    default:
+      return value;
+  }
+}
+
+function ChildCard({
+  child,
+}: {
+  child:
+    GuardianTahfizDashboardChild;
+}) {
+  const report =
+    child.latest_report;
+
+  return (
+    <article className="overflow-hidden rounded-3xl border border-line bg-white shadow-soft">
+      {/* STUDENT */}
+
+      <div className="border-b border-line p-5 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-2xl font-bold text-ink">
+                {
+                  child.student
+                    .full_name
+                }
+              </h2>
+
+              <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700">
+                {getGenderLabel(
+                  child.student
+                    .gender,
+                )}
+              </span>
+
+              {child.relationship
+                .is_primary_contact && (
+                <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">
+                  Kontak Utama
+                </span>
+              )}
+            </div>
+
+            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
+              {child.student
+                .nis && (
+                <span>
+                  NIS{" "}
+                  {
+                    child.student
+                      .nis
+                  }
+                </span>
+              )}
+
+              {child.class && (
+                <span>
+                  Kelas{" "}
+                  {
+                    child.class
+                      .name
+                  }
+                </span>
+              )}
+
+              <span>
+                Hubungan:{" "}
+                {getRelationshipLabel(
+                  child.relationship
+                    .type,
+                )}
+              </span>
+            </div>
+          </div>
+
+          <div className="w-fit rounded-2xl bg-brand-50 px-4 py-3 text-right">
+            <p className="text-xs font-medium text-brand-600">
+              Laporan Published
+            </p>
+
+            <p className="mt-1 text-2xl font-bold text-brand-900">
+              {
+                child.summary
+                  .published_report_count
+              }
+            </p>
+          </div>
+        </div>
+
+        {/* TAHFIZ GROUP */}
+
+        <div className="mt-5 rounded-2xl bg-slate-50 p-4">
+          <p className="text-xs font-medium text-muted">
+            Kelompok Tahfiz
+          </p>
+
+          {child.tahfiz_group ? (
+            <>
+              <p className="mt-1 font-semibold text-ink">
+                {
+                  child.tahfiz_group
+                    .name
+                }
+              </p>
+
+              <p className="mt-1 text-xs text-slate-400">
+                {
+                  child.tahfiz_group
+                    .code
+                }
+              </p>
+            </>
+          ) : (
+            <p className="mt-1 text-sm font-medium text-muted">
+              Belum tersedia
+            </p>
+          )}
+        </div>
+
+        {/* HISTORY BUTTON */}
+
+        <Link
+          href={`/wali/tahfiz/${child.student.id}`}
+          className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-brand-200 bg-white px-5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50 sm:w-auto"
+        >
+          Lihat Semua Riwayat Tahfiz
+        </Link>
+      </div>
+
+      {/* NO REPORT */}
+
+      {report === null ? (
+        <div className="p-5 sm:p-6">
+          <div className="rounded-2xl border border-dashed border-line bg-slate-50 p-6 text-center">
+            <h3 className="font-bold text-ink">
+              Belum ada laporan Tahfiz yang dipublikasikan
+            </h3>
+
+            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted">
+              Laporan Tahfiz akan
+              tampil di sini setelah
+              Pembina Tahfiz
+              mempublikasikannya.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="p-5 sm:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+                Laporan Tahfiz Terbaru
+              </p>
+
+              <h3 className="mt-2 text-xl font-bold text-ink">
+                {formatDate(
+                  report.week_start,
+                )}
+                {" – "}
+                {formatDate(
+                  report.week_end,
+                )}
+              </h3>
+            </div>
+
+            <span className="w-fit rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+              Published
+            </span>
+          </div>
+
+          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-2xl border border-line bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-600">
+                Capaian Hafalan Baru
+              </p>
+
+              <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-ink">
+                {
+                  report
+                    .memorization_achievement ??
+                  "-"
+                }
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-line bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-600">
+                Capaian Murajaah
+              </p>
+
+              <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-ink">
+                {
+                  report
+                    .murajaah_achievement ??
+                  "-"
+                }
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl bg-slate-50 p-4">
+              <p className="text-xs text-muted">
+                Kelancaran
+              </p>
+
+              <p className="mt-2 font-bold text-ink">
+                {getRatingLabel(
+                  report
+                    .fluency_rating,
+                )}
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-slate-50 p-4">
+              <p className="text-xs text-muted">
+                Tajwid
+              </p>
+
+              <p className="mt-2 font-bold text-ink">
+                {getRatingLabel(
+                  report
+                    .tajwid_rating,
+                )}
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-slate-50 p-4">
+              <p className="text-xs text-muted">
+                Konsistensi
+              </p>
+
+              <p className="mt-2 font-bold text-ink">
+                {getRatingLabel(
+                  report
+                    .consistency_rating,
+                )}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-2xl border border-line bg-white p-4">
+              <p className="text-xs font-semibold text-slate-500">
+                Catatan Pembina
+              </p>
+
+              <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-ink">
+                {
+                  report
+                    .supervisor_notes ??
+                  "-"
+                }
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-brand-100 bg-brand-50 p-4">
+              <p className="text-xs font-semibold text-brand-700">
+                Target Pekan Berikutnya
+              </p>
+
+              <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-brand-950">
+                {
+                  report
+                    .next_week_target ??
+                  "-"
+                }
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 border-t border-line pt-4">
+            <p className="text-xs text-slate-400">
+              Dipublikasikan{" "}
+              {formatDateTime(
+                report
+                  .published_at,
+              )}
+            </p>
+          </div>
+        </div>
+      )}
+    </article>
+  );
+}
+
+export function GuardianTahfizDashboard({
+  data,
+}: Props) {
+  return (
+    <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <section>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+          Orang Tua / Wali
+        </p>
+
+        <h1 className="mt-2 text-3xl font-bold text-ink">
+          Selamat datang,{" "}
+          {
+            data.guardian
+              .full_name
+          }
+        </h1>
+
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
+          Pantau perkembangan Tahfiz
+          anak melalui laporan yang
+          telah dipublikasikan oleh
+          Pembina Tahfiz.
+        </p>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
+            Tahun Ajaran{" "}
+            {
+              data.academic_year
+                .name
+            }
+          </span>
+
+          {data.profile
+            .login_id && (
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+              ID Login{" "}
+              {
+                data.profile
+                  .login_id
+              }
+            </span>
+          )}
+        </div>
+      </section>
+
+      <section className="mt-6 grid gap-4 sm:grid-cols-2">
+        <div className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
+          <p className="text-xs font-medium text-brand-700">
+            Anak Terhubung
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-brand-900">
+            {
+              data.summary
+                .child_count
+            }
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-line bg-white p-5 shadow-soft">
+          <p className="text-xs text-muted">
+            Laporan Tahfiz Published
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-ink">
+            {
+              data.summary
+                .published_report_count
+            }
+          </p>
+        </div>
+      </section>
+
+      <section className="mt-7">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+          Perkembangan Tahfiz
+        </p>
+
+        <h2 className="mt-2 text-2xl font-bold text-ink">
+          Anak Saya
+        </h2>
+
+        {data.children.length ===
+        0 ? (
+          <div className="mt-5 rounded-3xl border border-dashed border-line bg-white p-10 text-center">
+            <h3 className="font-bold text-ink">
+              Belum ada anak yang terhubung
+            </h3>
+
+            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted">
+              Akun Wali ini belum
+              memiliki relasi dengan
+              data santri.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-5 space-y-5">
+            {data.children.map(
+              (child) => (
+                <ChildCard
+                  key={
+                    child.student
+                      .id
+                  }
+                  child={child}
+                />
+              ),
+            )}
+          </div>
+        )}
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-blue-100 bg-blue-50 p-4 sm:p-5">
+        <p className="font-semibold text-blue-800">
+          Informasi yang ditampilkan
+        </p>
+
+        <p className="mt-1 max-w-4xl text-sm leading-6 text-blue-700">
+          Dashboard Orang Tua/Wali
+          hanya menampilkan
+          perkembangan Tahfiz anak
+          yang terhubung dengan akun
+          ini dan hanya laporan yang
+          sudah dipublikasikan oleh
+          Pembina Tahfiz.
+        </p>
+      </section>
+    </div>
+  );
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\guardian\dashboard\data\get-guardian-tahfiz-dashboard-data.ts
+========================================
+
+import {
+  createClient,
+} from "@/lib/supabase/server";
+
+import {
+  guardianTahfizDashboardSchema,
+  type GuardianTahfizDashboardData,
+} from "../schemas/guardian-tahfiz-dashboard-schema";
+
+export async function getGuardianTahfizDashboardData(): Promise<GuardianTahfizDashboardData> {
+  const supabase =
+    await createClient();
+
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "get_guardian_tahfiz_dashboard",
+  );
+
+  if (error) {
+    throw new Error(
+      `Gagal mengambil Dashboard Orang Tua/Wali: ${error.message}`,
+    );
+  }
+
+  const validation =
+    guardianTahfizDashboardSchema.safeParse(
+      data,
+    );
+
+  if (
+    !validation.success
+  ) {
+    console.error(
+      "Format Dashboard Orang Tua/Wali tidak valid:",
+      validation.error.flatten(),
+    );
+
+    throw new Error(
+      "Format Dashboard Orang Tua/Wali dari database tidak valid.",
+    );
+  }
+
+  return validation.data;
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\guardian\dashboard\schemas\guardian-tahfiz-dashboard-schema.ts
+========================================
+
+import { z } from "zod";
+
+const ratingSchema =
+  z.enum([
+    "excellent",
+    "good",
+    "fair",
+    "needs_guidance",
+  ]);
+
+const latestReportSchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    week_start:
+      z.string(),
+
+    week_end:
+      z.string(),
+
+    memorization_achievement:
+      z.string().nullable(),
+
+    murajaah_achievement:
+      z.string().nullable(),
+
+    fluency_rating:
+      ratingSchema.nullable(),
+
+    tajwid_rating:
+      ratingSchema.nullable(),
+
+    consistency_rating:
+      ratingSchema.nullable(),
+
+    supervisor_notes:
+      z.string().nullable(),
+
+    next_week_target:
+      z.string().nullable(),
+
+    status:
+      z.literal(
+        "published",
+      ),
+
+    published_at:
+      z.string(),
+
+    updated_at:
+      z.string(),
+  });
+
+const childSchema =
+  z.object({
+    relationship:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        type:
+          z.string(),
+
+        is_primary_contact:
+          z.boolean(),
+      }),
+
+    student:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        legacy_student_id:
+          z.string().nullable(),
+
+        nis:
+          z.string().nullable(),
+
+        full_name:
+          z.string(),
+
+        gender:
+          z.enum([
+            "male",
+            "female",
+          ]),
+      }),
+
+    class:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        name:
+          z.string(),
+
+        grade_level:
+          z.number()
+            .int(),
+      })
+        .nullable(),
+
+    tahfiz_group:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        code:
+          z.string(),
+
+        name:
+          z.string(),
+
+        gender:
+          z.enum([
+            "male",
+            "female",
+          ])
+            .nullable(),
+
+        grade_level:
+          z.number()
+            .int()
+            .nullable(),
+      })
+        .nullable(),
+
+    summary:
+      z.object({
+        published_report_count:
+          z.number()
+            .int()
+            .nonnegative(),
+      }),
+
+    latest_report:
+      latestReportSchema
+        .nullable(),
+  });
+
+export const guardianTahfizDashboardSchema =
+  z.object({
+    generated_at:
+      z.string(),
+
+    profile:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        login_id:
+          z.string().nullable(),
+      }),
+
+    guardian:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        legacy_guardian_id:
+          z.string().nullable(),
+
+        full_name:
+          z.string(),
+
+        phone:
+          z.string().nullable(),
+
+        email:
+          z.string().nullable(),
+      }),
+
+    academic_year:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        name:
+          z.string(),
+
+        start_date:
+          z.string(),
+
+        end_date:
+          z.string(),
+      }),
+
+    summary:
+      z.object({
+        child_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        published_report_count:
+          z.number()
+            .int()
+            .nonnegative(),
+      }),
+
+    children:
+      z.array(
+        childSchema,
+      ),
+  });
+
+export type GuardianTahfizDashboardData =
+  z.infer<
+    typeof guardianTahfizDashboardSchema
+  >;
+
+export type GuardianTahfizDashboardChild =
+  GuardianTahfizDashboardData["children"][number];
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\guardian\tahfiz\components\guardian-tahfiz-report-history.tsx
+========================================
+
+import Link from "next/link";
+
+import type {
+  GuardianTahfizReportHistoryData,
+} from "../schemas/guardian-tahfiz-report-history-schema";
+
+type Props = {
+  data:
+    GuardianTahfizReportHistoryData;
+
+  page:
+    number;
+};
+
+function formatDate(
+  value:
+    string,
+): string {
+  return new Intl.DateTimeFormat(
+    "id-ID",
+    {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    },
+  ).format(
+    new Date(
+      `${value}T00:00:00Z`,
+    ),
+  );
+}
+
+function formatDateTime(
+  value:
+    string,
+): string {
+  return new Intl.DateTimeFormat(
+    "id-ID",
+    {
+      dateStyle:
+        "medium",
+
+      timeStyle:
+        "short",
+    },
+  ).format(
+    new Date(
+      value,
+    ),
+  );
+}
+
+function ratingLabel(
+  value:
+    | "excellent"
+    | "good"
+    | "fair"
+    | "needs_guidance"
+    | null,
+): string {
+  switch (
+    value
+  ) {
+    case "excellent":
+      return "Sangat Baik";
+
+    case "good":
+      return "Baik";
+
+    case "fair":
+      return "Cukup";
+
+    case "needs_guidance":
+      return "Perlu Bimbingan";
+
+    default:
+      return "-";
+  }
+}
+
+function relationshipLabel(
+  value:
+    string,
+): string {
+  switch (
+    value
+      .trim()
+      .toLowerCase()
+  ) {
+    case "father":
+      return "Ayah";
+
+    case "mother":
+      return "Ibu";
+
+    case "parent":
+      return "Orang Tua";
+
+    case "guardian":
+      return "Wali";
+
+    default:
+      return value;
+  }
+}
+
+function buildPageHref(
+  studentId:
+    string,
+
+  page:
+    number,
+): string {
+  return `/wali/tahfiz/${studentId}?page=${page}`;
+}
+
+export function GuardianTahfizReportHistory({
+  data,
+  page,
+}: Props) {
+  return (
+    <div className="mx-auto w-full max-w-[1200px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
+
+      <section>
+        <Link
+          href="/wali/dashboard"
+          className="text-sm font-semibold text-brand-700 transition hover:text-brand-800"
+        >
+          ? Kembali ke Dashboard
+        </Link>
+
+        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+          Orang Tua / Wali
+        </p>
+
+        <h1 className="mt-2 text-3xl font-bold text-ink">
+          Riwayat Tahfiz
+        </h1>
+
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
+          Laporan perkembangan
+          Tahfiz yang telah
+          dipublikasikan oleh
+          Pembina Tahfiz.
+        </p>
+      </section>
+
+      {/* =====================================================
+          STUDENT
+      ===================================================== */}
+
+      <section className="mt-6 rounded-3xl border border-line bg-white p-5 shadow-soft sm:p-6">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-2xl font-bold text-ink">
+                {
+                  data.student
+                    .full_name
+                }
+              </h2>
+
+              <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700">
+                {data.student
+                  .gender ===
+                "male"
+                  ? "Putra"
+                  : "Putri"}
+              </span>
+
+              {data.relationship
+                .is_primary_contact && (
+                <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">
+                  Kontak Utama
+                </span>
+              )}
+            </div>
+
+            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted">
+              {data.student
+                .nis && (
+                <span>
+                  NIS{" "}
+                  {
+                    data.student
+                      .nis
+                  }
+                </span>
+              )}
+
+              <span>
+                Hubungan:{" "}
+                {relationshipLabel(
+                  data.relationship
+                    .type,
+                )}
+              </span>
+
+              <span>
+                Tahun Ajaran{" "}
+                {
+                  data.academic_year
+                    .name
+                }
+              </span>
+            </div>
+          </div>
+
+          <div className="w-fit rounded-2xl bg-brand-50 px-5 py-4">
+            <p className="text-xs font-medium text-brand-700">
+              Total Laporan
+            </p>
+
+            <p className="mt-1 text-3xl font-bold text-brand-900">
+              {
+                data.summary
+                  .published_report_count
+              }
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* =====================================================
+          LIST
+      ===================================================== */}
+
+      <section className="mt-7">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+          Laporan Published
+        </p>
+
+        <h2 className="mt-2 text-2xl font-bold text-ink">
+          Riwayat Pekanan
+        </h2>
+
+        {data.items.length ===
+        0 ? (
+          <div className="mt-5 rounded-3xl border border-dashed border-line bg-white p-10 text-center">
+            <h3 className="font-bold text-ink">
+              Belum ada laporan
+            </h3>
+
+            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted">
+              Belum terdapat
+              laporan Tahfiz yang
+              telah dipublikasikan
+              untuk santri ini.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-5 space-y-5">
+            {data.items.map(
+              (report) => (
+                <article
+                  key={
+                    report.id
+                  }
+                  className="overflow-hidden rounded-3xl border border-line bg-white shadow-soft"
+                >
+                  {/* REPORT HEADER */}
+
+                  <div className="border-b border-line p-5 sm:p-6">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-600">
+                          Periode Laporan
+                        </p>
+
+                        <h3 className="mt-2 text-xl font-bold text-ink">
+                          {formatDate(
+                            report.week_start,
+                          )}
+                          {" – "}
+                          {formatDate(
+                            report.week_end,
+                          )}
+                        </h3>
+
+                        <p className="mt-2 text-sm text-muted">
+                          {
+                            report
+                              .tahfiz_group
+                              .name
+                          }
+                        </p>
+                      </div>
+
+                      <span className="w-fit rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+                        Published
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* REPORT BODY */}
+
+                  <div className="p-5 sm:p-6">
+                    <div className="grid gap-4 lg:grid-cols-2">
+                      <div className="rounded-2xl border border-line p-4">
+                        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-600">
+                          Capaian Hafalan Baru
+                        </p>
+
+                        <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-ink">
+                          {
+                            report
+                              .memorization_achievement ??
+                            "-"
+                          }
+                        </p>
+                      </div>
+
+                      <div className="rounded-2xl border border-line p-4">
+                        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-600">
+                          Capaian Murajaah
+                        </p>
+
+                        <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-ink">
+                          {
+                            report
+                              .murajaah_achievement ??
+                            "-"
+                          }
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* RATINGS */}
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                      <div className="rounded-2xl bg-slate-50 p-4">
+                        <p className="text-xs text-muted">
+                          Kelancaran
+                        </p>
+
+                        <p className="mt-2 font-bold text-ink">
+                          {ratingLabel(
+                            report
+                              .fluency_rating,
+                          )}
+                        </p>
+                      </div>
+
+                      <div className="rounded-2xl bg-slate-50 p-4">
+                        <p className="text-xs text-muted">
+                          Tajwid
+                        </p>
+
+                        <p className="mt-2 font-bold text-ink">
+                          {ratingLabel(
+                            report
+                              .tajwid_rating,
+                          )}
+                        </p>
+                      </div>
+
+                      <div className="rounded-2xl bg-slate-50 p-4">
+                        <p className="text-xs text-muted">
+                          Konsistensi
+                        </p>
+
+                        <p className="mt-2 font-bold text-ink">
+                          {ratingLabel(
+                            report
+                              .consistency_rating,
+                          )}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* NOTES + TARGET */}
+
+                    <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                      <div className="rounded-2xl border border-line p-4">
+                        <p className="text-xs font-semibold text-slate-500">
+                          Catatan Pembina
+                        </p>
+
+                        <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-ink">
+                          {
+                            report
+                              .supervisor_notes ??
+                            "-"
+                          }
+                        </p>
+                      </div>
+
+                      <div className="rounded-2xl border border-brand-100 bg-brand-50 p-4">
+                        <p className="text-xs font-semibold text-brand-700">
+                          Target Pekan Berikutnya
+                        </p>
+
+                        <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-brand-950">
+                          {
+                            report
+                              .next_week_target ??
+                            "-"
+                          }
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 border-t border-line pt-4">
+                      <p className="text-xs text-slate-400">
+                        Dipublikasikan{" "}
+                        {formatDateTime(
+                          report
+                            .published_at,
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </article>
+              ),
+            )}
+          </div>
+        )}
+      </section>
+
+      {/* =====================================================
+          PAGINATION
+      ===================================================== */}
+
+      {(
+        data.pagination
+          .has_previous ||
+        data.pagination
+          .has_next
+      ) && (
+        <section className="mt-7 flex items-center justify-between gap-4">
+          <div>
+            {data.pagination
+              .has_previous ? (
+              <Link
+                href={buildPageHref(
+                  data.student.id,
+                  Math.max(
+                    page - 1,
+                    1,
+                  ),
+                )}
+                className="inline-flex min-h-10 items-center justify-center rounded-xl border border-line bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                ? Sebelumnya
+              </Link>
+            ) : (
+              <span />
+            )}
+          </div>
+
+          <p className="text-sm font-medium text-muted">
+            Halaman{" "}
+            {page}
+          </p>
+
+          <div>
+            {data.pagination
+              .has_next ? (
+              <Link
+                href={buildPageHref(
+                  data.student.id,
+                  page + 1,
+                )}
+                className="inline-flex min-h-10 items-center justify-center rounded-xl bg-brand-700 px-4 text-sm font-semibold text-white transition hover:bg-brand-800"
+              >
+                Berikutnya ?
+              </Link>
+            ) : (
+              <span />
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* =====================================================
+          INFO
+      ===================================================== */}
+
+      <section className="mt-6 rounded-2xl border border-blue-100 bg-blue-50 p-4 sm:p-5">
+        <p className="font-semibold text-blue-800">
+          Riwayat Tahfiz
+        </p>
+
+        <p className="mt-1 max-w-4xl text-sm leading-6 text-blue-700">
+          Halaman ini hanya
+          menampilkan laporan yang
+          sudah dipublikasikan oleh
+          Pembina Tahfiz. Draft tidak
+          ditampilkan kepada Orang
+          Tua/Wali.
+        </p>
+      </section>
+    </div>
+  );
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\guardian\tahfiz\data\get-guardian-tahfiz-report-history.ts
+========================================
+
+import {
+  z,
+} from "zod";
+
+import {
+  createClient,
+} from "@/lib/supabase/server";
+
+import type {
+  GuardianTahfizReportHistoryQuery,
+} from "../lib/parse-guardian-tahfiz-report-history-query";
+
+import {
+  guardianTahfizReportHistorySchema,
+  type GuardianTahfizReportHistoryData,
+} from "../schemas/guardian-tahfiz-report-history-schema";
+
+const studentIdSchema =
+  z.string().uuid();
+
+export async function getGuardianTahfizReportHistory(
+  studentId:
+    string,
+
+  query:
+    GuardianTahfizReportHistoryQuery,
+): Promise<GuardianTahfizReportHistoryData> {
+  const studentValidation =
+    studentIdSchema.safeParse(
+      studentId,
+    );
+
+  if (
+    !studentValidation.success
+  ) {
+    throw new Error(
+      "Student ID tidak valid.",
+    );
+  }
+
+  const supabase =
+    await createClient();
+
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "get_guardian_tahfiz_report_history",
+    {
+      p_student_id:
+        studentValidation.data,
+
+      p_limit:
+        query.limit,
+
+      p_offset:
+        query.offset,
+    },
+  );
+
+  if (error) {
+    throw new Error(
+      `Gagal mengambil Riwayat Tahfiz: ${error.message}`,
+    );
+  }
+
+  const validation =
+    guardianTahfizReportHistorySchema.safeParse(
+      data,
+    );
+
+  if (
+    !validation.success
+  ) {
+    console.error(
+      "Format Riwayat Tahfiz Wali tidak valid:",
+      validation.error.flatten(),
+    );
+
+    throw new Error(
+      "Format Riwayat Tahfiz dari database tidak valid.",
+    );
+  }
+
+  return validation.data;
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\guardian\tahfiz\lib\parse-guardian-tahfiz-report-history-query.ts
+========================================
+
+export type GuardianTahfizReportHistorySearchParams =
+  Record<
+    string,
+    string | string[] | undefined
+  >;
+
+export type GuardianTahfizReportHistoryQuery = {
+  page: number;
+  limit: number;
+  offset: number;
+};
+
+const PAGE_SIZE =
+  10;
+
+function firstValue(
+  value:
+    | string
+    | string[]
+    | undefined,
+): string | undefined {
+  return Array.isArray(value)
+    ? value[0]
+    : value;
+}
+
+export function parseGuardianTahfizReportHistoryQuery(
+  searchParams:
+    GuardianTahfizReportHistorySearchParams,
+): GuardianTahfizReportHistoryQuery {
+  const rawPage =
+    Number(
+      firstValue(
+        searchParams.page,
+      ) ?? "1",
+    );
+
+  const page =
+    Number.isInteger(
+      rawPage,
+    ) &&
+    rawPage > 0
+      ? rawPage
+      : 1;
+
+  return {
+    page,
+
+    limit:
+      PAGE_SIZE,
+
+    offset:
+      (
+        page - 1
+      ) *
+      PAGE_SIZE,
+  };
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\guardian\tahfiz\schemas\guardian-tahfiz-report-history-schema.ts
+========================================
+
+import { z } from "zod";
+
+const ratingSchema =
+  z.enum([
+    "excellent",
+    "good",
+    "fair",
+    "needs_guidance",
+  ]);
+
+const tahfizGroupSchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    code:
+      z.string(),
+
+    name:
+      z.string(),
+
+    gender:
+      z.enum([
+        "male",
+        "female",
+      ])
+        .nullable(),
+
+    grade_level:
+      z.number()
+        .int()
+        .nullable(),
+  });
+
+const reportSchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    week_start:
+      z.string(),
+
+    week_end:
+      z.string(),
+
+    memorization_achievement:
+      z.string().nullable(),
+
+    murajaah_achievement:
+      z.string().nullable(),
+
+    fluency_rating:
+      ratingSchema.nullable(),
+
+    tajwid_rating:
+      ratingSchema.nullable(),
+
+    consistency_rating:
+      ratingSchema.nullable(),
+
+    supervisor_notes:
+      z.string().nullable(),
+
+    next_week_target:
+      z.string().nullable(),
+
+    status:
+      z.literal(
+        "published",
+      ),
+
+    published_at:
+      z.string(),
+
+    updated_at:
+      z.string(),
+
+    tahfiz_group:
+      tahfizGroupSchema,
+  });
+
+export const guardianTahfizReportHistorySchema =
+  z.object({
+    generated_at:
+      z.string(),
+
+    guardian:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        full_name:
+          z.string(),
+      }),
+
+    academic_year:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        name:
+          z.string(),
+
+        start_date:
+          z.string(),
+
+        end_date:
+          z.string(),
+      }),
+
+    relationship:
+      z.object({
+        type:
+          z.string(),
+
+        is_primary_contact:
+          z.boolean(),
+      }),
+
+    student:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        legacy_student_id:
+          z.string().nullable(),
+
+        nis:
+          z.string().nullable(),
+
+        full_name:
+          z.string(),
+
+        gender:
+          z.enum([
+            "male",
+            "female",
+          ]),
+      }),
+
+    summary:
+      z.object({
+        published_report_count:
+          z.number()
+            .int()
+            .nonnegative(),
+      }),
+
+    pagination:
+      z.object({
+        limit:
+          z.number()
+            .int()
+            .positive(),
+
+        offset:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        has_previous:
+          z.boolean(),
+
+        has_next:
+          z.boolean(),
+      }),
+
+    items:
+      z.array(
+        reportSchema,
+      ),
+  });
+
+export type GuardianTahfizReportHistoryData =
+  z.infer<
+    typeof guardianTahfizReportHistorySchema
+  >;
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\dashboard\components\pembina-tahfiz-dashboard.tsx
+========================================
+
+import type {
+  PembinaTahfizDashboardData,
+  PembinaTahfizDashboardGroup,
+} from "../schemas/pembina-tahfiz-dashboard-schema";
+
+type Props = {
+  data:
+    PembinaTahfizDashboardData;
+};
+
+function getGenderLabel(
+  gender:
+    | "male"
+    | "female"
+    | null,
+): string {
+  switch (gender) {
+    case "male":
+      return "Putra";
+
+    case "female":
+      return "Putri";
+
+    default:
+      return "Campuran";
+  }
+}
+
+function GroupCard({
+  group,
+}: {
+  group:
+    PembinaTahfizDashboardGroup;
+}) {
+  return (
+    <article className="rounded-3xl border border-line bg-white p-5 shadow-soft sm:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <div className="flex flex-wrap gap-2">
+            <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700">
+              {getGenderLabel(
+                group.gender,
+              )}
+            </span>
+
+            {group.grade_level !==
+              null && (
+              <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                Tingkat{" "}
+                {
+                  group.grade_level
+                }
+              </span>
+            )}
+
+            {group.assignment
+              .is_primary && (
+              <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                Pembina Utama
+              </span>
+            )}
+          </div>
+
+          <h2 className="mt-3 text-xl font-bold text-ink">
+            {group.name}
+          </h2>
+
+          <p className="mt-1 text-sm text-muted">
+            Kode kelompok:{" "}
+            <span className="font-semibold text-slate-600">
+              {group.code}
+            </span>
+          </p>
+        </div>
+
+        <div className="rounded-2xl bg-brand-50 px-5 py-4 text-center">
+          <p className="text-3xl font-bold text-brand-900">
+            {
+              group.summary
+                .member_count
+            }
+          </p>
+
+          <p className="mt-1 text-xs font-medium text-brand-700">
+            Santri
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-5 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-2xl bg-slate-50 p-4">
+          <p className="text-xs text-muted">
+            Santri Putra
+          </p>
+
+          <p className="mt-1 text-xl font-bold text-ink">
+            {
+              group.summary
+                .male_count
+            }
+          </p>
+        </div>
+
+        <div className="rounded-2xl bg-slate-50 p-4">
+          <p className="text-xs text-muted">
+            Santri Putri
+          </p>
+
+          <p className="mt-1 text-xl font-bold text-ink">
+            {
+              group.summary
+                .female_count
+            }
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-6 border-t border-line pt-5">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-600">
+              Preview Santri
+            </p>
+
+            <p className="mt-1 text-sm text-muted">
+              Maksimal 8 santri
+              ditampilkan di
+              dashboard.
+            </p>
+          </div>
+        </div>
+
+        {group.member_preview
+          .length === 0 ? (
+          <div className="mt-4 rounded-2xl border border-dashed border-line p-5 text-center">
+            <p className="text-sm font-medium text-muted">
+              Belum ada santri
+              aktif pada kelompok
+              ini.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-4 divide-y divide-line overflow-hidden rounded-2xl border border-line">
+            {group.member_preview.map(
+              (student) => (
+                <div
+                  key={
+                    student.id
+                  }
+                  className="flex flex-col gap-2 bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-ink">
+                      {
+                        student.full_name
+                      }
+                    </p>
+
+                    <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-400">
+                      {student.nis && (
+                        <span>
+                          NIS{" "}
+                          {
+                            student.nis
+                          }
+                        </span>
+                      )}
+
+                      {student.class && (
+                        <span>
+                          Kelas{" "}
+                          {
+                            student.class
+                              .name
+                          }
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <span className="w-fit rounded-full bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-500">
+                    {student.gender ===
+                    "male"
+                      ? "Putra"
+                      : "Putri"}
+                  </span>
+                </div>
+              ),
+            )}
+          </div>
+        )}
+      </div>
+    </article>
+  );
+}
+
+export function PembinaTahfizDashboard({
+  data,
+}: Props) {
+  return (
+    <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
+
+      <section>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+          Pembina Tahfiz
+        </p>
+
+        <h1 className="mt-2 text-3xl font-bold text-ink">
+          Selamat datang,{" "}
+          {
+            data.staff
+              .full_name
+          }
+        </h1>
+
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
+          Pantau kelompok Tahfiz
+          dan santri yang menjadi
+          tanggung jawab Anda.
+        </p>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
+            Tahun Ajaran{" "}
+            {
+              data.academic_year
+                .name
+            }
+          </span>
+
+          {data.profile
+            .login_id && (
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+              {
+                data.profile
+                  .login_id
+              }
+            </span>
+          )}
+        </div>
+      </section>
+
+      {/* =====================================================
+          SUMMARY
+      ===================================================== */}
+
+      <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
+          <p className="text-xs font-medium text-brand-700">
+            Kelompok Ampuan
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-brand-900">
+            {
+              data.summary
+                .group_count
+            }
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-line bg-white p-5 shadow-soft">
+          <p className="text-xs text-muted">
+            Santri Ampuan
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-ink">
+            {
+              data.summary
+                .student_count
+            }
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5">
+          <p className="text-xs font-medium text-blue-700">
+            Santri Putra
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-blue-900">
+            {
+              data.summary
+                .male_count
+            }
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-pink-100 bg-pink-50 p-5">
+          <p className="text-xs font-medium text-pink-700">
+            Santri Putri
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-pink-900">
+            {
+              data.summary
+                .female_count
+            }
+          </p>
+        </div>
+      </section>
+
+      {/* =====================================================
+          GROUPS
+      ===================================================== */}
+
+      <section className="mt-8">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+            Assignment Aktif
+          </p>
+
+          <h2 className="mt-2 text-2xl font-bold text-ink">
+            Kelompok Tahfiz Ampuan
+          </h2>
+
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
+            Dashboard hanya
+            menampilkan kelompok
+            yang tercatat sebagai
+            assignment aktif Anda
+            pada tahun ajaran
+            berjalan.
+          </p>
+        </div>
+
+        {data.groups.length ===
+        0 ? (
+          <div className="mt-5 rounded-3xl border border-dashed border-line bg-white p-10 text-center">
+            <h3 className="font-bold text-ink">
+              Belum ada kelompok
+              Tahfiz
+            </h3>
+
+            <p className="mt-2 text-sm text-muted">
+              Akun Pembina belum
+              mempunyai assignment
+              kelompok aktif.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-5 grid gap-5 xl:grid-cols-2">
+            {data.groups.map(
+              (group) => (
+                <GroupCard
+                  key={
+                    group.id
+                  }
+                  group={
+                    group
+                  }
+                />
+              ),
+            )}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\dashboard\data\get-pembina-tahfiz-dashboard-data.ts
+========================================
+
+import {
+  createClient,
+} from "@/lib/supabase/server";
+
+import {
+  pembinaTahfizDashboardSchema,
+  type PembinaTahfizDashboardData,
+} from "../schemas/pembina-tahfiz-dashboard-schema";
+
+export async function getPembinaTahfizDashboardData(): Promise<PembinaTahfizDashboardData> {
+  const supabase =
+    await createClient();
+
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "get_pembina_tahfiz_dashboard",
+  );
+
+  if (error) {
+    throw new Error(
+      `Gagal mengambil Dashboard Pembina Tahfiz: ${error.message}`,
+    );
+  }
+
+  const validation =
+    pembinaTahfizDashboardSchema.safeParse(
+      data,
+    );
+
+  if (!validation.success) {
+    console.error(
+      "Format Dashboard Pembina Tahfiz tidak valid:",
+      validation.error.flatten(),
+    );
+
+    throw new Error(
+      "Format Dashboard Pembina Tahfiz dari database tidak valid.",
+    );
+  }
+
+  return validation.data;
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\dashboard\schemas\pembina-tahfiz-dashboard-schema.ts
+========================================
+
+import { z } from "zod";
+
+const memberPreviewSchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    legacy_student_id:
+      z.string().nullable(),
+
+    nis:
+      z.string().nullable(),
+
+    full_name:
+      z.string(),
+
+    gender:
+      z.enum([
+        "male",
+        "female",
+      ]),
+
+    class:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        name:
+          z.string(),
+
+        grade_level:
+          z.number().int(),
+      })
+        .nullable(),
+  });
+
+const tahfizGroupSchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    code:
+      z.string(),
+
+    name:
+      z.string(),
+
+    gender:
+      z.enum([
+        "male",
+        "female",
+      ])
+        .nullable(),
+
+    grade_level:
+      z.number()
+        .int()
+        .nullable(),
+
+    assignment:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        is_primary:
+          z.boolean(),
+
+        assigned_at:
+          z.string(),
+      }),
+
+    summary:
+      z.object({
+        member_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        male_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        female_count:
+          z.number()
+            .int()
+            .nonnegative(),
+      }),
+
+    member_preview:
+      z.array(
+        memberPreviewSchema,
+      ),
+  });
+
+export const pembinaTahfizDashboardSchema =
+  z.object({
+    generated_at:
+      z.string(),
+
+    profile:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        login_id:
+          z.string().nullable(),
+      }),
+
+    staff:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        legacy_staff_id:
+          z.string().nullable(),
+
+        full_name:
+          z.string(),
+
+        position:
+          z.string().nullable(),
+      }),
+
+    academic_year:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        name:
+          z.string(),
+
+        start_date:
+          z.string(),
+
+        end_date:
+          z.string(),
+      }),
+
+    summary:
+      z.object({
+        group_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        student_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        male_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        female_count:
+          z.number()
+            .int()
+            .nonnegative(),
+      }),
+
+    groups:
+      z.array(
+        tahfizGroupSchema,
+      ),
+  });
+
+export type PembinaTahfizDashboardData =
+  z.infer<
+    typeof pembinaTahfizDashboardSchema
+  >;
+
+export type PembinaTahfizDashboardGroup =
+  PembinaTahfizDashboardData["groups"][number];
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\students\components\pembina-tahfiz-student-list.tsx
+========================================
+
+import Link from "next/link";
+
+import type {
+  PembinaTahfizStudentListData,
+  PembinaTahfizStudentListItem,
+} from "../schemas/pembina-tahfiz-student-list-schema";
+
+type Props = {
+  data:
+    PembinaTahfizStudentListData;
+};
+
+function getGenderLabel(
+  gender:
+    "male" | "female",
+): string {
+  return gender === "male"
+    ? "Putra"
+    : "Putri";
+}
+
+function getGenderClassName(
+  gender:
+    "male" | "female",
+): string {
+  return gender === "male"
+    ? "bg-blue-50 text-blue-700"
+    : "bg-pink-50 text-pink-700";
+}
+
+function StudentCard({
+  student,
+}: {
+  student:
+    PembinaTahfizStudentListItem;
+}) {
+  return (
+    <article className="rounded-2xl border border-line bg-white p-4 shadow-soft sm:p-5">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-base font-bold text-ink sm:text-lg">
+              {
+                student.full_name
+              }
+            </h2>
+
+            <span
+              className={`rounded-full px-2.5 py-1 text-xs font-semibold ${getGenderClassName(
+                student.gender,
+              )}`}
+            >
+              {getGenderLabel(
+                student.gender,
+              )}
+            </span>
+          </div>
+
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
+            {student.nis && (
+              <span>
+                NIS{" "}
+                {
+                  student.nis
+                }
+              </span>
+            )}
+
+            {student.legacy_student_id && (
+              <span>
+                ID{" "}
+                {
+                  student.legacy_student_id
+                }
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-xl bg-brand-50 p-3">
+          <p className="text-xs font-medium text-brand-600">
+            Kelompok Tahfiz
+          </p>
+
+          <p className="mt-1 text-sm font-semibold text-brand-900">
+            {
+              student.tahfiz_group
+                .name
+            }
+          </p>
+
+          <p className="mt-1 text-xs text-brand-600">
+            {
+              student.tahfiz_group
+                .code
+            }
+          </p>
+        </div>
+
+        <div className="rounded-xl bg-slate-50 p-3">
+          <p className="text-xs text-muted">
+            Kelas
+          </p>
+
+          <p className="mt-1 text-sm font-semibold text-ink">
+            {student.class
+              ?.name ??
+              "Belum tersedia"}
+          </p>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export function PembinaTahfizStudentList({
+  data,
+}: Props) {
+  return (
+    <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
+
+      <section>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+          Pembina Tahfiz
+        </p>
+
+        <h1 className="mt-2 text-3xl font-bold text-ink">
+          Santri Tahfiz Ampuan
+        </h1>
+
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
+          Daftar santri yang berada
+          pada kelompok Tahfiz
+          assignment Anda pada tahun
+          ajaran berjalan.
+        </p>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
+            Tahun Ajaran{" "}
+            {
+              data.academic_year
+                .name
+            }
+          </span>
+
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+            {
+              data.staff
+                .full_name
+            }
+          </span>
+        </div>
+      </section>
+
+      {/* =====================================================
+          SUMMARY
+      ===================================================== */}
+
+      <section className="mt-6 grid gap-4 sm:grid-cols-3">
+        <div className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
+          <p className="text-xs font-medium text-brand-700">
+            Kelompok Ampuan
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-brand-900">
+            {
+              data.summary
+                .group_count
+            }
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-line bg-white p-5 shadow-soft">
+          <p className="text-xs text-muted">
+            Total Santri
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-ink">
+            {
+              data.summary
+                .student_count
+            }
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-line bg-white p-5 shadow-soft">
+          <p className="text-xs text-muted">
+            Hasil Pencarian
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-ink">
+            {
+              data.summary
+                .filtered_count
+            }
+          </p>
+        </div>
+      </section>
+
+      {/* =====================================================
+          SEARCH
+      ===================================================== */}
+
+      <section className="mt-6 rounded-2xl border border-line bg-white p-4 shadow-soft sm:p-5">
+        <form
+          action="/pembina-tahfiz/santri"
+          method="get"
+          className="flex flex-col gap-3 sm:flex-row"
+        >
+          <div className="flex-1">
+            <label
+              htmlFor="search"
+              className="mb-2 block text-xs font-semibold text-slate-600"
+            >
+              Cari Santri
+            </label>
+
+            <input
+              id="search"
+              name="search"
+              type="search"
+              defaultValue={
+                data.filters.search ??
+                ""
+              }
+              placeholder="Cari nama, NIS, ID santri, atau kelompok Tahfiz..."
+              className="min-h-11 w-full rounded-xl border border-line bg-white px-4 text-sm text-ink outline-none placeholder:text-slate-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-50"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="min-h-11 self-end rounded-xl bg-brand-700 px-6 text-sm font-semibold text-white transition hover:bg-brand-800"
+          >
+            Cari
+          </button>
+        </form>
+
+        {data.filters.search && (
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+            <span className="text-muted">
+              Pencarian:
+            </span>
+
+            <span className="font-semibold text-ink">
+              &quot;
+              {
+                data.filters.search
+              }
+              &quot;
+            </span>
+
+            <Link
+              href="/pembina-tahfiz/santri"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
+              Reset
+            </Link>
+          </div>
+        )}
+      </section>
+
+      {/* =====================================================
+          LIST
+      ===================================================== */}
+
+      <section className="mt-7">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+              Assignment Tahfiz
+            </p>
+
+            <h2 className="mt-2 text-2xl font-bold text-ink">
+              Daftar Santri
+            </h2>
+          </div>
+
+          <p className="text-sm text-muted">
+            {
+              data.summary
+                .filtered_count
+            }{" "}
+            santri ditampilkan
+          </p>
+        </div>
+
+        {data.items.length ===
+        0 ? (
+          <div className="mt-5 rounded-3xl border border-dashed border-line bg-white p-10 text-center">
+            <h3 className="font-bold text-ink">
+              Santri tidak ditemukan
+            </h3>
+
+            <p className="mt-2 text-sm text-muted">
+              Tidak ada santri
+              Tahfiz ampuan yang
+              sesuai dengan
+              pencarian.
+            </p>
+
+            {data.filters.search && (
+              <Link
+                href="/pembina-tahfiz/santri"
+                className="mt-4 inline-flex min-h-10 items-center justify-center rounded-xl bg-brand-700 px-4 text-sm font-semibold text-white"
+              >
+                Tampilkan Semua
+              </Link>
+            )}
+          </div>
+        ) : (
+          <div className="mt-5 grid gap-4 xl:grid-cols-2">
+            {data.items.map(
+              (student) => (
+                <StudentCard
+                  key={
+                    student.id
+                  }
+                  student={
+                    student
+                  }
+                />
+              ),
+            )}
+          </div>
+        )}
+      </section>
+
+      {/* =====================================================
+          INFO
+      ===================================================== */}
+
+      <section className="mt-6 rounded-2xl border border-blue-100 bg-blue-50 p-4 sm:p-5">
+        <p className="font-semibold text-blue-800">
+          Pengelolaan kelompok tetap
+          dilakukan oleh Admin
+        </p>
+
+        <p className="mt-1 max-w-3xl text-sm leading-6 text-blue-700">
+          Pembina Tahfiz hanya
+          melihat santri berdasarkan
+          assignment kelompoknya.
+          Pemindahan santri atau
+          perubahan assignment tidak
+          dilakukan dari halaman ini.
+        </p>
+      </section>
+    </div>
+  );
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\students\data\get-pembina-tahfiz-student-list.ts
+========================================
+
+import {
+  createClient,
+} from "@/lib/supabase/server";
+
+import type {
+  PembinaTahfizStudentListQuery,
+} from "../lib/parse-pembina-tahfiz-student-list-query";
+
+import {
+  pembinaTahfizStudentListSchema,
+  type PembinaTahfizStudentListData,
+} from "../schemas/pembina-tahfiz-student-list-schema";
+
+export async function getPembinaTahfizStudentList(
+  query:
+    PembinaTahfizStudentListQuery,
+): Promise<PembinaTahfizStudentListData> {
+  const supabase =
+    await createClient();
+
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "get_pembina_tahfiz_student_list",
+    {
+      p_search:
+        query.search,
+    },
+  );
+
+  if (error) {
+    throw new Error(
+      `Gagal mengambil Santri Tahfiz Ampuan: ${error.message}`,
+    );
+  }
+
+  const validation =
+    pembinaTahfizStudentListSchema.safeParse(
+      data,
+    );
+
+  if (!validation.success) {
+    console.error(
+      "Format Santri Tahfiz Ampuan tidak valid:",
+      validation.error.flatten(),
+    );
+
+    throw new Error(
+      "Format Santri Tahfiz Ampuan dari database tidak valid.",
+    );
+  }
+
+  return validation.data;
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\students\lib\parse-pembina-tahfiz-student-list-query.ts
+========================================
+
+export type PembinaTahfizStudentListSearchParams =
+  Record<
+    string,
+    string | string[] | undefined
+  >;
+
+export type PembinaTahfizStudentListQuery = {
+  search:
+    string | null;
+};
+
+function firstValue(
+  value:
+    | string
+    | string[]
+    | undefined,
+): string | undefined {
+  return Array.isArray(value)
+    ? value[0]
+    : value;
+}
+
+export function parsePembinaTahfizStudentListQuery(
+  searchParams:
+    PembinaTahfizStudentListSearchParams,
+): PembinaTahfizStudentListQuery {
+  const rawSearch =
+    firstValue(
+      searchParams.search,
+    )?.trim();
+
+  return {
+    search:
+      rawSearch &&
+      rawSearch.length > 0
+        ? rawSearch
+        : null,
+  };
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\students\schemas\pembina-tahfiz-student-list-schema.ts
+========================================
+
+import { z } from "zod";
+
+const tahfizGroupSchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    code:
+      z.string(),
+
+    name:
+      z.string(),
+
+    gender:
+      z.enum([
+        "male",
+        "female",
+      ])
+        .nullable(),
+
+    grade_level:
+      z.number()
+        .int()
+        .nullable(),
+  });
+
+const classSchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    name:
+      z.string(),
+
+    grade_level:
+      z.number()
+        .int(),
+  });
+
+const studentItemSchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    legacy_student_id:
+      z.string()
+        .nullable(),
+
+    nis:
+      z.string()
+        .nullable(),
+
+    full_name:
+      z.string(),
+
+    gender:
+      z.enum([
+        "male",
+        "female",
+      ]),
+
+    tahfiz_group:
+      tahfizGroupSchema,
+
+    class:
+      classSchema
+        .nullable(),
+  });
+
+export const pembinaTahfizStudentListSchema =
+  z.object({
+    generated_at:
+      z.string(),
+
+    profile:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        login_id:
+          z.string()
+            .nullable(),
+      }),
+
+    staff:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        legacy_staff_id:
+          z.string()
+            .nullable(),
+
+        full_name:
+          z.string(),
+
+        position:
+          z.string()
+            .nullable(),
+      }),
+
+    academic_year:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        name:
+          z.string(),
+
+        start_date:
+          z.string(),
+
+        end_date:
+          z.string(),
+      }),
+
+    filters:
+      z.object({
+        search:
+          z.string()
+            .nullable(),
+      }),
+
+    summary:
+      z.object({
+        group_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        student_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        filtered_count:
+          z.number()
+            .int()
+            .nonnegative(),
+      }),
+
+    items:
+      z.array(
+        studentItemSchema,
+      ),
+  });
+
+export type PembinaTahfizStudentListData =
+  z.infer<
+    typeof pembinaTahfizStudentListSchema
+  >;
+
+export type PembinaTahfizStudentListItem =
+  PembinaTahfizStudentListData["items"][number];
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\weekly-reports\actions\save-pembina-tahfiz-weekly-report.ts
+========================================
+
+"use server";
+
+import {
+  revalidatePath,
+} from "next/cache";
+
+import {
+  redirect,
+} from "next/navigation";
+
+import {
+  z,
+} from "zod";
+
+import {
+  requireRole,
+} from "@/lib/auth/guards";
+
+import {
+  createClient,
+} from "@/lib/supabase/server";
+
+import type {
+  PembinaTahfizWeeklyReportActionState,
+} from "../types/pembina-tahfiz-weekly-report-action-state";
+
+const ratingSchema =
+  z.union([
+    z.literal(""),
+    z.enum([
+      "excellent",
+      "good",
+      "fair",
+      "needs_guidance",
+    ]),
+  ]);
+
+const inputSchema =
+  z.object({
+    studentId:
+      z.string()
+        .uuid(),
+
+    weekStart:
+      z.string()
+        .regex(
+          /^\d{4}-\d{2}-\d{2}$/,
+          "Tanggal pekan tidak valid.",
+        ),
+
+    memorizationAchievement:
+      z.string()
+        .trim()
+        .max(
+          5000,
+          "Capaian hafalan maksimal 5.000 karakter.",
+        ),
+
+    murajaahAchievement:
+      z.string()
+        .trim()
+        .max(
+          5000,
+          "Capaian murajaah maksimal 5.000 karakter.",
+        ),
+
+    fluencyRating:
+      ratingSchema,
+
+    tajwidRating:
+      ratingSchema,
+
+    consistencyRating:
+      ratingSchema,
+
+    supervisorNotes:
+      z.string()
+        .trim()
+        .max(
+          5000,
+          "Catatan Pembina maksimal 5.000 karakter.",
+        ),
+
+    nextWeekTarget:
+      z.string()
+        .trim()
+        .max(
+          5000,
+          "Target pekan berikutnya maksimal 5.000 karakter.",
+        ),
+
+    intent:
+      z.enum([
+        "save",
+        "publish",
+      ]),
+  });
+
+const saveResponseSchema =
+  z.object({
+    success:
+      z.boolean(),
+
+    report_id:
+      z.string()
+        .uuid(),
+
+    student_id:
+      z.string()
+        .uuid(),
+
+    tahfiz_group_id:
+      z.string()
+        .uuid(),
+
+    week_start:
+      z.string(),
+
+    week_end:
+      z.string(),
+
+    status:
+      z.enum([
+        "draft",
+        "published",
+      ]),
+
+    saved_at:
+      z.string(),
+  });
+
+const publishResponseSchema =
+  z.object({
+    success:
+      z.boolean(),
+
+    report_id:
+      z.string()
+        .uuid(),
+
+    student_id:
+      z.string()
+        .uuid(),
+
+    week_start:
+      z.string(),
+
+    status:
+      z.literal(
+        "published",
+      ),
+
+    published_at:
+      z.string(),
+
+    published_by_staff_id:
+      z.string()
+        .uuid(),
+  });
+
+export async function savePembinaTahfizWeeklyReport(
+  _previousState:
+    PembinaTahfizWeeklyReportActionState,
+
+  formData:
+    FormData,
+): Promise<PembinaTahfizWeeklyReportActionState> {
+  await requireRole(
+    "pembina_tahfiz",
+  );
+
+  const validation =
+    inputSchema.safeParse({
+      studentId:
+        formData.get(
+          "studentId",
+        ),
+
+      weekStart:
+        formData.get(
+          "weekStart",
+        ),
+
+      memorizationAchievement:
+        formData.get(
+          "memorizationAchievement",
+        ) ?? "",
+
+      murajaahAchievement:
+        formData.get(
+          "murajaahAchievement",
+        ) ?? "",
+
+      fluencyRating:
+        formData.get(
+          "fluencyRating",
+        ) ?? "",
+
+      tajwidRating:
+        formData.get(
+          "tajwidRating",
+        ) ?? "",
+
+      consistencyRating:
+        formData.get(
+          "consistencyRating",
+        ) ?? "",
+
+      supervisorNotes:
+        formData.get(
+          "supervisorNotes",
+        ) ?? "",
+
+      nextWeekTarget:
+        formData.get(
+          "nextWeekTarget",
+        ) ?? "",
+
+      intent:
+        formData.get(
+          "intent",
+        ),
+    });
+
+  if (!validation.success) {
+    return {
+      status: "error",
+
+      message:
+        validation.error
+          .issues[0]
+          ?.message ??
+        "Data laporan belum valid.",
+    };
+  }
+
+  /*
+   * Untuk Publish, lakukan validasi awal
+   * agar Pembina mendapat pesan yang jelas
+   * sebelum RPC publish dipanggil.
+   */
+  if (
+    validation.data.intent ===
+    "publish"
+  ) {
+    if (
+      validation.data
+        .memorizationAchievement
+        .length === 0
+    ) {
+      return {
+        status: "error",
+        message:
+          "Capaian hafalan baru wajib diisi sebelum laporan dipublikasikan.",
+      };
+    }
+
+    if (
+      validation.data
+        .murajaahAchievement
+        .length === 0
+    ) {
+      return {
+        status: "error",
+        message:
+          "Capaian murajaah wajib diisi sebelum laporan dipublikasikan.",
+      };
+    }
+
+    if (
+      validation.data
+        .fluencyRating ===
+      ""
+    ) {
+      return {
+        status: "error",
+        message:
+          "Penilaian kelancaran wajib dipilih sebelum laporan dipublikasikan.",
+      };
+    }
+
+    if (
+      validation.data
+        .tajwidRating ===
+      ""
+    ) {
+      return {
+        status: "error",
+        message:
+          "Penilaian tajwid wajib dipilih sebelum laporan dipublikasikan.",
+      };
+    }
+
+    if (
+      validation.data
+        .consistencyRating ===
+      ""
+    ) {
+      return {
+        status: "error",
+        message:
+          "Penilaian konsistensi wajib dipilih sebelum laporan dipublikasikan.",
+      };
+    }
+
+    if (
+      validation.data
+        .nextWeekTarget
+        .length === 0
+    ) {
+      return {
+        status: "error",
+        message:
+          "Target pekan berikutnya wajib diisi sebelum laporan dipublikasikan.",
+      };
+    }
+  }
+
+  const supabase =
+    await createClient();
+
+  /*
+   * =====================================================
+   * 1. SAVE
+   * =====================================================
+   */
+
+  const {
+    data:
+      saveData,
+    error:
+      saveError,
+  } = await supabase.rpc(
+    "save_pembina_tahfiz_weekly_report",
+    {
+      p_student_id:
+        validation.data
+          .studentId,
+
+      p_week_start:
+        validation.data
+          .weekStart,
+
+      p_memorization_achievement:
+        validation.data
+          .memorizationAchievement
+          .length > 0
+          ? validation.data
+              .memorizationAchievement
+          : null,
+
+      p_murajaah_achievement:
+        validation.data
+          .murajaahAchievement
+          .length > 0
+          ? validation.data
+              .murajaahAchievement
+          : null,
+
+      p_fluency_rating:
+        validation.data
+          .fluencyRating ||
+        null,
+
+      p_tajwid_rating:
+        validation.data
+          .tajwidRating ||
+        null,
+
+      p_consistency_rating:
+        validation.data
+          .consistencyRating ||
+        null,
+
+      p_supervisor_notes:
+        validation.data
+          .supervisorNotes
+          .length > 0
+          ? validation.data
+              .supervisorNotes
+          : null,
+
+      p_next_week_target:
+        validation.data
+          .nextWeekTarget
+          .length > 0
+          ? validation.data
+              .nextWeekTarget
+          : null,
+    },
+  );
+
+  if (saveError) {
+    console.error(
+      "Gagal menyimpan Laporan Tahfiz:",
+      saveError,
+    );
+
+    return {
+      status: "error",
+      message:
+        saveError.message,
+    };
+  }
+
+  const saveValidation =
+    saveResponseSchema.safeParse(
+      saveData,
+    );
+
+  if (!saveValidation.success) {
+    console.error(
+      "Response save Laporan Tahfiz tidak valid:",
+      saveValidation.error.flatten(),
+    );
+
+    return {
+      status: "error",
+      message:
+        "Format response penyimpanan laporan tidak valid.",
+    };
+  }
+
+  /*
+   * =====================================================
+   * 2. PUBLISH
+   * =====================================================
+   */
+
+  if (
+    validation.data.intent ===
+    "publish"
+  ) {
+    const {
+      data:
+        publishData,
+      error:
+        publishError,
+    } = await supabase.rpc(
+      "publish_pembina_tahfiz_weekly_report",
+      {
+        p_student_id:
+          validation.data
+            .studentId,
+
+        p_week_start:
+          validation.data
+            .weekStart,
+      },
+    );
+
+    if (publishError) {
+      console.error(
+        "Gagal mempublikasikan Laporan Tahfiz:",
+        publishError,
+      );
+
+      /*
+       * Save yang dilakukan sebelumnya tetap
+       * tersimpan sebagai draft. Ini disengaja
+       * agar input Pembina tidak hilang.
+       */
+      return {
+        status: "error",
+
+        message:
+          `Draft berhasil disimpan, tetapi publikasi gagal: ${publishError.message}`,
+      };
+    }
+
+    const publishValidation =
+      publishResponseSchema.safeParse(
+        publishData,
+      );
+
+    if (
+      !publishValidation.success
+    ) {
+      console.error(
+        "Response publish Laporan Tahfiz tidak valid:",
+        publishValidation.error.flatten(),
+      );
+
+      return {
+        status: "error",
+
+        message:
+          "Laporan berhasil disimpan tetapi format response publikasi tidak valid.",
+      };
+    }
+  }
+
+  /*
+   * =====================================================
+   * 3. REFRESH DATA
+   * =====================================================
+   */
+
+  const studentId =
+    validation.data
+      .studentId;
+
+  const weekStart =
+    validation.data
+      .weekStart;
+
+  revalidatePath(
+    "/pembina-tahfiz/laporan",
+  );
+
+  revalidatePath(
+    `/pembina-tahfiz/laporan/${studentId}`,
+  );
+
+  /*
+   * Setelah Orang Tua dibuat nanti,
+   * published report juga akan kita
+   * revalidate pada route Guardian.
+   */
+
+  redirect(
+    `/pembina-tahfiz/laporan?week=${weekStart}`,
+  );
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-detail.tsx
+========================================
+
+import Link from "next/link";
+
+import type {
+  PembinaTahfizWeeklyReportDetailData,
+} from "../schemas/pembina-tahfiz-weekly-report-detail-schema";
+
+import {
+  PembinaTahfizWeeklyReportForm,
+} from "./pembina-tahfiz-weekly-report-form";
+
+type Props = {
+  data:
+    PembinaTahfizWeeklyReportDetailData;
+};
+
+function formatDate(
+  value:
+    string,
+): string {
+  return new Intl.DateTimeFormat(
+    "id-ID",
+    {
+      day:
+        "2-digit",
+
+      month:
+        "long",
+
+      year:
+        "numeric",
+    },
+  ).format(
+    new Date(
+      `${value}T00:00:00Z`,
+    ),
+  );
+}
+
+export function PembinaTahfizWeeklyReportDetail({
+  data,
+}: Props) {
+  const report =
+    data.report;
+
+  return (
+    <div className="mx-auto w-full max-w-[1200px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <Link
+        href={`/pembina-tahfiz/laporan?week=${data.week.start}`}
+        className="text-sm font-semibold text-brand-700 transition hover:text-brand-800"
+      >
+        ? Kembali ke Laporan
+      </Link>
+
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
+
+      <section className="mt-5 rounded-3xl border border-line bg-white p-5 shadow-soft sm:p-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+          Laporan Tahfiz Mingguan
+        </p>
+
+        <div className="mt-3 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-ink">
+              {
+                data.student
+                  .full_name
+              }
+            </h1>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
+                {
+                  data.tahfiz_group
+                    .name
+                }
+              </span>
+
+              {data.class && (
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                  Kelas{" "}
+                  {
+                    data.class
+                      .name
+                  }
+                </span>
+              )}
+
+              {data.student
+                .nis && (
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                  NIS{" "}
+                  {
+                    data.student
+                      .nis
+                  }
+                </span>
+              )}
+
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                {data.student
+                  .gender ===
+                "male"
+                  ? "Putra"
+                  : "Putri"}
+              </span>
+            </div>
+          </div>
+
+          {report === null ? (
+            <span className="w-fit rounded-full bg-slate-100 px-3 py-1.5 text-sm font-semibold text-slate-600">
+              Belum Dibuat
+            </span>
+          ) : report.status ===
+            "draft" ? (
+            <span className="w-fit rounded-full bg-amber-50 px-3 py-1.5 text-sm font-semibold text-amber-700">
+              Draft
+            </span>
+          ) : (
+            <span className="w-fit rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-700">
+              Published
+            </span>
+          )}
+        </div>
+
+        {/* =================================================
+            WEEK
+        ================================================= */}
+
+        <div className="mt-5 rounded-2xl bg-slate-50 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+            Periode Laporan
+          </p>
+
+          <p className="mt-2 font-bold text-ink">
+            {formatDate(
+              data.week.start,
+            )}
+            {" – "}
+            {formatDate(
+              data.week.end,
+            )}
+          </p>
+
+          <p className="mt-1 text-xs text-muted">
+            Tahun Ajaran{" "}
+            {
+              data.academic_year
+                .name
+            }
+          </p>
+        </div>
+      </section>
+
+      {/* =====================================================
+          PUBLISHED NOTICE
+      ===================================================== */}
+
+      {report?.status ===
+        "published" && (
+        <section className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 sm:p-5">
+          <p className="font-semibold text-emerald-800">
+            Laporan sudah
+            dipublikasikan
+          </p>
+
+          <p className="mt-1 text-sm leading-6 text-emerald-700">
+            Laporan ini sudah masuk
+            ke data publikasi Tahfiz.
+            Pembina masih dapat
+            memperbaiki isi laporan
+            apabila terdapat
+            kekeliruan.
+          </p>
+
+          {report.published_at && (
+            <p className="mt-2 text-xs font-medium text-emerald-600">
+              Dipublikasikan{" "}
+              {new Intl.DateTimeFormat(
+                "id-ID",
+                {
+                  dateStyle:
+                    "medium",
+
+                  timeStyle:
+                    "short",
+                },
+              ).format(
+                new Date(
+                  report.published_at,
+                ),
+              )}
+            </p>
+          )}
+        </section>
+      )}
+
+      {/* =====================================================
+          FORM
+      ===================================================== */}
+
+      <PembinaTahfizWeeklyReportForm
+        data={
+          data
+        }
+      />
+    </div>
+  );
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-form.tsx
+========================================
+
+"use client";
+
+import {
+  useActionState,
+} from "react";
+
+import {
+  useFormStatus,
+} from "react-dom";
+
+import {
+  savePembinaTahfizWeeklyReport,
+} from "../actions/save-pembina-tahfiz-weekly-report";
+
+import type {
+  PembinaTahfizWeeklyReportDetailData,
+} from "../schemas/pembina-tahfiz-weekly-report-detail-schema";
+
+import {
+  initialPembinaTahfizWeeklyReportActionState,
+} from "../types/pembina-tahfiz-weekly-report-action-state";
+
+type Props = {
+  data:
+    PembinaTahfizWeeklyReportDetailData;
+};
+
+function ActionButtons({
+  isPublished,
+}: {
+  isPublished:
+    boolean;
+}) {
+  const {
+    pending,
+  } = useFormStatus();
+
+  if (
+    isPublished
+  ) {
+    return (
+      <button
+        type="submit"
+        name="intent"
+        value="save"
+        disabled={
+          pending
+        }
+        className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-700 px-6 text-sm font-semibold text-white transition hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {pending
+          ? "Menyimpan..."
+          : "Simpan Perubahan"}
+      </button>
+    );
+  }
+
+  return (
+    <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+      <button
+        type="submit"
+        name="intent"
+        value="save"
+        disabled={
+          pending
+        }
+        className="inline-flex min-h-11 items-center justify-center rounded-xl border border-line bg-white px-6 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {pending
+          ? "Menyimpan..."
+          : "Simpan Draft"}
+      </button>
+
+      <button
+        type="submit"
+        name="intent"
+        value="publish"
+        disabled={
+          pending
+        }
+        onClick={(
+          event,
+        ) => {
+          if (
+            pending
+          ) {
+            return;
+          }
+
+          const confirmed =
+            window.confirm(
+              "Publikasikan laporan Tahfiz ini?\n\nSetelah dipublikasikan, laporan nantinya dapat dilihat oleh Orang Tua/Wali santri.",
+            );
+
+          if (
+            !confirmed
+          ) {
+            event.preventDefault();
+          }
+        }}
+        className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-700 px-6 text-sm font-semibold text-white transition hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {pending
+          ? "Memproses..."
+          : "Simpan & Publikasikan"}
+      </button>
+    </div>
+  );
+}
+
+export function PembinaTahfizWeeklyReportForm({
+  data,
+}: Props) {
+  const report =
+    data.report;
+
+  const [
+    state,
+    formAction,
+  ] = useActionState(
+    savePembinaTahfizWeeklyReport,
+    initialPembinaTahfizWeeklyReportActionState,
+  );
+
+  const isPublished =
+    report?.status ===
+    "published";
+
+  return (
+    <form
+      action={
+        formAction
+      }
+      className="mt-6"
+    >
+      <input
+        type="hidden"
+        name="studentId"
+        value={
+          data.student.id
+        }
+      />
+
+      <input
+        type="hidden"
+        name="weekStart"
+        value={
+          data.week.start
+        }
+      />
+
+      {/* =================================================
+          HAFALAN & MURAJAAH
+      ================================================= */}
+
+      <section className="grid gap-5 lg:grid-cols-2">
+        <div className="rounded-2xl border border-line bg-white p-5 shadow-soft">
+          <label
+            htmlFor="memorizationAchievement"
+            className="text-sm font-bold text-ink"
+          >
+            Capaian Hafalan Baru
+          </label>
+
+          <p className="mt-1 text-xs leading-5 text-muted">
+            Tuliskan capaian
+            hafalan santri selama
+            pekan ini.
+          </p>
+
+          <textarea
+            id="memorizationAchievement"
+            name="memorizationAchievement"
+            rows={
+              5
+            }
+            maxLength={
+              5000
+            }
+            defaultValue={
+              report
+                ?.memorization_achievement ??
+              ""
+            }
+            placeholder="Contoh: QS. Al-Baqarah ayat 1–20"
+            className="mt-3 w-full resize-y rounded-xl border border-line bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-slate-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-50"
+          />
+        </div>
+
+        <div className="rounded-2xl border border-line bg-white p-5 shadow-soft">
+          <label
+            htmlFor="murajaahAchievement"
+            className="text-sm font-bold text-ink"
+          >
+            Capaian Murajaah
+          </label>
+
+          <p className="mt-1 text-xs leading-5 text-muted">
+            Tuliskan bagian
+            hafalan yang diulang
+            dan dievaluasi.
+          </p>
+
+          <textarea
+            id="murajaahAchievement"
+            name="murajaahAchievement"
+            rows={
+              5
+            }
+            maxLength={
+              5000
+            }
+            defaultValue={
+              report
+                ?.murajaah_achievement ??
+              ""
+            }
+            placeholder="Contoh: Juz 30, An-Naba sampai An-Nazi'at"
+            className="mt-3 w-full resize-y rounded-xl border border-line bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-slate-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-50"
+          />
+        </div>
+      </section>
+
+      {/* =================================================
+          RATING
+      ================================================= */}
+
+      <section className="mt-5 rounded-2xl border border-line bg-white p-5 shadow-soft">
+        <div>
+          <h2 className="text-lg font-bold text-ink">
+            Penilaian Pekanan
+          </h2>
+
+          <p className="mt-1 text-sm text-muted">
+            Berikan penilaian
+            terhadap kualitas
+            Tahfiz santri selama
+            pekan ini.
+          </p>
+        </div>
+
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          <div>
+            <label
+              htmlFor="fluencyRating"
+              className="mb-2 block text-xs font-semibold text-slate-600"
+            >
+              Kelancaran
+            </label>
+
+            <select
+              id="fluencyRating"
+              name="fluencyRating"
+              defaultValue={
+                report
+                  ?.fluency_rating ??
+                ""
+              }
+              className="min-h-11 w-full rounded-xl border border-line bg-white px-3 text-sm text-ink"
+            >
+              <option value="">
+                Pilih penilaian
+              </option>
+
+              <option value="excellent">
+                Sangat Baik
+              </option>
+
+              <option value="good">
+                Baik
+              </option>
+
+              <option value="fair">
+                Cukup
+              </option>
+
+              <option value="needs_guidance">
+                Perlu Bimbingan
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor="tajwidRating"
+              className="mb-2 block text-xs font-semibold text-slate-600"
+            >
+              Tajwid
+            </label>
+
+            <select
+              id="tajwidRating"
+              name="tajwidRating"
+              defaultValue={
+                report
+                  ?.tajwid_rating ??
+                ""
+              }
+              className="min-h-11 w-full rounded-xl border border-line bg-white px-3 text-sm text-ink"
+            >
+              <option value="">
+                Pilih penilaian
+              </option>
+
+              <option value="excellent">
+                Sangat Baik
+              </option>
+
+              <option value="good">
+                Baik
+              </option>
+
+              <option value="fair">
+                Cukup
+              </option>
+
+              <option value="needs_guidance">
+                Perlu Bimbingan
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor="consistencyRating"
+              className="mb-2 block text-xs font-semibold text-slate-600"
+            >
+              Konsistensi
+            </label>
+
+            <select
+              id="consistencyRating"
+              name="consistencyRating"
+              defaultValue={
+                report
+                  ?.consistency_rating ??
+                ""
+              }
+              className="min-h-11 w-full rounded-xl border border-line bg-white px-3 text-sm text-ink"
+            >
+              <option value="">
+                Pilih penilaian
+              </option>
+
+              <option value="excellent">
+                Sangat Baik
+              </option>
+
+              <option value="good">
+                Baik
+              </option>
+
+              <option value="fair">
+                Cukup
+              </option>
+
+              <option value="needs_guidance">
+                Perlu Bimbingan
+              </option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      {/* =================================================
+          NOTES + TARGET
+      ================================================= */}
+
+      <section className="mt-5 grid gap-5 lg:grid-cols-2">
+        <div className="rounded-2xl border border-line bg-white p-5 shadow-soft">
+          <label
+            htmlFor="supervisorNotes"
+            className="text-sm font-bold text-ink"
+          >
+            Catatan Pembina
+          </label>
+
+          <p className="mt-1 text-xs leading-5 text-muted">
+            Catatan evaluasi
+            tambahan. Bagian ini
+            boleh dikosongkan.
+          </p>
+
+          <textarea
+            id="supervisorNotes"
+            name="supervisorNotes"
+            rows={
+              5
+            }
+            maxLength={
+              5000
+            }
+            defaultValue={
+              report
+                ?.supervisor_notes ??
+              ""
+            }
+            placeholder="Contoh: Perkembangan hafalan baik, perlu meningkatkan konsentrasi ketika murajaah."
+            className="mt-3 w-full resize-y rounded-xl border border-line bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-slate-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-50"
+          />
+        </div>
+
+        <div className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
+          <label
+            htmlFor="nextWeekTarget"
+            className="text-sm font-bold text-brand-900"
+          >
+            Target Pekan Berikutnya
+          </label>
+
+          <p className="mt-1 text-xs leading-5 text-brand-700">
+            Tentukan target hafalan
+            atau murajaah untuk pekan
+            berikutnya.
+          </p>
+
+          <textarea
+            id="nextWeekTarget"
+            name="nextWeekTarget"
+            rows={
+              5
+            }
+            maxLength={
+              5000
+            }
+            defaultValue={
+              report
+                ?.next_week_target ??
+              ""
+            }
+            placeholder="Contoh: Melanjutkan QS. Al-Baqarah ayat 21–35"
+            className="mt-3 w-full resize-y rounded-xl border border-brand-200 bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-slate-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+          />
+        </div>
+      </section>
+
+      {/* =================================================
+          ERROR
+      ================================================= */}
+
+      {state.status ===
+        "error" &&
+        state.message && (
+          <section className="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4">
+            <p className="font-semibold text-red-800">
+              Laporan belum dapat
+              diproses
+            </p>
+
+            <p className="mt-1 text-sm leading-6 text-red-700">
+              {
+                state.message
+              }
+            </p>
+          </section>
+        )}
+
+      {/* =================================================
+          ACTION BAR
+      ================================================= */}
+
+      <section className="sticky bottom-4 z-20 mt-6 rounded-2xl border border-line bg-white/95 p-4 shadow-lg backdrop-blur sm:p-5">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="font-semibold text-ink">
+              {isPublished
+                ? "Laporan sudah dipublikasikan"
+                : report
+                  ? "Laporan tersimpan sebagai Draft"
+                  : "Laporan belum disimpan"}
+            </p>
+
+            <p className="mt-1 max-w-2xl text-sm leading-6 text-muted">
+              {isPublished
+                ? "Perubahan berikutnya langsung memperbarui laporan yang sudah dapat dilihat Orang Tua."
+                : "Draft belum dapat dilihat Orang Tua. Publikasikan setelah seluruh data wajib sudah lengkap."}
+            </p>
+          </div>
+
+          <ActionButtons
+            isPublished={
+              isPublished
+            }
+          />
+        </div>
+      </section>
+    </form>
+  );
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-history.tsx
+========================================
+
+import Link from "next/link";
+
+import type {
+  PembinaTahfizWeeklyReportHistoryData,
+} from "../schemas/pembina-tahfiz-weekly-report-history-schema";
+
+type Props = {
+  data:
+    PembinaTahfizWeeklyReportHistoryData;
+
+  page:
+    number;
+};
+
+function formatDate(
+  value:
+    string,
+): string {
+  return new Intl.DateTimeFormat(
+    "id-ID",
+    {
+      day:
+        "2-digit",
+
+      month:
+        "short",
+
+      year:
+        "numeric",
+    },
+  ).format(
+    new Date(
+      `${value}T00:00:00Z`,
+    ),
+  );
+}
+
+function buildPageHref(
+  data:
+    PembinaTahfizWeeklyReportHistoryData,
+
+  page:
+    number,
+): string {
+  const params =
+    new URLSearchParams();
+
+  if (
+    data.filters.status
+  ) {
+    params.set(
+      "status",
+      data.filters.status,
+    );
+  }
+
+  if (
+    data.filters.search
+  ) {
+    params.set(
+      "search",
+      data.filters.search,
+    );
+  }
+
+  params.set(
+    "page",
+    String(
+      page,
+    ),
+  );
+
+  return `/pembina-tahfiz/laporan/riwayat?${params.toString()}`;
+}
+
+export function PembinaTahfizWeeklyReportHistory({
+  data,
+  page,
+}: Props) {
+  return (
+    <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      {/* HEADER */}
+
+      <section>
+        <Link
+          href="/pembina-tahfiz/laporan"
+          className="text-sm font-semibold text-brand-700 transition hover:text-brand-800"
+        >
+          ? Kembali ke Laporan
+        </Link>
+
+        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+          Pembina Tahfiz
+        </p>
+
+        <h1 className="mt-2 text-3xl font-bold text-ink">
+          Riwayat Laporan Tahfiz
+        </h1>
+
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
+          Lihat kembali seluruh
+          laporan Tahfiz Mingguan
+          yang pernah dibuat pada
+          tahun ajaran berjalan.
+        </p>
+
+        <div className="mt-3">
+          <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
+            Tahun Ajaran{" "}
+            {
+              data.academic_year
+                .name
+            }
+          </span>
+        </div>
+      </section>
+
+      {/* SUMMARY */}
+
+      <section className="mt-6 grid gap-4 sm:grid-cols-3">
+        <div className="rounded-2xl border border-line bg-white p-5 shadow-soft">
+          <p className="text-xs text-muted">
+            Total Laporan
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-ink">
+            {
+              data.summary
+                .total_count
+            }
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-amber-100 bg-amber-50 p-5">
+          <p className="text-xs font-medium text-amber-700">
+            Draft
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-amber-900">
+            {
+              data.summary
+                .draft_count
+            }
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
+          <p className="text-xs font-medium text-emerald-700">
+            Published
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-emerald-900">
+            {
+              data.summary
+                .published_count
+            }
+          </p>
+        </div>
+      </section>
+
+      {/* FILTER */}
+
+      <section className="mt-6 rounded-2xl border border-line bg-white p-4 shadow-soft sm:p-5">
+        <form
+          action="/pembina-tahfiz/laporan/riwayat"
+          method="get"
+          className="grid gap-4 lg:grid-cols-[220px_1fr_auto]"
+        >
+          <div>
+            <label
+              htmlFor="status"
+              className="mb-2 block text-xs font-semibold text-slate-600"
+            >
+              Status
+            </label>
+
+            <select
+              id="status"
+              name="status"
+              defaultValue={
+                data.filters.status ??
+                ""
+              }
+              className="min-h-11 w-full rounded-xl border border-line bg-white px-3 text-sm text-ink"
+            >
+              <option value="">
+                Semua Status
+              </option>
+
+              <option value="draft">
+                Draft
+              </option>
+
+              <option value="published">
+                Published
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor="search"
+              className="mb-2 block text-xs font-semibold text-slate-600"
+            >
+              Cari Laporan
+            </label>
+
+            <input
+              id="search"
+              name="search"
+              type="search"
+              defaultValue={
+                data.filters.search ??
+                ""
+              }
+              placeholder="Nama, NIS, ID santri, atau kelompok Tahfiz..."
+              className="min-h-11 w-full rounded-xl border border-line bg-white px-4 text-sm text-ink outline-none placeholder:text-slate-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-50"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="min-h-11 self-end rounded-xl bg-brand-700 px-6 text-sm font-semibold text-white transition hover:bg-brand-800"
+          >
+            Terapkan
+          </button>
+        </form>
+
+        {(
+          data.filters.search ||
+          data.filters.status
+        ) && (
+          <div className="mt-3">
+            <Link
+              href="/pembina-tahfiz/laporan/riwayat"
+              className="text-sm font-semibold text-brand-700 hover:text-brand-800"
+            >
+              Reset Filter
+            </Link>
+          </div>
+        )}
+      </section>
+
+      {/* LIST */}
+
+      <section className="mt-7">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+              Arsip Tahun Berjalan
+            </p>
+
+            <h2 className="mt-2 text-2xl font-bold text-ink">
+              Daftar Laporan
+            </h2>
+          </div>
+
+          <p className="text-sm text-muted">
+            {
+              data.summary
+                .filtered_count
+            }{" "}
+            laporan ditemukan
+          </p>
+        </div>
+
+        {data.items.length ===
+        0 ? (
+          <div className="mt-5 rounded-3xl border border-dashed border-line bg-white p-10 text-center">
+            <h3 className="font-bold text-ink">
+              Belum ada riwayat
+            </h3>
+
+            <p className="mt-2 text-sm text-muted">
+              Belum terdapat
+              laporan Tahfiz yang
+              sesuai dengan filter
+              saat ini.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-5 space-y-4">
+            {data.items.map(
+              (item) => (
+                <article
+                  key={
+                    item.report.id
+                  }
+                  className="rounded-2xl border border-line bg-white p-5 shadow-soft"
+                >
+                  <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-lg font-bold text-ink">
+                          {
+                            item.student
+                              .full_name
+                          }
+                        </h3>
+
+                        {item.report
+                          .status ===
+                        "draft" ? (
+                          <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
+                            Draft
+                          </span>
+                        ) : (
+                          <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                            Published
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
+                        {item.student
+                          .nis && (
+                          <span>
+                            NIS{" "}
+                            {
+                              item.student
+                                .nis
+                            }
+                          </span>
+                        )}
+
+                        {item.class && (
+                          <span>
+                            Kelas{" "}
+                            {
+                              item.class
+                                .name
+                            }
+                          </span>
+                        )}
+
+                        <span>
+                          {
+                            item.tahfiz_group
+                              .name
+                          }
+                        </span>
+                      </div>
+
+                      <div className="mt-4">
+                        <p className="text-xs font-medium text-muted">
+                          Periode
+                        </p>
+
+                        <p className="mt-1 text-sm font-semibold text-ink">
+                          {formatDate(
+                            item.report
+                              .week_start,
+                          )}
+                          {" – "}
+                          {formatDate(
+                            item.report
+                              .week_end,
+                          )}
+                        </p>
+                      </div>
+
+                      {item.report
+                        .published_at && (
+                        <p className="mt-2 text-xs text-emerald-600">
+                          Dipublikasikan{" "}
+                          {new Intl.DateTimeFormat(
+                            "id-ID",
+                            {
+                              dateStyle:
+                                "medium",
+
+                              timeStyle:
+                                "short",
+                            },
+                          ).format(
+                            new Date(
+                              item.report
+                                .published_at,
+                            ),
+                          )}
+                        </p>
+                      )}
+                    </div>
+
+                    <Link
+                      href={`/pembina-tahfiz/laporan/${item.student.id}?week=${item.report.week_start}`}
+                      className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-brand-700 px-5 text-sm font-semibold text-white transition hover:bg-brand-800"
+                    >
+                      {item.report
+                        .status ===
+                      "draft"
+                        ? "Lanjutkan Laporan"
+                        : "Lihat Laporan"}
+                    </Link>
+                  </div>
+                </article>
+              ),
+            )}
+          </div>
+        )}
+      </section>
+
+      {/* PAGINATION */}
+
+      {(
+        data.pagination
+          .has_previous ||
+        data.pagination
+          .has_next
+      ) && (
+        <section className="mt-6 flex items-center justify-between gap-4">
+          <div>
+            {data.pagination
+              .has_previous ? (
+              <Link
+                href={buildPageHref(
+                  data,
+                  Math.max(
+                    page - 1,
+                    1,
+                  ),
+                )}
+                className="inline-flex min-h-10 items-center justify-center rounded-xl border border-line bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              >
+                ? Sebelumnya
+              </Link>
+            ) : (
+              <span />
+            )}
+          </div>
+
+          <span className="text-sm font-medium text-muted">
+            Halaman{" "}
+            {page}
+          </span>
+
+          <div>
+            {data.pagination
+              .has_next ? (
+              <Link
+                href={buildPageHref(
+                  data,
+                  page + 1,
+                )}
+                className="inline-flex min-h-10 items-center justify-center rounded-xl bg-brand-700 px-4 text-sm font-semibold text-white hover:bg-brand-800"
+              >
+                Berikutnya ?
+              </Link>
+            ) : (
+              <span />
+            )}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\weekly-reports\components\pembina-tahfiz-weekly-report-overview.tsx
+========================================
+
+import Link from "next/link";
+
+import type {
+  PembinaTahfizWeeklyReportOverviewData,
+  PembinaTahfizWeeklyReportOverviewItem,
+} from "../schemas/pembina-tahfiz-weekly-report-overview-schema";
+
+type Props = {
+  data: PembinaTahfizWeeklyReportOverviewData;
+};
+
+/*
+ * =========================================================
+ * DATE FORMATTER
+ * =========================================================
+ */
+
+function formatDate(
+  value: string,
+): string {
+  return new Intl.DateTimeFormat(
+    "id-ID",
+    {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    },
+  ).format(
+    new Date(
+      `${value}T00:00:00Z`,
+    ),
+  );
+}
+
+/*
+ * =========================================================
+ * STUDENT REPORT CARD
+ * =========================================================
+ */
+
+function StudentReportCard({
+  item,
+  weekStart,
+}: {
+  item: PembinaTahfizWeeklyReportOverviewItem;
+  weekStart: string;
+}) {
+  const report =
+    item.report;
+
+  return (
+    <article className="rounded-2xl border border-line bg-white p-5 shadow-soft">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-lg font-bold text-ink">
+              {
+                item.student
+                  .full_name
+              }
+            </h2>
+
+            {report === null ? (
+              <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                Belum Dibuat
+              </span>
+            ) : report.status ===
+              "draft" ? (
+              <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
+                Draft
+              </span>
+            ) : (
+              <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                Published
+              </span>
+            )}
+          </div>
+
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
+            {item.student
+              .nis && (
+              <span>
+                NIS{" "}
+                {
+                  item.student
+                    .nis
+                }
+              </span>
+            )}
+
+            {item.student
+              .legacy_student_id && (
+              <span>
+                ID{" "}
+                {
+                  item.student
+                    .legacy_student_id
+                }
+              </span>
+            )}
+
+            {item.class && (
+              <span>
+                Kelas{" "}
+                {
+                  item.class
+                    .name
+                }
+              </span>
+            )}
+
+            <span>
+              {item.student
+                .gender ===
+              "male"
+                ? "Putra"
+                : "Putri"}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* =================================================
+          TAHFIZ GROUP
+      ================================================= */}
+
+      <div className="mt-4 rounded-xl bg-brand-50 p-3">
+        <p className="text-xs font-medium text-brand-600">
+          Kelompok Tahfiz
+        </p>
+
+        <p className="mt-1 text-sm font-semibold text-brand-900">
+          {
+            item.tahfiz_group
+              .name
+          }
+        </p>
+
+        <p className="mt-1 text-xs text-brand-600">
+          {
+            item.tahfiz_group
+              .code
+          }
+        </p>
+      </div>
+
+      {/* =================================================
+          REPORT INFORMATION
+      ================================================= */}
+
+      {report?.published_at && (
+        <p className="mt-3 text-xs text-slate-400">
+          Dipublikasikan{" "}
+          {new Intl.DateTimeFormat(
+            "id-ID",
+            {
+              dateStyle:
+                "medium",
+
+              timeStyle:
+                "short",
+            },
+          ).format(
+            new Date(
+              report.published_at,
+            ),
+          )}
+        </p>
+      )}
+
+      {report &&
+        !report.published_at && (
+          <p className="mt-3 text-xs text-slate-400">
+            Terakhir diperbarui{" "}
+            {new Intl.DateTimeFormat(
+              "id-ID",
+              {
+                dateStyle:
+                  "medium",
+
+                timeStyle:
+                  "short",
+              },
+            ).format(
+              new Date(
+                report.updated_at,
+              ),
+            )}
+          </p>
+        )}
+
+      {/* =================================================
+          ACTION
+      ================================================= */}
+
+      <Link
+        href={`/pembina-tahfiz/laporan/${item.student.id}?week=${weekStart}`}
+        className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-brand-700 px-4 text-sm font-semibold text-white transition hover:bg-brand-800"
+      >
+        {report === null
+          ? "Buat Laporan"
+          : report.status ===
+              "draft"
+            ? "Lanjutkan Draft"
+            : "Lihat Laporan"}
+      </Link>
+    </article>
+  );
+}
+
+/*
+ * =========================================================
+ * MAIN COMPONENT
+ * =========================================================
+ */
+
+export function PembinaTahfizWeeklyReportOverview({
+  data,
+}: Props) {
+  return (
+    <div className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
+
+      <section>
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+              Pembina Tahfiz
+            </p>
+
+            <h1 className="mt-2 text-3xl font-bold text-ink">
+              Laporan Tahfiz Mingguan
+            </h1>
+
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
+              Kelola laporan Tahfiz
+              individual setiap
+              santri pada pekan yang
+              dipilih.
+            </p>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
+                Tahun Ajaran{" "}
+                {
+                  data.academic_year
+                    .name
+                }
+              </span>
+
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                {formatDate(
+                  data.week.start,
+                )}
+                {" – "}
+                {formatDate(
+                  data.week.end,
+                )}
+              </span>
+            </div>
+          </div>
+
+          {/* =================================================
+              HISTORY BUTTON
+          ================================================= */}
+
+          <Link
+            href="/pembina-tahfiz/laporan/riwayat"
+            className="inline-flex min-h-11 w-fit shrink-0 items-center justify-center rounded-xl border border-brand-200 bg-white px-5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50"
+          >
+            Lihat Riwayat Laporan
+          </Link>
+        </div>
+      </section>
+
+      {/* =====================================================
+          SUMMARY
+      ===================================================== */}
+
+      <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {/* TOTAL */}
+
+        <div className="rounded-2xl border border-line bg-white p-5 shadow-soft">
+          <p className="text-xs text-muted">
+            Total Santri
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-ink">
+            {
+              data.summary
+                .student_count
+            }
+          </p>
+        </div>
+
+        {/* NOT CREATED */}
+
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+          <p className="text-xs text-slate-600">
+            Belum Dibuat
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-slate-900">
+            {
+              data.summary
+                .not_created_count
+            }
+          </p>
+        </div>
+
+        {/* DRAFT */}
+
+        <div className="rounded-2xl border border-amber-100 bg-amber-50 p-5">
+          <p className="text-xs font-medium text-amber-700">
+            Draft
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-amber-900">
+            {
+              data.summary
+                .draft_count
+            }
+          </p>
+        </div>
+
+        {/* PUBLISHED */}
+
+        <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
+          <p className="text-xs font-medium text-emerald-700">
+            Published
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-emerald-900">
+            {
+              data.summary
+                .published_count
+            }
+          </p>
+        </div>
+      </section>
+
+      {/* =====================================================
+          FILTER
+      ===================================================== */}
+
+      <section className="mt-6 rounded-2xl border border-line bg-white p-4 shadow-soft sm:p-5">
+        <form
+          action="/pembina-tahfiz/laporan"
+          method="get"
+          className="grid gap-4 lg:grid-cols-[280px_1fr_auto]"
+        >
+          {/* WEEK */}
+
+          <div>
+            <label
+              htmlFor="week"
+              className="mb-2 block text-xs font-semibold text-slate-600"
+            >
+              Awal Pekan
+            </label>
+
+            <input
+              id="week"
+              name="week"
+              type="date"
+              defaultValue={
+                data.week.start
+              }
+              min={
+                data.academic_year
+                  .start_date
+              }
+              max={
+                data.academic_year
+                  .end_date
+              }
+              className="min-h-11 w-full rounded-xl border border-line bg-white px-3 text-sm text-ink outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-50"
+            />
+
+            <p className="mt-1 text-xs text-slate-400">
+              Pilih tanggal hari
+              Senin.
+            </p>
+          </div>
+
+          {/* SEARCH */}
+
+          <div>
+            <label
+              htmlFor="search"
+              className="mb-2 block text-xs font-semibold text-slate-600"
+            >
+              Cari Santri
+            </label>
+
+            <input
+              id="search"
+              name="search"
+              type="search"
+              defaultValue={
+                data.filters.search ??
+                ""
+              }
+              placeholder="Nama, NIS, ID santri, atau kelompok Tahfiz..."
+              className="min-h-11 w-full rounded-xl border border-line bg-white px-4 text-sm text-ink outline-none placeholder:text-slate-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-50"
+            />
+          </div>
+
+          {/* SUBMIT */}
+
+          <button
+            type="submit"
+            className="min-h-11 self-start rounded-xl bg-brand-700 px-6 text-sm font-semibold text-white transition hover:bg-brand-800 lg:self-end"
+          >
+            Tampilkan
+          </button>
+        </form>
+
+        {/* ACTIVE SEARCH */}
+
+        {data.filters.search && (
+          <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
+            <span className="text-muted">
+              Pencarian:
+            </span>
+
+            <span className="font-semibold text-ink">
+              &quot;
+              {
+                data.filters.search
+              }
+              &quot;
+            </span>
+
+            <Link
+              href={`/pembina-tahfiz/laporan?week=${data.week.start}`}
+              className="font-semibold text-brand-700 transition hover:text-brand-800"
+            >
+              Reset Pencarian
+            </Link>
+          </div>
+        )}
+      </section>
+
+      {/* =====================================================
+          LIST HEADER
+      ===================================================== */}
+
+      <section className="mt-7">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+              Laporan Individual
+            </p>
+
+            <h2 className="mt-2 text-2xl font-bold text-ink">
+              Daftar Santri
+            </h2>
+          </div>
+
+          <p className="text-sm text-muted">
+            {
+              data.summary
+                .filtered_count
+            }{" "}
+            santri ditampilkan
+          </p>
+        </div>
+
+        {/* =================================================
+            EMPTY
+        ================================================= */}
+
+        {data.items.length ===
+        0 ? (
+          <div className="mt-5 rounded-3xl border border-dashed border-line bg-white p-10 text-center">
+            <h3 className="font-bold text-ink">
+              Santri tidak ditemukan
+            </h3>
+
+            <p className="mt-2 text-sm leading-6 text-muted">
+              Tidak ada santri
+              Tahfiz ampuan yang
+              sesuai dengan
+              pencarian pada pekan
+              ini.
+            </p>
+
+            {data.filters.search && (
+              <Link
+                href={`/pembina-tahfiz/laporan?week=${data.week.start}`}
+                className="mt-4 inline-flex min-h-10 items-center justify-center rounded-xl bg-brand-700 px-4 text-sm font-semibold text-white transition hover:bg-brand-800"
+              >
+                Tampilkan Semua
+              </Link>
+            )}
+          </div>
+        ) : (
+          /* ===============================================
+             STUDENT CARDS
+          =============================================== */
+
+          <div className="mt-5 grid gap-4 xl:grid-cols-2">
+            {data.items.map(
+              (item) => (
+                <StudentReportCard
+                  key={
+                    item.student.id
+                  }
+                  item={
+                    item
+                  }
+                  weekStart={
+                    data.week.start
+                  }
+                />
+              ),
+            )}
+          </div>
+        )}
+      </section>
+
+      {/* =====================================================
+          INFORMATION
+      ===================================================== */}
+
+      <section className="mt-6 rounded-2xl border border-blue-100 bg-blue-50 p-4 sm:p-5">
+        <p className="font-semibold text-blue-800">
+          Laporan dibuat per santri
+          setiap pekan
+        </p>
+
+        <p className="mt-1 max-w-4xl text-sm leading-6 text-blue-700">
+          Laporan yang masih
+          berstatus Draft belum
+          menjadi laporan publikasi.
+          Setelah laporan
+          dipublikasikan, statusnya
+          berubah menjadi Published
+          dan nantinya dapat
+          ditampilkan kepada Orang
+          Tua/Wali santri yang
+          terhubung.
+        </p>
+      </section>
+    </div>
+  );
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\weekly-reports\data\get-pembina-tahfiz-weekly-report-detail.ts
+========================================
+
+import {
+  z,
+} from "zod";
+
+import {
+  createClient,
+} from "@/lib/supabase/server";
+
+import {
+  pembinaTahfizWeeklyReportDetailSchema,
+  type PembinaTahfizWeeklyReportDetailData,
+} from "../schemas/pembina-tahfiz-weekly-report-detail-schema";
+
+const studentIdSchema =
+  z.string().uuid();
+
+const weekStartSchema =
+  z.string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}$/,
+    );
+
+export async function getPembinaTahfizWeeklyReportDetail(
+  studentId:
+    string,
+
+  weekStart:
+    string,
+): Promise<PembinaTahfizWeeklyReportDetailData> {
+  const studentValidation =
+    studentIdSchema.safeParse(
+      studentId,
+    );
+
+  const weekValidation =
+    weekStartSchema.safeParse(
+      weekStart,
+    );
+
+  if (
+    !studentValidation.success ||
+    !weekValidation.success
+  ) {
+    throw new Error(
+      "Parameter laporan Tahfiz tidak valid.",
+    );
+  }
+
+  const supabase =
+    await createClient();
+
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "get_pembina_tahfiz_weekly_report_detail",
+    {
+      p_student_id:
+        studentValidation.data,
+
+      p_week_start:
+        weekValidation.data,
+    },
+  );
+
+  if (error) {
+    throw new Error(
+      `Gagal mengambil detail Laporan Tahfiz: ${error.message}`,
+    );
+  }
+
+  const validation =
+    pembinaTahfizWeeklyReportDetailSchema.safeParse(
+      data,
+    );
+
+  if (!validation.success) {
+    console.error(
+      "Format detail Laporan Tahfiz tidak valid:",
+      validation.error.flatten(),
+    );
+
+    throw new Error(
+      "Format detail Laporan Tahfiz dari database tidak valid.",
+    );
+  }
+
+  return validation.data;
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\weekly-reports\data\get-pembina-tahfiz-weekly-report-history.ts
+========================================
+
+import {
+  createClient,
+} from "@/lib/supabase/server";
+
+import type {
+  PembinaTahfizWeeklyReportHistoryQuery,
+} from "../lib/parse-pembina-tahfiz-weekly-report-history-query";
+
+import {
+  pembinaTahfizWeeklyReportHistorySchema,
+  type PembinaTahfizWeeklyReportHistoryData,
+} from "../schemas/pembina-tahfiz-weekly-report-history-schema";
+
+export async function getPembinaTahfizWeeklyReportHistory(
+  query:
+    PembinaTahfizWeeklyReportHistoryQuery,
+): Promise<PembinaTahfizWeeklyReportHistoryData> {
+  const supabase =
+    await createClient();
+
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "get_pembina_tahfiz_weekly_report_history",
+    {
+      p_status:
+        query.status,
+
+      p_search:
+        query.search,
+
+      p_limit:
+        query.limit,
+
+      p_offset:
+        query.offset,
+    },
+  );
+
+  if (error) {
+    throw new Error(
+      `Gagal mengambil Riwayat Laporan Tahfiz: ${error.message}`,
+    );
+  }
+
+  const validation =
+    pembinaTahfizWeeklyReportHistorySchema.safeParse(
+      data,
+    );
+
+  if (
+    !validation.success
+  ) {
+    console.error(
+      "Format Riwayat Laporan Tahfiz tidak valid:",
+      validation.error.flatten(),
+    );
+
+    throw new Error(
+      "Format Riwayat Laporan Tahfiz dari database tidak valid.",
+    );
+  }
+
+  return validation.data;
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\weekly-reports\data\get-pembina-tahfiz-weekly-report-overview.ts
+========================================
+
+import {
+  createClient,
+} from "@/lib/supabase/server";
+
+import type {
+  PembinaTahfizWeeklyReportQuery,
+} from "../lib/parse-pembina-tahfiz-weekly-report-query";
+
+import {
+  pembinaTahfizWeeklyReportOverviewSchema,
+  type PembinaTahfizWeeklyReportOverviewData,
+} from "../schemas/pembina-tahfiz-weekly-report-overview-schema";
+
+export async function getPembinaTahfizWeeklyReportOverview(
+  query:
+    PembinaTahfizWeeklyReportQuery,
+): Promise<PembinaTahfizWeeklyReportOverviewData> {
+  const supabase =
+    await createClient();
+
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "get_pembina_tahfiz_weekly_report_overview",
+    {
+      p_week_start:
+        query.weekStart,
+
+      p_search:
+        query.search,
+    },
+  );
+
+  if (error) {
+    throw new Error(
+      `Gagal mengambil Laporan Tahfiz Mingguan: ${error.message}`,
+    );
+  }
+
+  const validation =
+    pembinaTahfizWeeklyReportOverviewSchema.safeParse(
+      data,
+    );
+
+  if (!validation.success) {
+    console.error(
+      "Format overview Laporan Tahfiz tidak valid:",
+      validation.error.flatten(),
+    );
+
+    throw new Error(
+      "Format Laporan Tahfiz dari database tidak valid.",
+    );
+  }
+
+  return validation.data;
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\weekly-reports\lib\parse-pembina-tahfiz-weekly-report-history-query.ts
+========================================
+
+export type PembinaTahfizWeeklyReportHistorySearchParams =
+  Record<
+    string,
+    string | string[] | undefined
+  >;
+
+export type PembinaTahfizWeeklyReportHistoryQuery = {
+  status:
+    | "draft"
+    | "published"
+    | null;
+
+  search:
+    string | null;
+
+  page:
+    number;
+
+  limit:
+    number;
+
+  offset:
+    number;
+};
+
+const PAGE_SIZE =
+  20;
+
+function firstValue(
+  value:
+    | string
+    | string[]
+    | undefined,
+): string | undefined {
+  return Array.isArray(value)
+    ? value[0]
+    : value;
+}
+
+export function parsePembinaTahfizWeeklyReportHistoryQuery(
+  searchParams:
+    PembinaTahfizWeeklyReportHistorySearchParams,
+): PembinaTahfizWeeklyReportHistoryQuery {
+  const rawStatus =
+    firstValue(
+      searchParams.status,
+    )?.trim()
+      .toLowerCase();
+
+  const status =
+    rawStatus === "draft" ||
+    rawStatus === "published"
+      ? rawStatus
+      : null;
+
+  const rawSearch =
+    firstValue(
+      searchParams.search,
+    )?.trim();
+
+  const rawPage =
+    Number(
+      firstValue(
+        searchParams.page,
+      ) ?? "1",
+    );
+
+  const page =
+    Number.isInteger(
+      rawPage,
+    ) &&
+    rawPage > 0
+      ? rawPage
+      : 1;
+
+  return {
+    status,
+
+    search:
+      rawSearch &&
+      rawSearch.length > 0
+        ? rawSearch
+        : null,
+
+    page,
+
+    limit:
+      PAGE_SIZE,
+
+    offset:
+      (
+        page - 1
+      ) *
+      PAGE_SIZE,
+  };
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\weekly-reports\lib\parse-pembina-tahfiz-weekly-report-query.ts
+========================================
+
+export type PembinaTahfizWeeklyReportSearchParams =
+  Record<
+    string,
+    string | string[] | undefined
+  >;
+
+export type PembinaTahfizWeeklyReportQuery = {
+  weekStart:
+    string | null;
+
+  search:
+    string | null;
+};
+
+function firstValue(
+  value:
+    | string
+    | string[]
+    | undefined,
+): string | undefined {
+  return Array.isArray(value)
+    ? value[0]
+    : value;
+}
+
+function isValidDate(
+  value: string,
+): boolean {
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(
+      value,
+    )
+  ) {
+    return false;
+  }
+
+  const [
+    year,
+    month,
+    day,
+  ] = value
+    .split("-")
+    .map(Number);
+
+  const date =
+    new Date(
+      Date.UTC(
+        year,
+        month - 1,
+        day,
+      ),
+    );
+
+  return (
+    date.getUTCFullYear() ===
+      year &&
+    date.getUTCMonth() ===
+      month - 1 &&
+    date.getUTCDate() ===
+      day
+  );
+}
+
+function isMonday(
+  value: string,
+): boolean {
+  if (
+    !isValidDate(
+      value,
+    )
+  ) {
+    return false;
+  }
+
+  const date =
+    new Date(
+      `${value}T00:00:00Z`,
+    );
+
+  return (
+    date.getUTCDay() === 1
+  );
+}
+
+export function parsePembinaTahfizWeekStart(
+  value:
+    | string
+    | string[]
+    | undefined,
+): string | null {
+  const rawValue =
+    firstValue(
+      value,
+    )?.trim();
+
+  if (
+    !rawValue ||
+    !isMonday(
+      rawValue,
+    )
+  ) {
+    return null;
+  }
+
+  return rawValue;
+}
+
+export function parsePembinaTahfizWeeklyReportQuery(
+  searchParams:
+    PembinaTahfizWeeklyReportSearchParams,
+): PembinaTahfizWeeklyReportQuery {
+  const rawSearch =
+    firstValue(
+      searchParams.search,
+    )?.trim();
+
+  return {
+    weekStart:
+      parsePembinaTahfizWeekStart(
+        searchParams.week,
+      ),
+
+    search:
+      rawSearch &&
+      rawSearch.length > 0
+        ? rawSearch
+        : null,
+  };
+}
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\weekly-reports\schemas\pembina-tahfiz-weekly-report-detail-schema.ts
+========================================
+
+import { z } from "zod";
+
+import {
+  tahfizWeeklyReportStatusSchema,
+} from "./pembina-tahfiz-weekly-report-overview-schema";
+
+const ratingSchema =
+  z.enum([
+    "excellent",
+    "good",
+    "fair",
+    "needs_guidance",
+  ]);
+
+export const pembinaTahfizWeeklyReportDetailSchema =
+  z.object({
+    generated_at:
+      z.string(),
+
+    academic_year:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        name:
+          z.string(),
+
+        start_date:
+          z.string(),
+
+        end_date:
+          z.string(),
+      }),
+
+    week:
+      z.object({
+        start:
+          z.string(),
+
+        end:
+          z.string(),
+      }),
+
+    student:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        legacy_student_id:
+          z.string().nullable(),
+
+        nis:
+          z.string().nullable(),
+
+        full_name:
+          z.string(),
+
+        gender:
+          z.enum([
+            "male",
+            "female",
+          ]),
+      }),
+
+    tahfiz_group:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        code:
+          z.string(),
+
+        name:
+          z.string(),
+
+        gender:
+          z.enum([
+            "male",
+            "female",
+          ])
+            .nullable(),
+
+        grade_level:
+          z.number()
+            .int()
+            .nullable(),
+      }),
+
+    class:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        name:
+          z.string(),
+
+        grade_level:
+          z.number().int(),
+      })
+        .nullable(),
+
+    report:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        week_start:
+          z.string(),
+
+        week_end:
+          z.string(),
+
+        memorization_achievement:
+          z.string().nullable(),
+
+        murajaah_achievement:
+          z.string().nullable(),
+
+        fluency_rating:
+          ratingSchema.nullable(),
+
+        tajwid_rating:
+          ratingSchema.nullable(),
+
+        consistency_rating:
+          ratingSchema.nullable(),
+
+        supervisor_notes:
+          z.string().nullable(),
+
+        next_week_target:
+          z.string().nullable(),
+
+        status:
+          tahfizWeeklyReportStatusSchema,
+
+        published_at:
+          z.string().nullable(),
+
+        created_at:
+          z.string(),
+
+        updated_at:
+          z.string(),
+      })
+        .nullable(),
+  });
+
+export type PembinaTahfizWeeklyReportDetailData =
+  z.infer<
+    typeof pembinaTahfizWeeklyReportDetailSchema
+  >;
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\weekly-reports\schemas\pembina-tahfiz-weekly-report-history-schema.ts
+========================================
+
+import { z } from "zod";
+
+import {
+  tahfizWeeklyReportStatusSchema,
+} from "./pembina-tahfiz-weekly-report-overview-schema";
+
+const historyItemSchema =
+  z.object({
+    report:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        week_start:
+          z.string(),
+
+        week_end:
+          z.string(),
+
+        status:
+          tahfizWeeklyReportStatusSchema,
+
+        published_at:
+          z.string().nullable(),
+
+        created_at:
+          z.string(),
+
+        updated_at:
+          z.string(),
+      }),
+
+    student:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        legacy_student_id:
+          z.string().nullable(),
+
+        nis:
+          z.string().nullable(),
+
+        full_name:
+          z.string(),
+
+        gender:
+          z.enum([
+            "male",
+            "female",
+          ]),
+      }),
+
+    tahfiz_group:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        code:
+          z.string(),
+
+        name:
+          z.string(),
+
+        gender:
+          z.enum([
+            "male",
+            "female",
+          ])
+            .nullable(),
+
+        grade_level:
+          z.number()
+            .int()
+            .nullable(),
+      }),
+
+    class:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        name:
+          z.string(),
+
+        grade_level:
+          z.number()
+            .int(),
+      })
+        .nullable(),
+  });
+
+export const pembinaTahfizWeeklyReportHistorySchema =
+  z.object({
+    generated_at:
+      z.string(),
+
+    academic_year:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        name:
+          z.string(),
+
+        start_date:
+          z.string(),
+
+        end_date:
+          z.string(),
+      }),
+
+    filters:
+      z.object({
+        status:
+          tahfizWeeklyReportStatusSchema
+            .nullable(),
+
+        search:
+          z.string()
+            .nullable(),
+
+        limit:
+          z.number()
+            .int()
+            .positive(),
+
+        offset:
+          z.number()
+            .int()
+            .nonnegative(),
+      }),
+
+    summary:
+      z.object({
+        total_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        filtered_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        draft_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        published_count:
+          z.number()
+            .int()
+            .nonnegative(),
+      }),
+
+    pagination:
+      z.object({
+        limit:
+          z.number()
+            .int()
+            .positive(),
+
+        offset:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        has_previous:
+          z.boolean(),
+
+        has_next:
+          z.boolean(),
+      }),
+
+    items:
+      z.array(
+        historyItemSchema,
+      ),
+  });
+
+export type PembinaTahfizWeeklyReportHistoryData =
+  z.infer<
+    typeof pembinaTahfizWeeklyReportHistorySchema
+  >;
+
+export type PembinaTahfizWeeklyReportHistoryItem =
+  PembinaTahfizWeeklyReportHistoryData["items"][number];
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\weekly-reports\schemas\pembina-tahfiz-weekly-report-overview-schema.ts
+========================================
+
+import { z } from "zod";
+
+export const tahfizWeeklyReportStatusSchema =
+  z.enum([
+    "draft",
+    "published",
+  ]);
+
+const studentSchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    legacy_student_id:
+      z.string().nullable(),
+
+    nis:
+      z.string().nullable(),
+
+    full_name:
+      z.string(),
+
+    gender:
+      z.enum([
+        "male",
+        "female",
+      ]),
+  });
+
+const tahfizGroupSchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    code:
+      z.string(),
+
+    name:
+      z.string(),
+
+    gender:
+      z.enum([
+        "male",
+        "female",
+      ])
+        .nullable(),
+
+    grade_level:
+      z.number()
+        .int()
+        .nullable(),
+  });
+
+const classSchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    name:
+      z.string(),
+
+    grade_level:
+      z.number().int(),
+  });
+
+const reportSchema =
+  z.object({
+    id:
+      z.string().uuid(),
+
+    status:
+      tahfizWeeklyReportStatusSchema,
+
+    week_start:
+      z.string(),
+
+    week_end:
+      z.string(),
+
+    published_at:
+      z.string().nullable(),
+
+    updated_at:
+      z.string(),
+  });
+
+const itemSchema =
+  z.object({
+    student:
+      studentSchema,
+
+    tahfiz_group:
+      tahfizGroupSchema,
+
+    class:
+      classSchema.nullable(),
+
+    report:
+      reportSchema.nullable(),
+  });
+
+export const pembinaTahfizWeeklyReportOverviewSchema =
+  z.object({
+    generated_at:
+      z.string(),
+
+    profile:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        login_id:
+          z.string().nullable(),
+      }),
+
+    staff:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        legacy_staff_id:
+          z.string().nullable(),
+
+        full_name:
+          z.string(),
+
+        position:
+          z.string().nullable(),
+      }),
+
+    academic_year:
+      z.object({
+        id:
+          z.string().uuid(),
+
+        name:
+          z.string(),
+
+        start_date:
+          z.string(),
+
+        end_date:
+          z.string(),
+      }),
+
+    week:
+      z.object({
+        start:
+          z.string(),
+
+        end:
+          z.string(),
+      }),
+
+    filters:
+      z.object({
+        search:
+          z.string().nullable(),
+      }),
+
+    summary:
+      z.object({
+        group_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        student_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        filtered_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        not_created_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        draft_count:
+          z.number()
+            .int()
+            .nonnegative(),
+
+        published_count:
+          z.number()
+            .int()
+            .nonnegative(),
+      }),
+
+    items:
+      z.array(
+        itemSchema,
+      ),
+  });
+
+export type PembinaTahfizWeeklyReportOverviewData =
+  z.infer<
+    typeof pembinaTahfizWeeklyReportOverviewSchema
+  >;
+
+export type PembinaTahfizWeeklyReportOverviewItem =
+  PembinaTahfizWeeklyReportOverviewData["items"][number];
+
+========================================
+C:\Users\Nryuu\e-mahad\src\features\pembina-tahfiz\weekly-reports\types\pembina-tahfiz-weekly-report-action-state.ts
+========================================
+
+export type PembinaTahfizWeeklyReportActionState = {
+  status:
+    | "idle"
+    | "error";
+
+  message:
+    | string
+    | null;
+};
+
+export const initialPembinaTahfizWeeklyReportActionState: PembinaTahfizWeeklyReportActionState =
+  {
+    status: "idle",
+    message: null,
+  };
